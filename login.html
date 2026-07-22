@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — 1K Beats</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;
+  background: #111111;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+a { color: #D91A72; text-decoration: none; }
+a:hover { color: #ff3dac; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes glow {
+  0%,100% { opacity: .4; transform: scale(1); }
+  50%      { opacity: .7; transform: scale(1.06); }
+}
+.bg-blob {
+  position: fixed; pointer-events: none; border-radius: 50%;
+}
+.blob1 {
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, #D91A7222 0%, transparent 70%);
+  top: -200px; right: -180px;
+  animation: glow 7s ease-in-out infinite;
+}
+.blob2 {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, #D91A7218 0%, transparent 70%);
+  bottom: -120px; left: -80px;
+  animation: glow 9s ease-in-out infinite 3s;
+}
+.wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 400px;
+  animation: fadeUp .5s ease-out both;
+}
+.logo {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.logo svg { display: inline-block; }
+.logo-divider {
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #D91A72, transparent);
+  margin-top: 10px;
+}
+.logo-sub {
+  margin-top: 9px;
+  font-size: 11px;
+  color: #444;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.card {
+  background: #181818;
+  border: 1px solid #242424;
+  border-radius: 16px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+}
+.card-title { font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.card-sub   { font-size: 13px; color: #555; margin-bottom: 26px; }
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: #666; margin-bottom: 7px;
+}
+.field input {
+  width: 100%; height: 44px;
+  background: #111; border: 1.5px solid #2a2a2a; border-radius: 8px;
+  padding: 0 14px; font-size: 14px; color: #fff;
+  font-family: inherit; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input::placeholder { color: #3a3a3a; }
+.field input:focus {
+  border-color: #D91A72;
+  box-shadow: 0 0 0 3px rgba(233,30,140,.14);
+}
+.btn-login {
+  width: 100%; height: 46px;
+  background: #D91A72; border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 700; color: #fff;
+  font-family: inherit; cursor: pointer; margin-top: 8px;
+  letter-spacing: .04em;
+  box-shadow: 0 4px 20px rgba(233,30,140,.35);
+  transition: background .2s, box-shadow .2s, transform .1s;
+}
+.btn-login:hover { background: #d4197e; box-shadow: 0 6px 28px rgba(233,30,140,.5); }
+.btn-login:active { transform: scale(.98); }
+.btn-login:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+.forgot {
+  text-align: center; margin-top: 18px;
+  font-size: 12px; color: #444;
+}
+.error {
+  display: none;
+  background: rgba(233,30,140,.1);
+  border: 1px solid rgba(233,30,140,.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px; color: #D91A72;
+  margin-bottom: 18px;
+}
+.footer {
+  text-align: center; margin-top: 28px;
+  font-size: 11px; color: #333; letter-spacing: .04em;
+}
+</style>
+</head>
+<body>
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+
+<div class="wrap">
+  <div class="logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60"><rect width="56" height="56" x="2" y="2" rx="12" fill="#D91A72"/><text x="8" y="42" font-family="Nunito,Arial,sans-serif" font-weight="900" font-size="30" fill="white">1K</text><path d="M70 18 C82 26 82 34 70 42" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M78 12 C96 22 96 38 78 48" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M86 8 C108 20 108 40 86 52" stroke="#D91A72" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/><text x="100" y="36" font-family="Nunito,Arial,sans-serif" font-weight="700" font-size="14" fill="#2A2A35">beats</text></svg>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">Sistema de Orçamentos</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Bem-vindo</div>
+    <div class="card-sub">Acesse sua conta para continuar</div>
+
+    <div class="error" id="errMsg">Usuário ou senha incorretos.</div>
+
+    <div class="field">
+      <label>Usuário</label>
+      <input type="text" id="usuario" placeholder="ex: guto" autocomplete="username" autocapitalize="none">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn-login" id="btnLogin">Entrar</button>
+
+    <div class="forgot">
+      Esqueceu a senha?
+      <a href="https://wa.me/5521999999999?text=Ol%C3%A1%20Alessandro%2C%20esqueci%20minha%20senha%20do%20sistema%20da%20Printer%20%26%20Co." target="_blank">Falar com Alessandro</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Desenvolvido por <strong style="color:#555">Alessandro Lima</strong><br>
+    © 2026 · Todos os direitos reservados
+  </div>
+</div>
+
+<script>
+var SURL   = 'https://SUPABASE_URL_PLACEHOLDER';
+var SKEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4Z3B1d3FpaGRvamlzaXNobXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMzgzNzksImV4cCI6MjA5OTgxNDM3OX0.nAjSIB4fMbC99JEtfkaDLd8LHbnwmx5QNxUPty88C2w';
+var DOMAIN = '@printer.interno';
+
+var sess = localStorage.getItem('1kbeats_session');
+if (sess) {
+  try {
+    var s = JSON.parse(sess);
+    if (s.expires_at && Date.now() / 1000 < s.expires_at) {
+      window.location.href = './index.html';
+    }
+  } catch(e) { localStorage.removeItem('1kbeats_session'); }
+}
+
+function login() {
+  var usuario = document.getElementById('usuario').value.trim().toLowerCase();
+  var senha   = document.getElementById('senha').value;
+  var btn     = document.getElementById('btnLogin');
+  var err     = document.getElementById('errMsg');
+
+  if (!usuario || !senha) {
+    err.style.display = 'block';
+    err.textContent = 'Preencha usuário e senha.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  err.style.display = 'none';
+
+  var email = usuario + DOMAIN;
+
+  fetch(SURL + '/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SKEY },
+    body: JSON.stringify({ email: email, password: senha })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.access_token) {
+      localStorage.setItem('1kbeats_session', JSON.stringify({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600),
+        user: data.user
+      }));
+      window.location.href = './index.html';
+    } else {
+      err.style.display = 'block';
+      err.textContent = 'Usuário ou senha incorretos.';
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+    }
+  })
+  .catch(function() {
+    err.style.display = 'block';
+    err.textContent = 'Erro de conexão. Tente novamente.';
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  });
+}
+
+document.getElementById('btnLogin').addEventListener('click', login);
+document.getElementById('senha').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') login();
+});
+document.getElementById('usuario').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('senha').focus();
+});
+</script>
+</body>
+</html>
