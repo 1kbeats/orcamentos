@@ -86,9 +86,9 @@
       </button>
     </div>
 
-    <!-- ══ PAINEL: ORÇAMENTOS ══ -->
+        <!-- ══ PAINEL: ORÇAMENTOS ══ -->
     <div class="panel active" id="panelOrcamentos">
-      <div class="page">
+      <div class="page" id="pageRoot" style="background:var(--bg);min-height:100vh;">
 
         <!-- Masthead -->
         <div class="masthead no-print">
@@ -103,120 +103,134 @@
             </svg>
           </div>
           <div class="masthead-right">
-            <div class="masthead-doc-label">Documento Comercial</div>
+            <div class="masthead-doc-label">Documento comercial</div>
             <div class="masthead-doc-title">Orçamento</div>
-            <div style="display:flex;gap:24px;justify-content:flex-end">
-              <div><div class="meta-k">Emissão</div><div class="meta-v" id="metaEmissao">—</div></div>
-              <div><div class="meta-k">Válido até</div><div class="meta-v" id="metaValidade">—</div></div>
+            <div class="masthead-meta">
+              <div class="meta-row"><span class="meta-k">Emissão</span><span class="meta-v" id="metaEmissao">—</span></div>
+              <div class="meta-row"><span class="meta-k">Validade</span><span class="meta-v" id="metaValidade">—</span></div>
+              <div class="meta-row" id="metaRefRow" style="display:none"><span class="meta-k">Ref.</span><span class="meta-v" id="metaRef">—</span></div>
             </div>
           </div>
         </div>
 
-        <!-- Ref -->
-        <div class="card" style="padding:1.5rem 2rem 1rem">
-          <div class="ref-row" id="metaRefRow" style="display:none">
-            <div class="sec-label">Referência</div>
-            <div id="metaRef" style="font-size:13px;color:#555"></div>
-          </div>
-          <input type="text" class="ref-input" id="refEvento" placeholder="Referência / nome do evento (opcional)">
-        </div>
+        <div style="background:var(--surface);border-radius:0 0 12px 12px;padding:1.75rem 2rem 1.75rem;margin-bottom:0;">
 
-        <!-- Cliente -->
-        <div class="card" style="padding:1.5rem 2rem">
-          <div class="client-row">
-            <div class="cf">
-              <label>Empresa / Cliente</label>
-              <div class="cliente-wrap">
-                <div class="cliente-input-row">
-                  <input type="text" id="nomeCliente" placeholder="Nome do cliente" autocomplete="off">
-                  <button class="btn-add-cliente no-print" id="btnAddCliente" title="Cadastrar novo cliente">+</button>
-                </div>
-                <div class="cliente-dropdown" id="clienteDropdown"></div>
+          <!-- CLIENTE -->
+          <div class="client-row no-print">
+            <div class="cf cliente-wrap">
+              <label>Cliente / Empresa</label>
+              <div class="cliente-input-row">
+                <input type="text" id="nomeCliente" placeholder="Buscar ou digitar cliente..." autocomplete="off">
+                <button class="btn-add-cliente no-print" id="btnAddCliente" title="Cadastrar novo cliente">+</button>
               </div>
+              <div class="cliente-dropdown" id="clienteDropdown"></div>
             </div>
             <div class="cf">
               <label>CNPJ / CPF</label>
-              <input type="text" id="cnpjCliente" placeholder="00.000.000/0000-00">
+              <input type="text" id="cnpjCliente" placeholder="00.000.000/0001-00">
             </div>
             <div class="cf">
-              <label>Validade</label>
+              <label>Válido até</label>
               <input type="date" id="validade">
             </div>
           </div>
 
-          <!-- Itens -->
+          <!-- SOLICITANTE -->
+          <div class="ref-row no-print">
+            <div class="sec-label">Solicitante</div>
+            <input class="ref-input" type="text" id="solicitante" placeholder="Nome da pessoa que solicitou o orçamento">
+          </div>
+
+          <!-- REFERÊNCIA -->
+          <div class="ref-row no-print">
+            <div class="sec-label">Referência</div>
+            <input class="ref-input" type="text" id="refEvento" placeholder="Ex: VI 159.26 CVL — Referência do projeto ou evento">
+          </div>
+
+          <!-- ITENS -->
           <div class="items-section">
-            <div class="sec-label">Itens</div>
+            <div class="sec-label">Itens do orçamento</div>
             <div class="tbl-head">
               <span>Descrição</span>
-              <span style="text-align:center">Qtd</span>
-              <span>Valor Unit.</span>
+              <span style="text-align:center">Qtd.</span>
+              <span>Val. unitário</span>
               <span>Total</span>
               <span></span>
             </div>
             <div id="itemsContainer"></div>
             <button class="btn-add-row no-print" id="btnAdd">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
               Adicionar item
             </button>
           </div>
 
-          <!-- Bottom -->
+          <!-- BOTTOM -->
           <div class="bottom-row">
-            <div>
-              <div class="sec-label">Observações</div>
-              <textarea class="obs-textarea" id="obs" placeholder="Condições de pagamento, prazo de entrega, observações gerais..."></textarea>
+            <div class="obs-block">
+              <div class="sec-label" style="margin-bottom:10px">Observações</div>
+              <textarea class="obs-textarea" id="obs" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
             <div class="totals-block">
-              <div class="disc-field">
+              <div class="sec-label" style="margin-bottom:10px">Resumo</div>
+              <div class="disc-field no-print">
                 <label>Desconto</label>
-                <div class="disc-row">
-                  <input type="number" id="desconto" min="0" step="0.01" placeholder="0">
-                  <select id="descontoTipo">
+                <div style="display:flex;gap:6px;align-items:center">
+                  <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1">
+                  <select id="descontoTipo" style="height:32px;border:none;border-bottom:1.5px solid var(--line);background:none;font-size:13px;color:var(--ink);outline:none;cursor:pointer;padding:0 4px">
                     <option value="pct">%</option>
                     <option value="val">R$</option>
                   </select>
                 </div>
-                <div class="disc-preview" id="descontoPreview"></div>
+                <div id="descontoPreview" style="font-size:11px;color:#666;margin-top:3px;min-height:16px;text-align:right"></div>
               </div>
               <div class="tot-line"><span>Subtotal</span><span class="tv" id="subtotal">R$ 0,00</span></div>
-              <div class="tot-line disc" id="descontoRow" style="display:none"><span>Desconto</span><span class="tv" id="descontoVal"></span></div>
-              <div class="tot-final"><span class="fl">Total</span><span class="fa" id="total">R$ 0,00</span></div>
+              <div class="tot-line disc" id="descontoRow" style="display:none"><span>Desconto</span><span class="tv" id="descontoVal">—</span></div>
+              <div class="tot-final">
+                <span class="fl">Total</span>
+                <span class="fa" id="total">R$ 0,00</span>
+              </div>
             </div>
           </div>
 
-          <!-- Ações -->
+          <!-- ACTIONS -->
           <div class="actions-strip no-print">
             <button class="btn-act btn-wpp" id="btnWpp">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 11.999c0 2.125.557 4.117 1.529 5.845L.057 23.879l6.219-1.633A11.94 11.94 0 0 0 12 23.999c6.626 0 12-5.373 12-12S18.625 0 12 0zm.001 21.818a9.822 9.822 0 0 1-5.003-1.368l-.36-.214-3.714.975.993-3.63-.234-.374A9.818 9.818 0 0 1 2.18 12c0-5.42 4.402-9.82 9.82-9.82s9.82 4.4 9.82 9.82-4.4 9.818-9.82 9.818z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.478 2 12.001c0 1.77.458 3.437 1.268 4.885L2 22l5.237-1.24A9.944 9.944 0 0012 22c5.522 0 10-4.478 10-10S17.522 2 12 2zm0 18.156a8.156 8.156 0 01-4.271-1.206l-.306-.183-3.106.735.774-3.009-.2-.309A8.157 8.157 0 013.844 12c0-4.502 3.654-8.156 8.156-8.156 4.503 0 8.157 3.654 8.157 8.157 0 4.502-3.654 8.155-8.157 8.155z"/></svg>
               WhatsApp
             </button>
             <button class="btn-act btn-pdf" id="btnPdf">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v3.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
               Salvar PDF
             </button>
           </div>
 
-          <!-- Config -->
-          <div class="no-print" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)">
-            <button class="btn-cfg" id="btnConfig">⚙ Configurações da empresa</button>
-            <div class="cfg-panel" id="configPanel" style="margin-top:1rem">
-              <div class="cfg-grid">
-                <div class="cfg-fld"><label>Nome da empresa</label><input type="text" id="cfgNome" placeholder="1K Beats"></div>
-                <div class="cfg-fld"><label>CNPJ</label><input type="text" id="cfgCnpj" placeholder="00.000.000/0000-00"></div>
-                <div class="cfg-fld"><label>Telefone / WhatsApp</label><input type="text" id="cfgTelefone" placeholder="(21) 99999-9999"></div>
-                <div class="cfg-fld"><label>E-mail</label><input type="text" id="cfgEmail" placeholder="contato@1kbeats.com"></div>
-              </div>
-              <div class="cfg-fld" style="margin-bottom:16px"><label>Endereço</label><input type="text" id="cfgEndereco" placeholder="Rua, número, cidade - UF"></div>
-              <button class="btn-save-cfg" id="btnSaveConfig">Salvar configurações</button>
-            </div>
-          </div>
+        </div><!-- /surface -->
 
-        </div><!-- /card -->
+        <!-- CONFIG -->
+        <div class="cfg-toggle no-print" style="margin-bottom:10px;padding:0 2rem">
+          <button class="btn-cfg" id="btnConfig">⚙ Configurar dados da empresa</button>
+        </div>
+        <div class="cfg-panel" id="configPanel" style="padding:0 2rem 2rem">
+          <div style="padding-top:1.5rem;border-top:1px solid var(--line);margin-top:0.5rem">
+            <div class="sec-label" style="margin-bottom:1.25rem">Dados da empresa</div>
+            <div class="cfg-grid">
+              <div class="cfg-fld"><label>Nome</label><input type="text" id="cfgNome" placeholder="1K Beats"></div>
+              <div class="cfg-fld"><label>CNPJ</label><input type="text" id="cfgCnpj" placeholder="00.000.000/0001-00"></div>
+              <div class="cfg-fld"><label>WhatsApp</label><input type="text" id="cfgTelefone" placeholder="(21) 99999-9999"></div>
+              <div class="cfg-fld"><label>E-mail</label><input type="text" id="cfgEmail" placeholder="contato@empresa.com.br"></div>
+            </div>
+            <div class="cfg-fld" style="margin-bottom:16px">
+              <label>Endereço</label>
+              <input type="text" id="cfgEndereco" placeholder="Rua, número, bairro, cidade">
+            </div>
+            <button class="btn-save-cfg" id="btnSaveConfig">Salvar configurações</button>
+          </div>
+        </div>
+
       </div><!-- /page -->
     </div><!-- /panelOrcamentos -->
 
-    <!-- ══ PAINEL: CLIENTES ══ -->
+    
     <div class="panel" id="panelClientes">
       <div class="admin-wrap">
         <div class="admin-header">
