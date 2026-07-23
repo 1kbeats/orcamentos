@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1K Beats — Orçamentos</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#D91A72">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="140" height="52">
+        <rect width="56" height="56" x="2" y="2" rx="12" fill="#D91A72"/>
+        <text x="8" y="42" font-family="Nunito,Arial,sans-serif" font-weight="900" font-size="30" fill="white">1K</text>
+        <path d="M70 18 C82 26 82 34 70 42" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M78 12 C96 22 96 38 78 48" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M86 8 C108 20 108 40 86 52" stroke="#D91A72" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
+        <text x="100" y="36" font-family="Nunito,Arial,sans-serif" font-weight="700" font-size="14" fill="rgba(255,255,255,0.85)">beats</text>
+      </svg>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">U</div>
+      <div>
+        <div class="sidebar-username" id="userNome">—</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Operacional</div>
+      <div class="nav-item active" id="navOrcamentos" onclick="Nav.showPanel('orcamentos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Orçamentos
+      </div>
+      <div class="nav-item" id="navClientes" onclick="Nav.showPanel('clientes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clientes
+      </div>
+      <div class="nav-item" id="navFinanceiro" onclick="Nav.showPanel('financeiro')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Financeiro
+      </div>
+      <div class="nav-section admin-only" id="navSectionAdmin" style="display:none">Administração</div>
+      <div class="nav-item admin-only" id="navAdmin" onclick="Nav.showPanel('admin')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Usuários
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="Usuarios.abrirAlterarSenha()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span style="color:rgba(255,255,255,0.5);font-size:13px">Alterar senha</span>
+      </div>
+      <div class="nav-item danger" onclick="Auth.logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ OVERLAY MOBILE ══ -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="Nav.closeSidebar()"></div>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-content">
+
+    <!-- TOPBAR MOBILE -->
+    <div class="topbar no-print">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="100" height="38">
+        <rect width="56" height="56" x="2" y="2" rx="12" fill="#D91A72"/>
+        <text x="8" y="42" font-family="Nunito,Arial,sans-serif" font-weight="900" font-size="30" fill="white">1K</text>
+        <path d="M70 18 C82 26 82 34 70 42" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M78 12 C96 22 96 38 78 48" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <text x="100" y="36" font-family="Nunito,Arial,sans-serif" font-weight="700" font-size="14" fill="rgba(255,255,255,0.85)">beats</text>
+      </svg>
+      <button class="btn-menu" id="btnMenuMobile" onclick="Nav.openSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- ══ PAINEL: ORÇAMENTOS ══ -->
+    <div class="panel active" id="panelOrcamentos">
+      <div class="page">
+
+        <!-- Masthead -->
+        <div class="masthead no-print">
+          <div class="masthead-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+              <rect width="56" height="56" x="2" y="2" rx="12" fill="#D91A72"/>
+              <text x="8" y="42" font-family="Nunito,Arial,sans-serif" font-weight="900" font-size="30" fill="white">1K</text>
+              <path d="M70 18 C82 26 82 34 70 42" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+              <path d="M78 12 C96 22 96 38 78 48" stroke="#D91A72" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+              <path d="M86 8 C108 20 108 40 86 52" stroke="#D91A72" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55"/>
+              <text x="100" y="36" font-family="Nunito,Arial,sans-serif" font-weight="700" font-size="14" fill="rgba(255,255,255,0.85)">beats</text>
+            </svg>
+          </div>
+          <div class="masthead-right">
+            <div class="masthead-doc-label">Documento Comercial</div>
+            <div class="masthead-doc-title">Orçamento</div>
+            <div style="display:flex;gap:24px;justify-content:flex-end">
+              <div><div class="meta-k">Emissão</div><div class="meta-v" id="metaEmissao">—</div></div>
+              <div><div class="meta-k">Válido até</div><div class="meta-v" id="metaValidade">—</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ref -->
+        <div class="card" style="padding:1.5rem 2rem 1rem">
+          <div class="ref-row" id="metaRefRow" style="display:none">
+            <div class="sec-label">Referência</div>
+            <div id="metaRef" style="font-size:13px;color:#555"></div>
+          </div>
+          <input type="text" class="ref-input" id="refEvento" placeholder="Referência / nome do evento (opcional)">
+        </div>
+
+        <!-- Cliente -->
+        <div class="card" style="padding:1.5rem 2rem">
+          <div class="client-row">
+            <div class="cf">
+              <label>Empresa / Cliente</label>
+              <div class="cliente-wrap">
+                <div class="cliente-input-row">
+                  <input type="text" id="nomeCliente" placeholder="Nome do cliente" autocomplete="off">
+                  <button class="btn-add-cliente no-print" id="btnAddCliente" title="Cadastrar novo cliente">+</button>
+                </div>
+                <div class="cliente-dropdown" id="clienteDropdown"></div>
+              </div>
+            </div>
+            <div class="cf">
+              <label>CNPJ / CPF</label>
+              <input type="text" id="cnpjCliente" placeholder="00.000.000/0000-00">
+            </div>
+            <div class="cf">
+              <label>Validade</label>
+              <input type="date" id="validade">
+            </div>
+          </div>
+
+          <!-- Itens -->
+          <div class="items-section">
+            <div class="sec-label">Itens</div>
+            <div class="tbl-head">
+              <span>Descrição</span>
+              <span style="text-align:center">Qtd</span>
+              <span>Valor Unit.</span>
+              <span>Total</span>
+              <span></span>
+            </div>
+            <div id="itemsContainer"></div>
+            <button class="btn-add-row no-print" id="btnAdd">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar item
+            </button>
+          </div>
+
+          <!-- Bottom -->
+          <div class="bottom-row">
+            <div>
+              <div class="sec-label">Observações</div>
+              <textarea class="obs-textarea" id="obs" placeholder="Condições de pagamento, prazo de entrega, observações gerais..."></textarea>
+            </div>
+            <div class="totals-block">
+              <div class="disc-field">
+                <label>Desconto</label>
+                <div class="disc-row">
+                  <input type="number" id="desconto" min="0" step="0.01" placeholder="0">
+                  <select id="descontoTipo">
+                    <option value="pct">%</option>
+                    <option value="val">R$</option>
+                  </select>
+                </div>
+                <div class="disc-preview" id="descontoPreview"></div>
+              </div>
+              <div class="tot-line"><span>Subtotal</span><span class="tv" id="subtotal">R$ 0,00</span></div>
+              <div class="tot-line disc" id="descontoRow" style="display:none"><span>Desconto</span><span class="tv" id="descontoVal"></span></div>
+              <div class="tot-final"><span class="fl">Total</span><span class="fa" id="total">R$ 0,00</span></div>
+            </div>
+          </div>
+
+          <!-- Ações -->
+          <div class="actions-strip no-print">
+            <button class="btn-act btn-wpp" id="btnWpp">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 0C5.373 0 0 5.373 0 11.999c0 2.125.557 4.117 1.529 5.845L.057 23.879l6.219-1.633A11.94 11.94 0 0 0 12 23.999c6.626 0 12-5.373 12-12S18.625 0 12 0zm.001 21.818a9.822 9.822 0 0 1-5.003-1.368l-.36-.214-3.714.975.993-3.63-.234-.374A9.818 9.818 0 0 1 2.18 12c0-5.42 4.402-9.82 9.82-9.82s9.82 4.4 9.82 9.82-4.4 9.818-9.82 9.818z"/></svg>
+              WhatsApp
+            </button>
+            <button class="btn-act btn-pdf" id="btnPdf">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Salvar PDF
+            </button>
+          </div>
+
+          <!-- Config -->
+          <div class="no-print" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)">
+            <button class="btn-cfg" id="btnConfig">⚙ Configurações da empresa</button>
+            <div class="cfg-panel" id="configPanel" style="margin-top:1rem">
+              <div class="cfg-grid">
+                <div class="cfg-fld"><label>Nome da empresa</label><input type="text" id="cfgNome" placeholder="1K Beats"></div>
+                <div class="cfg-fld"><label>CNPJ</label><input type="text" id="cfgCnpj" placeholder="00.000.000/0000-00"></div>
+                <div class="cfg-fld"><label>Telefone / WhatsApp</label><input type="text" id="cfgTelefone" placeholder="(21) 99999-9999"></div>
+                <div class="cfg-fld"><label>E-mail</label><input type="text" id="cfgEmail" placeholder="contato@1kbeats.com"></div>
+              </div>
+              <div class="cfg-fld" style="margin-bottom:16px"><label>Endereço</label><input type="text" id="cfgEndereco" placeholder="Rua, número, cidade - UF"></div>
+              <button class="btn-save-cfg" id="btnSaveConfig">Salvar configurações</button>
+            </div>
+          </div>
+
+        </div><!-- /card -->
+      </div><!-- /page -->
+    </div><!-- /panelOrcamentos -->
+
+    <!-- ══ PAINEL: CLIENTES ══ -->
+    <div class="panel" id="panelClientes">
+      <div class="admin-wrap">
+        <div class="admin-header">
+          <h2>Clientes</h2>
+          <button class="btn-novo" id="btnNovoCliente">+ Novo cliente</button>
+        </div>
+        <div class="card" id="listaClientes">
+          <div style="color:#999;padding:2rem;text-align:center">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAINEL: FINANCEIRO ══ -->
+    <div class="panel" id="panelFinanceiro">
+      <div class="admin-wrap">
+        <div class="admin-header"><h2>Financeiro</h2></div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Total emitido</div><div class="kpi-value" id="kpiTotal">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Aprovado</div><div class="kpi-value" id="kpiAprovado">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Pendente</div><div class="kpi-value" id="kpiPendente">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Qtd. orçamentos</div><div class="kpi-value" id="kpiQtd">—</div></div>
+        </div>
+        <div class="fin-filtros">
+          <button class="fin-filtro active" data-status="">Todos</button>
+          <button class="fin-filtro" data-status="pendente">Pendentes</button>
+          <button class="fin-filtro" data-status="aprovado">Aprovados</button>
+          <button class="fin-filtro" data-status="recusado">Recusados</button>
+        </div>
+        <div class="card" id="financeiroLista"></div>
+      </div>
+    </div>
+
+    <!-- ══ PAINEL: ADMIN ══ -->
+    <div class="panel" id="panelAdmin">
+      <div class="admin-wrap">
+        <div class="admin-header">
+          <h2>Usuários</h2>
+          <button class="btn-new-user" id="btnNovoUsuario">+ Novo usuário</button>
+        </div>
+        <div class="card" id="listaUsuarios"></div>
+      </div>
+    </div>
+
+  </main><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toastBox"></div>
+
+<!-- ══ UPDATE BANNER ══ -->
+<div class="update-banner" id="updateBanner" onclick="location.reload()">
+  🔄 Nova versão disponível — clique para atualizar
+</div>
+
+<!-- ══ MODAL: CLIENTE RÁPIDO (no formulário de orçamento) ══ -->
+<div class="modal-overlay" id="modalCliente">
+  <div class="modal-box">
+    <div class="modal-title">Novo Cliente</div>
+    <div class="modal-field"><label>Nome / Empresa</label><input type="text" id="modalClienteNome" placeholder="Nome do cliente"></div>
+    <div class="modal-field"><label>CNPJ / CPF</label><input type="text" id="modalClienteCnpj" placeholder="Opcional"></div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" id="modalClienteCancel">Cancelar</button>
+      <button class="modal-btn-save" id="modalClienteSave">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CADASTRO/EDIÇÃO DE CLIENTE ══ -->
+<div class="modal-bg" id="modalCliente2">
+  <div class="modal-box">
+    <div class="modal-title" id="modalCliente2Titulo">Novo Cliente</div>
+    <div class="modal-field"><label>Nome / Empresa</label><input type="text" id="cliNome" placeholder="Nome do cliente"></div>
+    <div class="modal-field"><label>CNPJ / CPF</label><input type="text" id="cliCnpj" placeholder="Opcional"></div>
+    <div class="modal-field"><label>Telefone</label><input type="text" id="cliTel" placeholder="Opcional"></div>
+    <div class="modal-field"><label>E-mail</label><input type="text" id="cliEmail" placeholder="Opcional"></div>
+    <div class="modal-field"><label>Endereço</label><input type="text" id="cliEnd" placeholder="Opcional"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelarCliente">Cancelar</button>
+      <button class="btn-save" id="btnSalvarCliente">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NOVO USUÁRIO ══ -->
+<div class="modal-bg" id="modalNovoUsuario">
+  <div class="modal-box">
+    <div class="modal-title">Novo Usuário</div>
+    <div class="modal-field"><label>Nome</label><input type="text" id="novoUsuarioNome" placeholder="Ex: joao"></div>
+    <div class="modal-field" style="margin-bottom:4px"><label>E-mail gerado</label></div>
+    <div style="font-size:12px;color:#888;margin-bottom:12px;padding:0 2px">nome@1kbeats.interno</div>
+    <div class="modal-field"><label>Senha</label><input type="password" id="novoUsuarioSenha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelarNovoUsuario">Cancelar</button>
+      <button class="btn-save" id="btnCriarUsuario">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: EDITAR SENHA DO USUÁRIO ══ -->
+<div class="modal-edit-bg" id="modalEditSenha">
+  <div class="modal-box">
+    <div class="modal-title">Alterar senha — <span id="editSenhaNome"></span></div>
+    <div class="modal-field"><label>Nova senha</label><input type="password" id="editSenhaInput" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelarSenha">Cancelar</button>
+      <button class="btn-save" id="btnSalvarSenha">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ALTERAR MINHA SENHA ══ -->
+<div class="modal-edit-bg" id="modalAlterarSenha">
+  <div class="modal-box">
+    <div class="modal-title">Alterar minha senha</div>
+    <div class="modal-field"><label>Nova senha</label><input type="password" id="novaSenhaInput" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelAlterarSenha">Cancelar</button>
+      <button class="btn-save" id="btnConfAlterarSenha">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS (ordem importa) ══ -->
+<script src="./js/config.js"></script>
+<script src="./js/utils.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/nav.js"></script>
+<script src="./js/clientes.js"></script>
+<script src="./js/financeiro.js"></script>
+<script src="./js/usuarios.js"></script>
+<script src="./js/orcamentos.js"></script>
+
+<script>
+  // ── Inicialização ──────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    Auth.verificarSessao();
+    Orcamentos.init();
+    Clientes.bindEvents();
+    Financeiro.bindEvents();
+    Usuarios.bindEvents();
+  });
+
+  // ── PWA: Service Worker ────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              document.getElementById('updateBanner').classList.add('show');
+            }
+          });
+        });
+      });
+    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+  }
+</script>
+
+</body>
+</html>
