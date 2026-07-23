@@ -274,7 +274,7 @@ const Orcamentos = {
       const id = rows[0] && rows[0].id;
       if (id) {
         const linkOrc = 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
-        msg += nl + nl + '*Visualizar orçamento:*' + nl + linkOrc;
+        msg += nl + nl + '🔗 *Visualizar orçamento:*' + nl + linkOrc;
       }
       const telN = (cfg.tel || '').replace(/[^0-9]/g, '');
       const wUrl = telN ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg) : 'https://wa.me/?text=' + encodeURIComponent(msg);
@@ -301,6 +301,14 @@ const Orcamentos = {
 
     // Cabeçalho
     doc.setFillColor(42, 42, 53); doc.rect(0, 0, pw, 52, 'F');
+
+    // Logo 1K Beats — bloco rosa + texto vetorial
+    doc.setFillColor(217, 26, 114); doc.roundedRect(ml, 8, 20, 20, 3, 3, 'F');
+    doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    doc.text('1K', ml + 10, 22, { align: 'center' });
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    doc.text('beats', ml + 24, 22);
+
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
     doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
