@@ -7,15 +7,15 @@
 :root {
   --accent: #D91A72;
   --accent-hover: #FF4DA6;
-  --ink: #2A2A35;
-  --mid: #555566;
+  --ink: #1A1A22;
+  --mid: #404050;
   --line: #E0E0EA;
   --bg: #F5F5FA;
   --surface: #FFFFFF;
   --mono: 'Courier New', Courier, monospace;
 }
 
-body { font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+body { font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 input, textarea, button, select { font-family: inherit; }
 
 .app-shell { display: flex; min-height: 100vh; }
