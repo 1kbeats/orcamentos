@@ -300,7 +300,7 @@ const Orcamentos = {
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
 
     // Cabeçalho
-    doc.setFillColor(42, 42, 53); doc.rect(0, 0, pw, 52, 'F');
+    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 52, 'F');
 
     // Logo 1K Beats — bloco rosa + texto vetorial
     doc.setFillColor(217, 26, 114); doc.roundedRect(ml, 8, 20, 20, 3, 3, 'F');
