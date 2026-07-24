@@ -40,13 +40,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Orçamentos
       </div>
+      <div class="nav-section">Cadastros</div>
       <div class="nav-item" id="navClientes" onclick="Nav.showPanel('clientes')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Clientes
       </div>
-      <div class="nav-item" id="navFinanceiro" onclick="Nav.showPanel('financeiro')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Financeiro
+      <div class="nav-item" id="navCatalogo" onclick="Nav.showPanel('catalogo')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="7" height="9"/><rect x="15" y="3" width="7" height="5"/><rect x="15" y="12" width="7" height="9"/><rect x="2" y="16" width="7" height="5"/></svg>
+        Catálogo
       </div>
       <div class="nav-section admin-only" id="navSectionAdmin" style="display:none">Administração</div>
       <div class="nav-item admin-only" id="navAdmin" onclick="Nav.showPanel('admin')" style="display:none">
@@ -169,23 +170,40 @@
               <textarea class="obs-textarea" id="obs" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
             <div class="totals-block">
-              <div class="sec-label" style="margin-bottom:10px">Resumo</div>
-              <div class="disc-field no-print">
-                <label>Desconto</label>
-                <div style="display:flex;gap:6px;align-items:center">
-                  <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1">
-                  <select id="descontoTipo" style="height:32px;border:none;border-bottom:1.5px solid var(--line);background:none;font-size:13px;color:var(--ink);outline:none;cursor:pointer;padding:0 4px">
-                    <option value="pct">%</option>
-                    <option value="val">R$</option>
-                  </select>
+              <div class="totals-card">
+
+                <!-- Subtotal -->
+                <div class="tot-row">
+                  <span class="tot-label">Subtotal</span>
+                  <span class="tot-val" id="subtotal">R$ 0,00</span>
                 </div>
-                <div id="descontoPreview" style="font-size:11px;color:#666;margin-top:3px;min-height:16px;text-align:right"></div>
-              </div>
-              <div class="tot-line"><span>Subtotal</span><span class="tv" id="subtotal">R$ 0,00</span></div>
-              <div class="tot-line disc" id="descontoRow" style="display:none"><span>Desconto</span><span class="tv" id="descontoVal">—</span></div>
-              <div class="tot-final">
-                <span class="fl">Total</span>
-                <span class="fa" id="total">R$ 0,00</span>
+
+                <!-- Desconto -->
+                <div class="disc-block no-print">
+                  <div class="disc-label">Desconto</div>
+                  <div class="disc-input-row">
+                    <div class="disc-toggle">
+                      <button class="disc-toggle-btn active" id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')">%</button>
+                      <button class="disc-toggle-btn" id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')">R$</button>
+                    </div>
+                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01">
+                    <input type="hidden" id="descontoTipo" value="pct">
+                  </div>
+                  <div class="disc-preview" id="descontoPreview"></div>
+                </div>
+
+                <!-- Linha desconto -->
+                <div class="tot-row disc-row" id="descontoRow" style="display:none">
+                  <span class="tot-label-disc">Desconto</span>
+                  <span class="tot-val-disc" id="descontoVal">—</span>
+                </div>
+
+                <!-- Total -->
+                <div class="tot-final-block">
+                  <span class="tot-final-label">Total</span>
+                  <span class="tot-final-val" id="total">R$ 0,00</span>
+                </div>
+
               </div>
             </div>
           </div>
@@ -241,23 +259,32 @@
       </div>
     </div>
 
-    <!-- ══ PAINEL: FINANCEIRO ══ -->
-    <div class="panel" id="panelFinanceiro">
+    <!-- ══ PAINEL: CATÁLOGO ══ -->
+    <div class="panel" id="panelCatalogo">
       <div class="admin-wrap">
-        <div class="admin-header"><h2>Financeiro</h2></div>
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">Total emitido</div><div class="kpi-value" id="kpiTotal">—</div></div>
-          <div class="kpi-card"><div class="kpi-label">Aprovado</div><div class="kpi-value" id="kpiAprovado">—</div></div>
-          <div class="kpi-card"><div class="kpi-label">Pendente</div><div class="kpi-value" id="kpiPendente">—</div></div>
-          <div class="kpi-card"><div class="kpi-label">Qtd. orçamentos</div><div class="kpi-value" id="kpiQtd">—</div></div>
+        <div class="admin-header">
+          <h2>Catálogo</h2>
+          <button class="btn-novo" id="btnNovoCatalogo">+ Novo item</button>
         </div>
-        <div class="fin-filtros">
-          <button class="fin-filtro active" data-status="">Todos</button>
-          <button class="fin-filtro" data-status="pendente">Pendentes</button>
-          <button class="fin-filtro" data-status="aprovado">Aprovados</button>
-          <button class="fin-filtro" data-status="recusado">Recusados</button>
+        <div class="cat-filtros">
+          <button class="cat-filtro active" data-cat="">Todos</button>
+          <button class="cat-filtro" data-cat="Sonorização">Sonorização</button>
+          <button class="cat-filtro" data-cat="Iluminação">Iluminação</button>
+          <button class="cat-filtro" data-cat="Vídeo">Vídeo</button>
+          <button class="cat-filtro" data-cat="Microfone">Microfone</button>
+          <button class="cat-filtro" data-cat="Estrutura">Estrutura</button>
+          <button class="cat-filtro" data-cat="Outros">Outros</button>
         </div>
-        <div class="card" id="financeiroLista"></div>
+        <!-- Cabeçalho da lista -->
+        <div class="cat-list-head">
+          <span>Descrição</span>
+          <span>Categoria</span>
+          <span style="text-align:right">Valor padrão</span>
+          <span></span>
+        </div>
+        <div class="card" id="listaCatalogo">
+          <div style="color:#999;padding:2rem;text-align:center">Carregando...</div>
+        </div>
       </div>
     </div>
 
@@ -312,6 +339,36 @@
   </div>
 </div>
 
+<!-- ══ MODAL: CATÁLOGO ══ -->
+<div class="modal-bg" id="modalCatalogo">
+  <div class="modal-box">
+    <div class="modal-title" id="modalCatTitulo">Novo item</div>
+    <div class="modal-field">
+      <label>Nome / Descrição</label>
+      <input type="text" id="catNome" placeholder="Ex: Caixa de som ativo 15&quot;">
+    </div>
+    <div class="modal-field">
+      <label>Categoria</label>
+      <select id="catCategoria">
+        <option>Sonorização</option>
+        <option>Iluminação</option>
+        <option>Vídeo</option>
+        <option>Microfone</option>
+        <option>Estrutura</option>
+        <option>Outros</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Valor padrão (R$)</label>
+      <input type="number" id="catValor" placeholder="0,00" min="0" step="0.01">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelarCatalogo">Cancelar</button>
+      <button class="btn-save" id="btnSalvarCatalogo">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL: NOVO USUÁRIO ══ -->
 <div class="modal-bg" id="modalNovoUsuario">
   <div class="modal-box">
@@ -359,6 +416,7 @@
 <script src="./js/clientes.js"></script>
 <script src="./js/financeiro.js"></script>
 <script src="./js/usuarios.js"></script>
+<script src="./js/catalogo.js"></script>
 <script src="./js/orcamentos.js"></script>
 
 <script>
@@ -367,7 +425,7 @@
     Auth.verificarSessao();
     Orcamentos.init();
     Clientes.bindEvents();
-    Financeiro.bindEvents();
+    Catalogo.bindEvents();
     Usuarios.bindEvents();
   });
 

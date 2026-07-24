@@ -1,4 +1,4 @@
-var CACHE = '1kbeats-orcamentos-v5';
+var CACHE = '1kbeats-orcamentos-v7';
 var FILES = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ var FILES = [
   './js/clientes.js',
   './js/financeiro.js',
   './js/usuarios.js',
+  './js/catalogo.js',
   './js/orcamentos.js'
 ];
 
