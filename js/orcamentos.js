@@ -19,7 +19,6 @@ const Orcamentos = {
   bindEvents() {
     document.getElementById('btnAdd').addEventListener('click', () => this.addItem());
     document.getElementById('desconto').addEventListener('input', () => this.calcTotals());
-    document.getElementById('descontoTipo').addEventListener('change', () => this.calcTotals());
     document.getElementById('validade').addEventListener('change', () => this.updateMeta());
     document.getElementById('refEvento').addEventListener('input', () => this.updateMeta());
     document.getElementById('cnpjCliente').addEventListener('input', function() {
@@ -56,6 +55,14 @@ const Orcamentos = {
     document.getElementById('modalClienteSave').addEventListener('click', () => this.salvarClienteRapido());
   },
 
+  // ── Tipo de desconto ─────────────────────────────────────
+  setDiscTipo(tipo) {
+    document.getElementById('descontoTipo').value = tipo;
+    document.getElementById('btnDiscPct').classList.toggle('active', tipo === 'pct');
+    document.getElementById('btnDiscVal').classList.toggle('active', tipo === 'val');
+    this.calcTotals();
+  },
+
   // ── Itens do orçamento ────────────────────────────────────
   addItem() {
     this._cnt++;
@@ -72,7 +79,43 @@ const Orcamentos = {
     document.getElementById('itemsContainer').appendChild(div);
     div.querySelectorAll('input').forEach(i => i.addEventListener('input', () => this.calcTotals()));
     div.querySelector('.btn-remove').addEventListener('click', () => { div.remove(); this.calcTotals(); });
-    div.querySelector('input').focus();
+    // Autocomplete do catálogo na descrição
+    const descInput = div.querySelector('input');
+    const dropdown = document.createElement('div');
+    dropdown.className = 'cat-autocomplete';
+    div.style.position = 'relative';
+    div.insertBefore(dropdown, descInput.nextSibling);
+
+    descInput.addEventListener('input', () => {
+      const termo = descInput.value.trim();
+      if (!termo) { dropdown.innerHTML = ''; dropdown.classList.remove('open'); return; }
+      Catalogo.buscar(termo, resultados => {
+        if (resultados.length === 0) { dropdown.innerHTML = ''; dropdown.classList.remove('open'); return; }
+        dropdown.innerHTML = '';
+        resultados.slice(0, 6).forEach(item => {
+          const opt = document.createElement('div');
+          opt.className = 'cat-opt';
+          opt.innerHTML = '<span class="cat-opt-nome">' + item.nome + '</span><span class="cat-opt-val">' + Utils.fmt(item.valor) + '</span>';
+          opt.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            descInput.value = item.nome;
+            const inputs = div.querySelectorAll('input');
+            inputs[2].value = item.valor;
+            dropdown.innerHTML = ''; dropdown.classList.remove('open');
+            this.calcTotals();
+            inputs[1].focus();
+          });
+          dropdown.appendChild(opt);
+        });
+        dropdown.classList.add('open');
+      });
+    });
+
+    descInput.addEventListener('blur', () => {
+      setTimeout(() => { dropdown.innerHTML = ''; dropdown.classList.remove('open'); }, 150);
+    });
+
+    descInput.focus();
     this.calcTotals();
   },
 

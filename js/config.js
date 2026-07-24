@@ -5,7 +5,7 @@
 
 const CONFIG = {
   EMPRESA: '1K Beats',
-  APP_VERSION: 'v1.3',
+  APP_VERSION: 'v1.5',
 
   SUPABASE_URL: 'https://hcjbfdspmqlyzkgypacb.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjamJmZHNwbXFseXprZ3lwYWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDkzMzAsImV4cCI6MjEwMDMyNTMzMH0.tQMrsJ7pMCvUNb2CobEhn6vvFgiKHGDtFFPM_QJFYCQ',
