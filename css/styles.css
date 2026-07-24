@@ -241,3 +241,53 @@ input, textarea, button, select { font-family: inherit; }
   .kpi-grid { grid-template-columns: 1fr 1fr !important; }
   .modal-box { margin: 1rem; padding: 1.25rem; }
 }
+
+/* ── CATÁLOGO ── */
+.cat-filtros { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+.cat-filtro { background: none; border: 1px solid #DDD; border-radius: 20px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; color: #666; transition: all .15s; }
+.cat-filtro.active, .cat-filtro:hover { background: var(--ink); color: white; border-color: var(--ink); }
+.cat-list-head { display: grid; grid-template-columns: 1fr 130px 120px 80px; gap: 8px; padding: 8px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.cat-list-head span { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #888; }
+.cat-item { display: grid; grid-template-columns: 1fr 130px 120px 80px; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #F0F0F0; background: var(--surface); align-items: center; }
+.cat-info .cat-nome { font-size: 14px; font-weight: 600; color: #111; }
+.cat-info .cat-cat { font-size: 11px; color: #888; margin-top: 2px; }
+.cat-valor { font-size: 14px; font-weight: 600; color: var(--accent); font-family: var(--mono); text-align: right; }
+.cat-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.btn-edit-cat, .btn-del-cat { background: none; border: 1px solid #DDD; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn-edit-cat:hover { background: var(--ink); color: white; border-color: var(--ink); }
+.btn-del-cat { color: #E24B4A; }
+.btn-del-cat:hover { background: #E24B4A; color: white; border-color: #E24B4A; }
+
+/* ── AUTOCOMPLETE CATÁLOGO NO ORÇAMENTO ── */
+.cat-autocomplete { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid #CCC; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 200; max-height: 200px; overflow-y: auto; margin-top: 2px; }
+.cat-autocomplete.open { display: block; }
+.cat-opt { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; cursor: pointer; border-bottom: 1px solid #F5F5F5; transition: background .1s; }
+.cat-opt:last-child { border-bottom: none; }
+.cat-opt:hover { background: #FDF0F6; }
+.cat-opt-nome { font-size: 13px; font-weight: 500; color: #111; }
+.cat-opt-val { font-size: 12px; color: var(--accent); font-family: var(--mono); }
+
+/* ── BLOCO DE TOTAIS NOVO ── */
+.totals-card { background: var(--surface); border: 0.5px solid var(--line); border-radius: 12px; overflow: hidden; }
+
+.tot-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--line); }
+.tot-label { font-size: 13px; color: var(--mid); }
+.tot-val { font-size: 13px; font-weight: 500; color: var(--ink); font-family: var(--mono); }
+
+.disc-block { padding: 12px 16px; border-bottom: 0.5px solid var(--line); }
+.disc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #888; margin-bottom: 8px; }
+.disc-input-row { display: flex; gap: 6px; align-items: center; }
+.disc-input-row input[type=number] { flex: 1; border: 0.5px solid var(--line); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 500; text-align: right; background: var(--bg); color: var(--ink); outline: none; transition: border-color .15s; }
+.disc-input-row input[type=number]:focus { border-color: var(--ink); }
+.disc-toggle { display: flex; border: 0.5px solid var(--line); border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+.disc-toggle-btn { padding: 6px 12px; font-size: 12px; font-weight: 600; background: var(--bg); color: #888; border: none; cursor: pointer; transition: all .15s; font-family: inherit; }
+.disc-toggle-btn.active { background: var(--ink); color: white; }
+.disc-preview { font-size: 11px; color: #E24B4A; text-align: right; margin-top: 6px; min-height: 16px; }
+
+.disc-row { background: rgba(226,75,74,0.04); }
+.tot-label-disc { font-size: 12px; color: #E24B4A; }
+.tot-val-disc { font-size: 12px; font-weight: 600; color: #E24B4A; font-family: var(--mono); }
+
+.tot-final-block { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; }
+.tot-final-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--mid); }
+.tot-final-val { font-size: 26px; font-weight: 500; color: var(--accent); font-family: var(--mono); letter-spacing: -0.04em; }
