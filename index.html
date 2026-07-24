@@ -169,39 +169,39 @@
               <div class="sec-label" style="margin-bottom:10px">Observações</div>
               <textarea class="obs-textarea" id="obs" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
-            <div class="totals-block">
-              <div class="totals-card">
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div style="background:#fff;border:1px solid #E0E0EA;border-radius:12px;overflow:hidden">
 
                 <!-- Subtotal -->
-                <div class="tot-row">
-                  <span class="tot-label">Subtotal</span>
-                  <span class="tot-val" id="subtotal">R$ 0,00</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #E0E0EA">
+                  <span style="font-size:13px;color:#555566">Subtotal</span>
+                  <span style="font-size:13px;font-weight:500;color:#1A1A22;font-family:monospace" id="subtotal">R$ 0,00</span>
                 </div>
 
                 <!-- Desconto -->
-                <div class="disc-block no-print">
-                  <div class="disc-label">Desconto</div>
-                  <div class="disc-input-row">
-                    <div class="disc-toggle">
-                      <button class="disc-toggle-btn active" id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')">%</button>
-                      <button class="disc-toggle-btn" id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')">R$</button>
+                <div class="no-print" style="padding:12px 16px;border-bottom:1px solid #E0E0EA">
+                  <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:8px">Desconto</div>
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <div style="display:flex;border:1px solid #CCC;border-radius:6px;overflow:hidden;flex-shrink:0">
+                      <button id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')" style="padding:6px 12px;font-size:12px;font-weight:700;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
+                      <button id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')" style="padding:6px 12px;font-size:12px;font-weight:700;background:#F5F5FA;color:#888;border:none;cursor:pointer;font-family:inherit">R$</button>
                     </div>
-                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01">
+                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1;border:1px solid #CCC;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:500;text-align:right;background:#F5F5FA;color:#1A1A22;outline:none;font-family:monospace">
                     <input type="hidden" id="descontoTipo" value="pct">
                   </div>
-                  <div class="disc-preview" id="descontoPreview"></div>
+                  <div id="descontoPreview" style="font-size:11px;color:#E24B4A;text-align:right;margin-top:6px;min-height:16px"></div>
                 </div>
 
                 <!-- Linha desconto -->
-                <div class="tot-row disc-row" id="descontoRow" style="display:none">
-                  <span class="tot-label-disc">Desconto</span>
-                  <span class="tot-val-disc" id="descontoVal">—</span>
+                <div id="descontoRow" style="display:none;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #E0E0EA;background:rgba(226,75,74,0.05)">
+                  <span style="font-size:12px;color:#E24B4A">Desconto</span>
+                  <span style="font-size:12px;font-weight:600;color:#E24B4A;font-family:monospace" id="descontoVal">—</span>
                 </div>
 
                 <!-- Total -->
-                <div class="tot-final-block">
-                  <span class="tot-final-label">Total</span>
-                  <span class="tot-final-val" id="total">R$ 0,00</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
+                  <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#555566">Total</span>
+                  <span style="font-size:26px;font-weight:500;color:#D91A72;font-family:monospace;letter-spacing:-.03em" id="total">R$ 0,00</span>
                 </div>
 
               </div>
