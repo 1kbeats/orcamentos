@@ -13,6 +13,9 @@ const Orcamentos = {
     this.loadCfg();
     this.bindEvents();
     this.addItem();
+    // Preencher validade com hoje por padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('validade').value = hoje;
     this.updateMeta();
   },
 
@@ -308,13 +311,16 @@ const Orcamentos = {
         itens: d.itens, obs: d.obs || null,
         empresa: cfg.nome || '', cnpj_emp: cfg.cnpj || '',
         tel_emp: cfg.tel || '', email_emp: cfg.email || '',
-        solicitante: d.solicitante || null
+        solicitante: d.solicitante || null,
+        total: d.total, cliente_nome: d.cliente,
+        status: 'pendente'
       };
+      const hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
       const res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
-        method: 'POST', headers: CONFIG.headers(), body: JSON.stringify(dadosOrc)
+        method: 'POST', headers: hdrs, body: JSON.stringify(dadosOrc)
       });
       const rows = await res.json();
-      const id = rows[0] && rows[0].id;
+      const id = rows && rows[0] && rows[0].id;
       if (id) {
         const linkOrc = 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
         msg += nl + nl + '🔗 *Visualizar orçamento:*' + nl + linkOrc;
@@ -345,12 +351,13 @@ const Orcamentos = {
     // Cabeçalho
     doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 52, 'F');
 
-    // Logo 1K Beats — bloco rosa + texto vetorial
-    doc.setFillColor(217, 26, 114); doc.roundedRect(ml, 8, 20, 20, 3, 3, 'F');
-    doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-    doc.text('1K', ml + 10, 22, { align: 'center' });
-    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-    doc.text('beats', ml + 24, 22);
+    // Logo 1K Beats — tipográfico alinhado com baseline comum
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    doc.text('1K', ml, 26);
+    doc.setFontSize(16); doc.setFont('helvetica', 'normal'); doc.setTextColor(180, 180, 180);
+    doc.text('beats', ml + 18, 26);
+    doc.setFontSize(16); doc.setFont('helvetica', 'normal'); doc.setTextColor(217, 26, 114);
+    doc.text('))', ml + 44, 26);
 
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
