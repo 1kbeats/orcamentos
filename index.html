@@ -170,38 +170,38 @@
               <textarea class="obs-textarea" id="obs" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
             <div style="display:flex;flex-direction:column;gap:0">
-              <div style="background:#fff;border:1px solid #E0E0EA;border-radius:12px;overflow:hidden">
+              <div style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
 
                 <!-- Subtotal -->
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #E0E0EA">
-                  <span style="font-size:13px;color:#555566">Subtotal</span>
-                  <span style="font-size:13px;font-weight:500;color:#1A1A22;font-family:monospace" id="subtotal">R$ 0,00</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid #F0F0F5">
+                  <span style="font-size:12px;color:#888">Subtotal</span>
+                  <span style="font-size:12px;font-family:monospace;color:#404050" id="subtotal">R$ 0,00</span>
                 </div>
 
                 <!-- Desconto -->
-                <div class="no-print" style="padding:12px 16px;border-bottom:1px solid #E0E0EA">
-                  <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#888;margin-bottom:8px">Desconto</div>
-                  <div style="display:flex;gap:6px;align-items:center">
-                    <div style="display:flex;border:1px solid #CCC;border-radius:6px;overflow:hidden;flex-shrink:0">
-                      <button id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')" style="padding:6px 12px;font-size:12px;font-weight:700;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
-                      <button id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')" style="padding:6px 12px;font-size:12px;font-weight:700;background:#F5F5FA;color:#888;border:none;cursor:pointer;font-family:inherit">R$</button>
+                <div class="no-print" style="padding:10px 14px;border-bottom:1px solid #F0F0F5">
+                  <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#AAA;margin-bottom:7px">Desconto</div>
+                  <div style="display:flex;gap:5px;align-items:center">
+                    <div style="display:flex;border:1px solid #DDD;border-radius:6px;overflow:hidden;flex-shrink:0">
+                      <button id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')" style="padding:5px 11px;font-size:12px;font-weight:600;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
+                      <button id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')" style="padding:5px 11px;font-size:12px;font-weight:600;background:#F5F5FA;color:#AAA;border:none;cursor:pointer;font-family:inherit">R$</button>
                     </div>
-                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1;border:1px solid #CCC;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:500;text-align:right;background:#F5F5FA;color:#1A1A22;outline:none;font-family:monospace">
+                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1;border:1px solid #DDD;border-radius:6px;padding:5px 10px;font-size:13px;text-align:right;background:#F5F5FA;color:#404050;outline:none;font-family:monospace">
                     <input type="hidden" id="descontoTipo" value="pct">
                   </div>
-                  <div id="descontoPreview" style="font-size:11px;color:#E24B4A;text-align:right;margin-top:6px;min-height:16px"></div>
+                  <div id="descontoPreview" style="font-size:11px;color:#E24B4A;text-align:right;margin-top:5px;min-height:16px"></div>
                 </div>
 
-                <!-- Linha desconto -->
-                <div id="descontoRow" style="display:none;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #E0E0EA;background:rgba(226,75,74,0.05)">
+                <!-- Linha desconto — sem fundo colorido -->
+                <div id="descontoRow" style="display:none;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid #F0F0F5">
                   <span style="font-size:12px;color:#E24B4A">Desconto</span>
-                  <span style="font-size:12px;font-weight:600;color:#E24B4A;font-family:monospace" id="descontoVal">—</span>
+                  <span style="font-size:12px;font-family:monospace;color:#E24B4A" id="descontoVal">—</span>
                 </div>
 
                 <!-- Total -->
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
-                  <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:#555566">Total</span>
-                  <span style="font-size:26px;font-weight:500;color:#D91A72;font-family:monospace;letter-spacing:-.03em" id="total">R$ 0,00</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 14px">
+                  <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:#888">Total</span>
+                  <span style="font-size:24px;font-weight:500;color:#D91A72;font-family:monospace;letter-spacing:-.02em" id="total">R$ 0,00</span>
                 </div>
 
               </div>
@@ -262,28 +262,43 @@
     <!-- ══ PAINEL: CATÁLOGO ══ -->
     <div class="panel" id="panelCatalogo">
       <div class="admin-wrap">
-        <div class="admin-header">
-          <h2>Catálogo</h2>
-          <button class="btn-novo" id="btnNovoCatalogo">+ Novo item</button>
-        </div>
-        <div class="cat-filtros">
-          <button class="cat-filtro active" data-cat="">Todos</button>
-          <button class="cat-filtro" data-cat="Sonorização">Sonorização</button>
-          <button class="cat-filtro" data-cat="Iluminação">Iluminação</button>
-          <button class="cat-filtro" data-cat="Vídeo">Vídeo</button>
-          <button class="cat-filtro" data-cat="Microfone">Microfone</button>
-          <button class="cat-filtro" data-cat="Estrutura">Estrutura</button>
-          <button class="cat-filtro" data-cat="Outros">Outros</button>
-        </div>
-        <!-- Cabeçalho da lista -->
-        <div class="cat-list-head">
-          <span>Descrição</span>
-          <span>Categoria</span>
-          <span style="text-align:right">Valor padrão</span>
-          <span></span>
-        </div>
-        <div class="card" id="listaCatalogo">
-          <div style="color:#999;padding:2rem;text-align:center">Carregando...</div>
+        <div style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
+
+          <!-- Header -->
+          <div style="padding:14px 18px;border-bottom:1px solid #E0E0EA;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:15px;font-weight:600;color:#1A1A22">Catálogo</div>
+              <div style="font-size:12px;color:#AAA;margin-top:1px">Produtos e serviços para orçamento</div>
+            </div>
+            <button id="btnNovoCatalogo" style="background:#1A1A22;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit">
+              + Novo item
+            </button>
+          </div>
+
+          <!-- Filtros -->
+          <div style="padding:10px 18px;border-bottom:1px solid #E0E0EA;display:flex;gap:6px;flex-wrap:wrap;background:#FAFAFA">
+            <button class="cat-filtro active" data-cat="" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:inherit">Todos</button>
+            <button class="cat-filtro" data-cat="Sonorização" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Sonorização</button>
+            <button class="cat-filtro" data-cat="Iluminação" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Iluminação</button>
+            <button class="cat-filtro" data-cat="Vídeo" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Vídeo</button>
+            <button class="cat-filtro" data-cat="Microfone" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Microfone</button>
+            <button class="cat-filtro" data-cat="Estrutura" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Estrutura</button>
+            <button class="cat-filtro" data-cat="Outros" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Outros</button>
+          </div>
+
+          <!-- Cabeçalho colunas -->
+          <div style="display:grid;grid-template-columns:1fr 120px 110px 72px;padding:8px 18px;background:#FAFAFA;border-bottom:1px solid #E0E0EA">
+            <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Descrição</span>
+            <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Categoria</span>
+            <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Valor padrão</span>
+            <span></span>
+          </div>
+
+          <!-- Lista -->
+          <div id="listaCatalogo">
+            <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>
+          </div>
+
         </div>
       </div>
     </div>
