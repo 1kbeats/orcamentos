@@ -291,27 +291,30 @@ const Orcamentos = {
 
     try {
       // 1. Salvar primeiro para obter o ID e número
-      console.log('[1K v2.5] Salvando orçamento no Supabase...');
       const dadosOrc = {
-        cliente: d.cliente, cnpj_cli: d.cnpjCli || null,
-        referencia: d.ref || null, valido_ate: d.val || null,
-        desconto: d.discVal, tipo_desc: d.tipo,
-        itens: d.itens, obs: d.obs || null,
-        empresa: cfg.nome || '', cnpj_emp: cfg.cnpj || '',
-        tel_emp: cfg.tel || '', email_emp: cfg.email || '',
-        solicitante: d.solicitante || null,
-        total: d.total, cliente_nome: d.cliente,
-        status: 'pendente'
+        cliente_nome: d.cliente || null,
+        cnpj_cli:     d.cnpjCli || null,
+        referencia:   d.ref || null,
+        valido_ate:   d.val || null,
+        desconto_tipo:  d.tipo,
+        desconto_valor: d.discVal || 0,
+        itens:        d.itens,
+        observacoes:  d.obs || null,
+        empresa:      cfg.nome || null,
+        cnpj_emp:     cfg.cnpj || null,
+        tel_emp:      cfg.tel || null,
+        email_emp:    cfg.email || null,
+        solicitante:  d.solicitante || null,
+        total:        d.total,
+        status:       'pendente'
       };
       const hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
       const res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
         method: 'POST', headers: hdrs, body: JSON.stringify(dadosOrc)
       });
       const rows = await res.json();
-      console.log('[1K v2.5] Resposta Supabase:', JSON.stringify(rows));
       const id = rows && rows[0] && rows[0].id;
       const numero = rows && rows[0] && rows[0].numero;
-      console.log('[1K v2.5] ID:', id, '| Numero:', numero);
 
       // Mostrar número no masthead
       if (numero) {
@@ -369,15 +372,21 @@ const Orcamentos = {
         const _d = this._coletarDados();
         const _cfg = this._cfg;
         const _dadosOrc = {
-          cliente: _d.cliente, cnpj_cli: _d.cnpjCli || null,
-          referencia: _d.ref || null, valido_ate: _d.val || null,
-          desconto: _d.discVal, tipo_desc: _d.tipo,
-          itens: _d.itens, obs: _d.obs || null,
-          empresa: _cfg.nome || '', cnpj_emp: _cfg.cnpj || '',
-          tel_emp: _cfg.tel || '', email_emp: _cfg.email || '',
-          solicitante: _d.solicitante || null,
-          total: _d.total, cliente_nome: _d.cliente,
-          status: 'pendente'
+          cliente_nome: _d.cliente || null,
+          cnpj_cli:     _d.cnpjCli || null,
+          referencia:   _d.ref || null,
+          valido_ate:   _d.val || null,
+          desconto_tipo:  _d.tipo,
+          desconto_valor: _d.discVal || 0,
+          itens:        _d.itens,
+          observacoes:  _d.obs || null,
+          empresa:      _cfg.nome || null,
+          cnpj_emp:     _cfg.cnpj || null,
+          tel_emp:      _cfg.tel || null,
+          email_emp:    _cfg.email || null,
+          solicitante:  _d.solicitante || null,
+          total:        _d.total,
+          status:       'pendente'
         };
         const _hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
         const _res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
