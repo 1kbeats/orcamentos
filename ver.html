@@ -200,6 +200,23 @@
   // Verificar tipo de link
   var params = new URLSearchParams(window.location.search);
   var orcId  = params.get('id');
+  var orcNum = params.get('n');
+  // Se veio número curto, buscar por número
+  if (!orcId && orcNum) {
+    // Busca por número sequencial
+    fetch(SURL+'/rest/v1/orcamentos?numero=eq.'+orcNum+'&select=id&limit=1', {
+      headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY }
+    }).then(r=>r.json()).then(rows=>{
+      if (rows && rows[0]) {
+        orcId = rows[0].id;
+        carregarOrcamento();
+      } else {
+        document.getElementById('loading').style.display='none';
+        document.getElementById('error').style.display='block';
+        document.getElementById('error').textContent='Orçamento #'+orcNum+' não encontrado.';
+      }
+    });
+  }
 
   if (orcId) {
     document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Carregando...</h2><p>Buscando orçamento #'+orcId+'</p></div>';
