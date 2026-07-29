@@ -201,25 +201,34 @@
   var params = new URLSearchParams(window.location.search);
   var orcId  = params.get('id');
   var orcNum = params.get('n');
-  // Se veio número curto, buscar por número
-  if (!orcId && orcNum) {
-    // Busca por número sequencial
-    fetch(SURL+'/rest/v1/orcamentos?numero=eq.'+orcNum+'&select=id&limit=1', {
-      headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY }
-    }).then(r=>r.json()).then(rows=>{
-      if (rows && rows[0]) {
-        orcId = rows[0].id;
-        carregarOrcamento();
-      } else {
+
+  function iniciar() {
+    if (orcNum && !orcId) {
+      // Link curto ?n=6 — buscar UUID pelo número
+      fetch(SURL+'/rest/v1/orcamentos?numero=eq.'+orcNum+'&select=id&limit=1', {
+        headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY }
+      }).then(function(r){ return r.json(); }).then(function(rows){
+        if (rows && rows[0]) {
+          orcId = rows[0].id;
+          carregarOrcamento();
+        } else {
+          document.getElementById('loading').style.display='none';
+          document.getElementById('error').style.display='block';
+        }
+      }).catch(function(){
         document.getElementById('loading').style.display='none';
         document.getElementById('error').style.display='block';
-        document.getElementById('error').textContent='Orçamento #'+orcNum+' não encontrado.';
-      }
-    });
+      });
+    } else if (orcId) {
+      carregarOrcamento();
+    } else {
+      document.getElementById('loading').style.display='none';
+      document.getElementById('error').style.display='block';
+    }
   }
 
-  if (orcId) {
-    document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Carregando...</h2><p>Buscando orçamento #'+orcId+'</p></div>';
+  function carregarOrcamento() {
+    document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Carregando...</h2><p>Buscando orçamento...</p></div>';
     fetch(SURL+'/rest/v1/orcamentos?id=eq.'+orcId+'&select=*', {
       headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY, 'Accept': 'application/json' }
     })

@@ -4,139 +4,231 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login — 1K Beats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Arial, sans-serif;
-  background: #111111;
-  color: #fff;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  background: #070709;
+  color: #E8E8F0;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
+  background-image:
+    linear-gradient(rgba(217,26,114,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217,26,114,0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 a { color: #D91A72; text-decoration: none; }
-a:hover { color: #ff3dac; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes glow {
-  0%,100% { opacity: .4; transform: scale(1); }
-  50%      { opacity: .7; transform: scale(1.06); }
-}
-.bg-blob {
-  position: fixed; pointer-events: none; border-radius: 50%;
-}
-.blob1 {
-  width: 560px; height: 560px;
-  background: radial-gradient(circle, #D91A7222 0%, transparent 70%);
-  top: -200px; right: -180px;
-  animation: glow 7s ease-in-out infinite;
-}
-.blob2 {
-  width: 380px; height: 380px;
-  background: radial-gradient(circle, #D91A7218 0%, transparent 70%);
-  bottom: -120px; left: -80px;
-  animation: glow 9s ease-in-out infinite 3s;
-}
+a:hover { color: #FF4DA6; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+@keyframes waveMove { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes eq1 { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
+@keyframes eq2 { 0%,100%{transform:scaleY(0.7)} 33%{transform:scaleY(0.2)} 66%{transform:scaleY(0.9)} }
+@keyframes eq3 { 0%,100%{transform:scaleY(0.9)} 50%{transform:scaleY(0.15)} }
+@keyframes eq4 { 0%,100%{transform:scaleY(0.4)} 40%{transform:scaleY(1)} }
+@keyframes eq5 { 0%,100%{transform:scaleY(0.6)} 60%{transform:scaleY(0.2)} }
+@keyframes eq6 { 0%,100%{transform:scaleY(0.2)} 50%{transform:scaleY(0.85)} }
+@keyframes blinkDot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
 .wrap {
   position: relative; z-index: 1;
   width: 100%; max-width: 400px;
   animation: fadeUp .5s ease-out both;
 }
-.logo {
-  text-align: center;
-  margin-bottom: 36px;
+
+/* ── LOGO AREA ── */
+.logo-area { text-align: center; margin-bottom: 32px; }
+
+/* Waveform strip */
+.wave-strip {
+  overflow: hidden; height: 28px; margin-bottom: 20px;
+  position: relative;
 }
-.logo svg { display: inline-block; }
-.logo-divider {
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent, #D91A72, transparent);
-  margin-top: 10px;
+.wave-strip svg {
+  width: 200%; height: 100%;
+  animation: waveMove 3s linear infinite;
 }
-.logo-sub {
-  margin-top: 9px;
-  font-size: 11px;
-  color: #444;
-  letter-spacing: .18em;
-  text-transform: uppercase;
+
+.logo-mark {
+  display: inline-flex; align-items: center; gap: 14px; margin-bottom: 12px;
 }
+.logo-icon {
+  width: 56px; height: 56px; background: #D91A72; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 0 20px rgba(217,26,114,0.55));
+  flex-shrink: 0;
+}
+.logo-icon svg { width: 36px; height: 36px; }
+.logo-text { text-align: left; }
+.logo-text-main {
+  font-size: 28px; font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+}
+.logo-text-main .beats { color: #505065; }
+.logo-text-main .waves { color: #D91A72; }
+.logo-text-sub {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #404058;
+  text-transform: uppercase; margin-top: 4px; font-family: 'Space Mono', monospace;
+}
+
+/* EQ bars below logo */
+.eq-bars {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 3px; height: 20px; margin-top: 14px;
+}
+.eq-bar {
+  width: 4px; background: #D91A72; border-radius: 1px 1px 0 0;
+  transform-origin: bottom;
+}
+.eq-bar:nth-child(1) { animation: eq1 0.7s ease-in-out infinite; }
+.eq-bar:nth-child(2) { animation: eq2 0.5s ease-in-out infinite; }
+.eq-bar:nth-child(3) { animation: eq3 0.9s ease-in-out infinite; }
+.eq-bar:nth-child(4) { animation: eq4 0.6s ease-in-out infinite; color: #FF4DA6; background: #FF4DA6; }
+.eq-bar:nth-child(5) { animation: eq1 0.75s ease-in-out 0.1s infinite; }
+.eq-bar:nth-child(6) { animation: eq5 0.8s ease-in-out infinite; }
+.eq-bar:nth-child(7) { animation: eq3 0.65s ease-in-out infinite; }
+.eq-bar:nth-child(8) { animation: eq6 0.55s ease-in-out infinite; background: #FF4DA6; }
+.eq-bar:nth-child(9) { animation: eq2 0.85s ease-in-out infinite; }
+.eq-bar:nth-child(10){ animation: eq4 0.7s ease-in-out infinite; }
+.eq-bar:nth-child(11){ animation: eq1 0.9s ease-in-out infinite; }
+.eq-bar:nth-child(12){ animation: eq5 0.6s ease-in-out infinite; background: #FF4DA6; }
+
+/* ── CARD ── */
 .card {
-  background: #181818;
-  border: 1px solid #242424;
-  border-radius: 16px;
-  padding: 36px 32px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+  background: #0E0E14;
+  border: 1px solid rgba(217,26,114,0.2);
+  border-radius: 4px;
+  padding: 32px 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(217,26,114,0.05);
+  position: relative; overflow: hidden;
 }
-.card-title { font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.card-sub   { font-size: 13px; color: #555; margin-bottom: 26px; }
-.field { margin-bottom: 16px; }
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #D91A72, transparent);
+}
+
+/* REC indicator */
+.rec-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  color: #404058; letter-spacing: 0.12em; margin-bottom: 20px;
+}
+.rec-dot { width: 6px; height: 6px; background: #D91A72; border-radius: 50%; animation: blinkDot 1.2s ease infinite; }
+
+.card-title { font-size: 18px; font-weight: 700; color: #E8E8F0; margin-bottom: 3px; }
+.card-sub   { font-size: 12px; color: #404058; margin-bottom: 24px; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
+
+/* ── FIELDS ── */
+.field { margin-bottom: 14px; }
 .field label {
-  display: block;
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .1em;
-  color: #666; margin-bottom: 7px;
+  display: block; font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: #404058; margin-bottom: 7px; font-family: 'Space Mono', monospace;
 }
 .field input {
   width: 100%; height: 44px;
-  background: #111; border: 1.5px solid #2a2a2a; border-radius: 8px;
-  padding: 0 14px; font-size: 14px; color: #fff;
-  font-family: inherit; outline: none;
+  background: #070709; border: 1px solid rgba(255,255,255,0.07); border-radius: 0;
+  padding: 0 14px; font-size: 14px; color: #E8E8F0;
+  font-family: 'Space Grotesk', sans-serif; outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
-.field input::placeholder { color: #3a3a3a; }
+.field input::placeholder { color: #252535; }
 .field input:focus {
   border-color: #D91A72;
-  box-shadow: 0 0 0 3px rgba(233,30,140,.14);
+  box-shadow: 0 0 0 3px rgba(217,26,114,0.12);
 }
+
+/* ── BUTTON ── */
 .btn-login {
-  width: 100%; height: 46px;
-  background: #D91A72; border: none; border-radius: 8px;
-  font-size: 14px; font-weight: 700; color: #fff;
-  font-family: inherit; cursor: pointer; margin-top: 8px;
-  letter-spacing: .04em;
-  box-shadow: 0 4px 20px rgba(233,30,140,.35);
+  width: 100%; height: 48px;
+  background: #D91A72; border: none; border-radius: 0;
+  font-size: 13px; font-weight: 700; color: #fff;
+  font-family: 'Space Mono', monospace; cursor: pointer; margin-top: 8px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 0 32px rgba(217,26,114,0.4);
   transition: background .2s, box-shadow .2s, transform .1s;
 }
-.btn-login:hover { background: #d4197e; box-shadow: 0 6px 28px rgba(233,30,140,.5); }
+.btn-login:hover { background: #FF4DA6; box-shadow: 0 0 48px rgba(217,26,114,0.55); }
 .btn-login:active { transform: scale(.98); }
-.btn-login:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
-.forgot {
-  text-align: center; margin-top: 18px;
-  font-size: 12px; color: #444;
-}
+.btn-login:disabled { background: #303045; cursor: not-allowed; box-shadow: none; color: #505068; }
+
+/* ── ERROR ── */
 .error {
   display: none;
-  background: rgba(233,30,140,.1);
-  border: 1px solid rgba(233,30,140,.3);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px; color: #D91A72;
-  margin-bottom: 18px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-left: 2px solid #EF4444;
+  padding: 10px 14px; font-size: 12px; color: #EF4444;
+  margin-bottom: 16px; font-family: 'Space Mono', monospace;
 }
+
+.forgot { text-align: center; margin-top: 16px; font-size: 11px; color: #404058; font-family: 'Space Mono', monospace; }
+
+/* ── FOOTER ── */
 .footer {
-  text-align: center; margin-top: 28px;
-  font-size: 11px; color: #333; letter-spacing: .04em;
+  text-align: center; margin-top: 24px;
+  font-size: 10px; color: #252535; letter-spacing: 0.08em;
+  font-family: 'Space Mono', monospace; line-height: 1.8;
 }
+.footer strong { color: #404058; }
 </style>
 </head>
 <body>
-<div class="bg-blob blob1"></div>
-<div class="bg-blob blob2"></div>
 
 <div class="wrap">
-  <div class="logo">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" width="220" height="52"><text x="0" y="40" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="42" fill="white" letter-spacing="-1">1K</text><text x="66" y="40" font-family="Arial,sans-serif" font-weight="400" font-size="30" fill="rgba(255,255,255,0.65)">beats</text><text x="170" y="38" font-family="Arial,sans-serif" font-weight="700" font-size="28" fill="#D91A72">))</text></svg>
-    <div class="logo-divider"></div>
-    <div class="logo-sub">Sistema de Orçamentos</div>
+
+  <div class="logo-area">
+    <!-- Animated waveform -->
+    <div class="wave-strip">
+      <svg viewBox="0 0 600 28" preserveAspectRatio="none">
+        <path d="M0,14 Q15,3 30,14 Q45,25 60,14 Q75,3 90,14 Q105,25 120,8 Q135,1 150,14 Q165,25 180,6 Q195,1 210,14 Q225,25 240,10 Q255,3 270,14 Q285,25 300,14 Q315,3 330,14 Q345,25 360,14 Q375,3 390,14 Q405,25 420,8 Q435,1 450,14 Q465,25 480,6 Q495,1 510,14 Q525,25 540,10 Q555,3 570,14 Q585,25 600,14" stroke="#D91A72" fill="none" stroke-width="1.5" opacity="0.35"/>
+      </svg>
+    </div>
+
+    <!-- Logo mark -->
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="4" y="40" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="30" fill="white">1K</text>
+          <path d="M46 16 C54 24 54 32 46 40" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+          <path d="M52 20 C58 26 58 30 52 36" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-text-main">1K<span class="beats">beats</span><span class="waves">))</span></div>
+        <div class="logo-text-sub">Sistema de Orçamentos</div>
+      </div>
+    </div>
+
+    <!-- EQ bars -->
+    <div class="eq-bars">
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:20px"></div>
+    </div>
   </div>
 
   <div class="card">
+    <div class="rec-badge">
+      <div class="rec-dot"></div>
+      <span>ACCESS CONTROL · v3.3</span>
+    </div>
+
     <div class="card-title">Bem-vindo</div>
-    <div class="card-sub">Acesse sua conta para continuar</div>
+    <div class="card-sub">ACESSE SUA CONTA PARA CONTINUAR</div>
 
     <div class="error" id="errMsg">Usuário ou senha incorretos.</div>
 
@@ -149,7 +241,7 @@ a:hover { color: #ff3dac; }
       <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
     </div>
 
-    <button class="btn-login" id="btnLogin">Entrar</button>
+    <button class="btn-login" id="btnLogin">ENTRAR</button>
 
     <div class="forgot">
       Esqueceu a senha?
@@ -158,9 +250,9 @@ a:hover { color: #ff3dac; }
   </div>
 
   <div class="footer">
-    Desenvolvido por <strong style="color:#555">Alessandro Lima</strong><br>
-    © 2026 · Todos os direitos reservados<br>
-    <span style="color:#888;font-size:10px">v3.2</span>
+    Desenvolvido por <strong>Alessandro Lima</strong><br>
+    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v4.0</span><br>
+    v3.3
   </div>
 </div>
 
@@ -192,7 +284,7 @@ function login() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Entrando...';
+  btn.textContent = 'CONECTANDO...';
   err.style.display = 'none';
 
   var email = usuario + DOMAIN;
@@ -216,24 +308,20 @@ function login() {
       err.style.display = 'block';
       err.textContent = 'Usuário ou senha incorretos.';
       btn.disabled = false;
-      btn.textContent = 'Entrar';
+      btn.textContent = 'ENTRAR';
     }
   })
   .catch(function() {
     err.style.display = 'block';
     err.textContent = 'Erro de conexão. Tente novamente.';
     btn.disabled = false;
-    btn.textContent = 'Entrar';
+    btn.textContent = 'ENTRAR';
   });
 }
 
 document.getElementById('btnLogin').addEventListener('click', login);
-document.getElementById('senha').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('usuario').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') document.getElementById('senha').focus();
-});
+document.getElementById('senha').addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+document.getElementById('usuario').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('senha').focus(); });
 </script>
 </body>
 </html>
