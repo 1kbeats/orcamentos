@@ -415,13 +415,15 @@ const Orcamentos = {
     // Cabeçalho
     doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 52, 'F');
 
-        // Logo 1K Beats — vetorial Arial Black
-    doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
-    doc.text('1K', ml, 30);
-    doc.setFontSize(13); doc.setFont('helvetica', 'normal'); doc.setTextColor(180,180,180);
-    doc.text('beats', ml+17, 30);
-    doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
-    doc.text('))', ml+40, 29);
+        // Logo 1K Beats — compacto e alinhado
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+    var _w1k = doc.getTextWidth('1K');
+    doc.text('1K', ml, 28);
+    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
+    var _wBeats = doc.getTextWidth('beats');
+    doc.text('beats', ml + _w1k + 2, 28);
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
+    doc.text('))', ml + _w1k + _wBeats + 3, 27);
 
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
@@ -435,8 +437,10 @@ const Orcamentos = {
     doc.text('EMISSÃO', pw - mr - 30, 37); doc.text('VALIDADE', pw - mr - 30, 43);
     doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 37, { align: 'right' }); doc.text(valStr, pw - mr, 43, { align: 'right' });
     if (_numStr) {
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
       doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 49);
-      doc.setTextColor(217, 26, 114); doc.text(_numStr, pw - mr, 49, { align: 'right' });
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
+      doc.text(_numStr, pw - mr, 49, { align: 'right' });
     }
     if (d.ref) {
       doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 49);
