@@ -158,14 +158,14 @@
           + '<div class="meta">'
             + '<div><strong>Emissão</strong> &nbsp;'+new Date().toLocaleDateString('pt-BR')+'</div>'
             + '<div><strong>Validade</strong> &nbsp;'+fmtDate(v)+'</div>'
-            + (d.numero ? '<div><strong>Nº</strong> &nbsp;<span style="color:#D91A72;font-weight:700">'+String(d.numero).padStart(4,'0')+'</span></div>' : '')
+            + (d.num ? '<div><strong>Nº</strong> &nbsp;<span style="color:#D91A72;font-weight:700">'+String(d.num).padStart(4,'0')+'</span></div>' : '')
             + (d.r||d.referencia ? '<div><strong>Ref.</strong> &nbsp;'+(d.r||d.referencia)+'</div>' : '')
           + '</div>'
         + '</div>'
       + '</div>'
       + '<div class="body">'
         + '<div class="client-grid">'
-          + '<div><div class="cf-label">Cliente</div><div class="cf-val">'+(d.c||d.cliente||'—')+'</div></div>'
+          + '<div><div class="cf-label">Cliente</div><div class="cf-val">'+(d.c||d.cliente||'—')+(d.sol ? '<br><span style="font-size:11px;color:#888;font-weight:400">Solicitante: '+d.sol+'</span>' : '')+'</div></div>'
           + '<div><div class="cf-label">CNPJ / CPF</div><div class="cf-val">'+(d.cc||d.cnpj_cli||'—')+'</div></div>'
           + '<div style="text-align:right"><div class="cf-label">Emitido por</div>'
             + '<div class="cf-val" style="font-size:12px">'+en+(ec?'<br><span style="font-size:10px;color:#888;font-weight:400">'+ec+'</span>':'')+'</div>'
@@ -217,10 +217,11 @@
         return { d: i.desc||i.d||'', q: parseFloat(i.qty||i.q||0), u: parseFloat(i.unit||i.u||0) };
       });
       montarOrcamento({
-        c: row.cliente, cc: row.cnpj_cli, r: row.referencia,
-        v: row.valido_ate, dv: row.desconto, dt: row.tipo_desc,
-        it: itens, o: row.obs,
-        en: row.empresa, ec: row.cnpj_emp, et: row.tel_emp, ee: row.email_emp
+        c: row.cliente_nome, cc: row.cnpj_cli, r: row.referencia,
+        v: row.valido_ate, dv: row.desconto_valor, dt: row.desconto_tipo,
+        it: itens, o: row.observacoes,
+        en: row.empresa, ec: row.cnpj_emp, et: row.tel_emp, ee: row.email_emp,
+        sol: row.solicitante, num: row.numero
       });
     })
     .catch(function(e) {
