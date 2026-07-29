@@ -416,17 +416,17 @@ const Orcamentos = {
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
 
     // Cabeçalho
-    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 58, 'F');
+    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 64, 'F');
 
-        // Logo 1K Beats — maior e alinhado
-    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+        // Logo 1K Beats — grande e proporcional
+    doc.setFontSize(36); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
     var _w1k = doc.getTextWidth('1K');
-    doc.text('1K', ml, 32);
-    doc.setFontSize(18); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
+    doc.text('1K', ml, 36);
+    doc.setFontSize(22); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
     var _wBeats = doc.getTextWidth('beats');
-    doc.text('beats', ml + _w1k + 2, 32);
-    doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
-    doc.text('))', ml + _w1k + _wBeats + 3, 31);
+    doc.text('beats', ml + _w1k + 3, 36);
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
+    doc.text('))', ml + _w1k + _wBeats + 4, 35);
 
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
@@ -437,21 +437,21 @@ const Orcamentos = {
     const _numStr = _nEl && _nEl.textContent && _nEl.textContent !== '—' ? _nEl.textContent : null;
 
     doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 160, 160);
-    doc.text('EMISSÃO', pw - mr - 30, 36); doc.text('VALIDADE', pw - mr - 30, 43);
-    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 36, { align: 'right' }); doc.text(valStr, pw - mr, 43, { align: 'right' });
+    doc.text('EMISSÃO', pw - mr - 30, 38); doc.text('VALIDADE', pw - mr - 30, 46);
+    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 38, { align: 'right' }); doc.text(valStr, pw - mr, 46, { align: 'right' });
     if (_numStr) {
       doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 50);
+      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 54);
       doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-      doc.text(_numStr, pw - mr, 50, { align: 'right' });
+      doc.text(_numStr, pw - mr, 54, { align: 'right' });
     }
     if (d.ref) {
       doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 56);
-      doc.setTextColor(200, 200, 200); doc.text(d.ref.substring(0, 70), pw - mr, 56, { align: 'right' });
+      doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 62);
+      doc.setTextColor(200, 200, 200); doc.text(d.ref.substring(0, 70), pw - mr, 62, { align: 'right' });
     }
 
-    let y = 64;
+    let y = 72;
     // Dados do cliente
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(150, 150, 150);
     doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('EMITIDO POR', pw - mr, y, { align: 'right' });
