@@ -21,6 +21,7 @@ const Nav = {
     this.closeSidebar();
 
     // Carregar dados do painel ao entrar
+    if (panel === 'listaOrcamentos') ListaOrcamentos.carregar();
     if (panel === 'clientes')  Clientes.renderLista();
     if (panel === 'catalogo')  Catalogo.renderLista();
     if (panel === 'admin')     Usuarios.carregar();

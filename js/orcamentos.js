@@ -524,3 +524,103 @@ const Orcamentos = {
     doc.save('1K Beats - Orcamento.pdf');
   }
 };
+
+// ════════════════════════════════════════════════════════════
+// Lista de orçamentos — painel inicial
+// ════════════════════════════════════════════════════════════
+
+const ListaOrcamentos = {
+
+  carregar() {
+    const container = document.getElementById('listaOrcamentos');
+    if (!container) return;
+    container.innerHTML = '<div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>';
+
+    fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?select=*&order=created_at.desc&limit=10', {
+      headers: CONFIG.headers()
+    })
+    .then(r => r.json())
+    .then(lista => {
+      if (!lista || lista.length === 0) {
+        container.innerHTML = '<div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Nenhum orçamento enviado ainda.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      lista.forEach((orc, i) => {
+        const num = orc.numero ? String(orc.numero).padStart(4, '0') : '—';
+        const data = orc.created_at ? Utils.fmtDate(orc.created_at.split('T')[0]) : '—';
+        const valor = Utils.fmt(orc.total || 0);
+        const ref = orc.referencia ? orc.referencia.substring(0, 20) + (orc.referencia.length > 20 ? '...' : '') : '—';
+        const cliente = (orc.cliente_nome || '—').substring(0, 22) + ((orc.cliente_nome || '').length > 22 ? '...' : '');
+        const statusLabels = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
+        const statusStyles = {
+          pendente:  'background:#FFFBEB;color:#92400E',
+          aprovado:  'background:#E8F5E9;color:#2E7D32',
+          recusado:  'background:#FFEBEE;color:#C62828',
+          cancelado: 'background:#F5F5F5;color:#666'
+        };
+        const st = orc.status || 'pendente';
+        const bg = i % 2 === 0 ? '#fff' : '#FAFAFA';
+        const semNumero = !orc.numero;
+
+        const div = document.createElement('div');
+        div.style.cssText = `display:grid;grid-template-columns:52px 1fr 130px 90px 100px 90px 36px;gap:0;padding:11px 16px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center;cursor:pointer`;
+        div.innerHTML =
+          `<span style="font-size:13px;font-weight:700;color:#D91A72">${num}</span>` +
+          `<span style="font-size:13px;color:#1A1A22">${cliente}</span>` +
+          `<span style="font-size:11px;color:#888">${ref}</span>` +
+          `<span style="font-size:11px;color:#AAA">${data}</span>` +
+          `<span style="font-size:13px;font-weight:600;color:#1A1A22;text-align:right">${valor}</span>` +
+          `<div style="text-align:center">` +
+            `<select class="orc-status-sel" data-id="${orc.id}" style="border:none;border-radius:20px;padding:3px 6px;font-size:10px;font-weight:600;cursor:pointer;${statusStyles[st]}">` +
+              Object.entries(statusLabels).map(([v,l]) => `<option value="${v}"${st===v?' selected':''}>${l}</option>`).join('') +
+            `</select>` +
+          `</div>` +
+          `<div style="text-align:center">` +
+            (semNumero ? `<button class="orc-del-btn" data-id="${orc.id}" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0" title="Excluir">✕</button>` : '') +
+            (orc.numero ? `<a href="ver.html?n=${orc.numero}" target="_blank" style="color:#D91A72;font-size:16px;text-decoration:none" title="Visualizar">↗</a>` : '') +
+          `</div>`;
+
+        // Hover
+        div.addEventListener('mouseenter', () => div.style.background = '#FDF0F6');
+        div.addEventListener('mouseleave', () => div.style.background = bg);
+
+        // Mudar status
+        div.querySelector('.orc-status-sel').addEventListener('change', (e) => {
+          e.stopPropagation();
+          const sel = e.target;
+          const novoStatus = sel.value;
+          const st2 = statusStyles[novoStatus] || '';
+          sel.style.cssText = `border:none;border-radius:20px;padding:3px 6px;font-size:10px;font-weight:600;cursor:pointer;${st2}`;
+          fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?id=eq.' + e.target.dataset.id, {
+            method: 'PATCH', headers: CONFIG.headers(), body: JSON.stringify({ status: novoStatus })
+          }).then(() => Utils.toast('Status atualizado!'))
+            .catch(() => Utils.toast('Erro ao atualizar status.'));
+        });
+
+        // Excluir (só sem número)
+        const delBtn = div.querySelector('.orc-del-btn');
+        if (delBtn) {
+          delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!confirm('Excluir este orçamento?')) return;
+            fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?id=eq.' + delBtn.dataset.id, {
+              method: 'DELETE', headers: CONFIG.headers()
+            }).then(() => { Utils.toast('Orçamento excluído.'); this.carregar(); })
+              .catch(() => Utils.toast('Erro ao excluir.'));
+          });
+        }
+
+        container.appendChild(div);
+      });
+    })
+    .catch(() => {
+      container.innerHTML = '<div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Erro ao carregar orçamentos.</div>';
+    });
+  },
+
+  bindEvents() {
+    const btnNovo = document.getElementById('btnNovoOrcamento');
+    if (btnNovo) btnNovo.addEventListener('click', () => Nav.showPanel('orcamentos'));
+  }
+};
