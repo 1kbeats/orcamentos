@@ -415,13 +415,13 @@ const Orcamentos = {
     // Cabeçalho
     doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 52, 'F');
 
-    // Logo 1K Beats — compacto
-    doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-    doc.text('1K', ml, 28);
-    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(200, 200, 200);
-    doc.text('beats', ml + 16, 28);
-    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(217, 26, 114);
-    doc.text('))', ml + 38, 27);
+        // Logo 1K Beats — vetorial Arial Black
+    doc.setFontSize(20); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+    doc.text('1K', ml, 30);
+    doc.setFontSize(13); doc.setFont('helvetica', 'normal'); doc.setTextColor(180,180,180);
+    doc.text('beats', ml+17, 30);
+    doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
+    doc.text('))', ml+40, 29);
 
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
