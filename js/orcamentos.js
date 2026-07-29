@@ -290,7 +290,8 @@ const Orcamentos = {
     if (btnEl) { btnEl.textContent = 'Salvando...'; btnEl.disabled = true; }
 
     try {
-      // 1. Salvar primeiro para obter o ID
+      // 1. Salvar primeiro para obter o ID e número
+      console.log('[1K v2.5] Salvando orçamento no Supabase...');
       const dadosOrc = {
         cliente: d.cliente, cnpj_cli: d.cnpjCli || null,
         referencia: d.ref || null, valido_ate: d.val || null,
@@ -307,8 +308,10 @@ const Orcamentos = {
         method: 'POST', headers: hdrs, body: JSON.stringify(dadosOrc)
       });
       const rows = await res.json();
+      console.log('[1K v2.5] Resposta Supabase:', JSON.stringify(rows));
       const id = rows && rows[0] && rows[0].id;
       const numero = rows && rows[0] && rows[0].numero;
+      console.log('[1K v2.5] ID:', id, '| Numero:', numero);
 
       // Mostrar número no masthead
       if (numero) {
