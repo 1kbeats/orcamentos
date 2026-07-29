@@ -342,7 +342,10 @@ const Orcamentos = {
       msg += nl + nl + 'Em caso de dúvidas, estamos à disposição!';
       if (id) {
         msg += nl + nl + 'Visualizar orçamento:' + nl;
-        msg += 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
+        // Usar número curto se disponível, senão usar UUID
+        const linkId = numero ? numero : id;
+        const paramName = numero ? 'n' : 'id';
+        msg += 'https://1kbeats.github.io/orcamentos/ver.html?' + paramName + '=' + linkId;
       }
 
       // 3. Abrir WhatsApp com mensagem completa
@@ -413,17 +416,17 @@ const Orcamentos = {
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
 
     // Cabeçalho
-    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 52, 'F');
+    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 58, 'F');
 
-        // Logo 1K Beats — compacto e alinhado
-    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+        // Logo 1K Beats — maior e alinhado
+    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
     var _w1k = doc.getTextWidth('1K');
-    doc.text('1K', ml, 28);
-    doc.setFontSize(14); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
+    doc.text('1K', ml, 32);
+    doc.setFontSize(18); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
     var _wBeats = doc.getTextWidth('beats');
-    doc.text('beats', ml + _w1k + 2, 28);
-    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
-    doc.text('))', ml + _w1k + _wBeats + 3, 27);
+    doc.text('beats', ml + _w1k + 2, 32);
+    doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
+    doc.text('))', ml + _w1k + _wBeats + 3, 31);
 
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
@@ -434,17 +437,18 @@ const Orcamentos = {
     const _numStr = _nEl && _nEl.textContent && _nEl.textContent !== '—' ? _nEl.textContent : null;
 
     doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 160, 160);
-    doc.text('EMISSÃO', pw - mr - 30, 37); doc.text('VALIDADE', pw - mr - 30, 43);
-    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 37, { align: 'right' }); doc.text(valStr, pw - mr, 43, { align: 'right' });
+    doc.text('EMISSÃO', pw - mr - 30, 36); doc.text('VALIDADE', pw - mr - 30, 43);
+    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 36, { align: 'right' }); doc.text(valStr, pw - mr, 43, { align: 'right' });
     if (_numStr) {
       doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 49);
+      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 50);
       doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-      doc.text(_numStr, pw - mr, 49, { align: 'right' });
+      doc.text(_numStr, pw - mr, 50, { align: 'right' });
     }
     if (d.ref) {
-      doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 49);
-      doc.setTextColor(210, 210, 210); doc.text(d.ref.substring(0, 60), pw - mr, 49, { align: 'right' });
+      doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 56);
+      doc.setTextColor(200, 200, 200); doc.text(d.ref.substring(0, 70), pw - mr, 56, { align: 'right' });
     }
 
     let y = 64;
