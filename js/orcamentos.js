@@ -564,21 +564,23 @@ const ListaOrcamentos = {
         const semNumero = !orc.numero;
 
         const div = document.createElement('div');
-        div.style.cssText = `display:grid;grid-template-columns:52px 1.4fr 1.2fr 86px 110px 110px 36px;gap:0;padding:11px 16px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center;cursor:pointer`;
+        div.style.cssText = `display:grid;grid-template-columns:60px 1fr 110px 140px 120px 36px;gap:0;padding:14px 24px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center`;
         div.innerHTML =
-          `<span style="font-size:13px;font-weight:700;color:#D91A72">${num}</span>` +
-          `<span style="font-size:13px;color:#1A1A22">${cliente}</span>` +
-          `<span style="font-size:11px;color:#888">${ref}</span>` +
-          `<span style="font-size:11px;color:#AAA">${data}</span>` +
-          `<span style="font-size:13px;font-weight:600;color:#1A1A22;text-align:right">${valor}</span>` +
+          `<span style="font-size:14px;font-weight:700;color:#D91A72">${num}</span>` +
+          `<div style="min-width:0;padding-right:16px">` +
+            `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cliente}</div>` +
+            (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ref}</div>` : '') +
+          `</div>` +
+          `<span style="font-size:12px;color:#AAA;padding-left:8px">${data}</span>` +
+          `<span style="font-size:14px;font-weight:500;color:#1A1A22;text-align:right">${valor}</span>` +
           `<div style="text-align:center">` +
-            `<select class="orc-status-sel" data-id="${orc.id}" style="border:none;border-radius:20px;padding:3px 6px;font-size:10px;font-weight:600;cursor:pointer;${statusStyles[st]}">` +
+            `<select class="orc-status-sel" data-id="${orc.id}" style="border:none;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;${statusStyles[st]}">` +
               Object.entries(statusLabels).map(([v,l]) => `<option value="${v}"${st===v?' selected':''}>${l}</option>`).join('') +
             `</select>` +
           `</div>` +
           `<div style="text-align:center">` +
             (semNumero ? `<button class="orc-del-btn" data-id="${orc.id}" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0" title="Excluir">✕</button>` : '') +
-            (orc.numero ? `<a href="ver.html?n=${orc.numero}" target="_blank" style="color:#D91A72;font-size:16px;text-decoration:none" title="Visualizar">↗</a>` : '') +
+            (orc.numero ? `<a href="ver.html?n=${orc.numero}" target="_blank" style="color:#D91A72;text-decoration:none;font-size:18px;display:flex;align-items:center;justify-content:center" title="Visualizar orçamento">↗</a>` : '') +
           `</div>`;
 
         // Hover
