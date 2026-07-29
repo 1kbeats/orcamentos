@@ -39,7 +39,7 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Operacional</div>
-      <div class="nav-item active" id="navOrcamentos" onclick="Nav.showPanel('orcamentos')">
+      <div class="nav-item active" id="navOrcamentos" onclick="Nav.showPanel('listaOrcamentos')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Orçamentos
       </div>
@@ -88,8 +88,38 @@
       </button>
     </div>
 
-        <!-- ══ PAINEL: ORÇAMENTOS ══ -->
-    <div class="panel active" id="panelOrcamentos">
+        <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
+    <div class="panel active" id="panelListaOrcamentos">
+      <div class="admin-wrap">
+        <div class="admin-header">
+          <div>
+            <h2>Orçamentos</h2>
+            <div style="font-size:12px;color:#AAA;margin-top:2px">Últimos enviados</div>
+          </div>
+          <button class="btn-novo" id="btnNovoOrcamento">
+            + Novo orçamento
+          </button>
+        </div>
+
+        <!-- CABEÇALHO DA LISTA -->
+        <div style="display:grid;grid-template-columns:52px 1fr 130px 90px 100px 90px 36px;gap:0;padding:7px 16px;background:#EBEBF0;border-radius:8px 8px 0 0;margin-bottom:0">
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Nº</span>
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Cliente</span>
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Referência</span>
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Data</span>
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:right">Valor</span>
+          <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:center">Status</span>
+          <span></span>
+        </div>
+
+        <div class="card" id="listaOrcamentos">
+          <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAINEL: ORÇAMENTOS (FORMULÁRIO) ══ -->
+    <div class="panel" id="panelOrcamentos">
       <div class="page" id="pageRoot" style="background:var(--bg);min-height:100vh;">
 
         <!-- Masthead -->
@@ -443,6 +473,8 @@
   document.addEventListener('DOMContentLoaded', function() {
     Auth.verificarSessao();
     Orcamentos.init();
+    ListaOrcamentos.bindEvents();
+    ListaOrcamentos.carregar();
     Clientes.bindEvents();
     Catalogo.bindEvents();
     Usuarios.bindEvents();
