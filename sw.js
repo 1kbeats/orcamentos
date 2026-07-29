@@ -1,4 +1,4 @@
-var CACHE = '1kbeats-orcamentos-v26';
+var CACHE = '1kbeats-orcamentos-v28';
 var FILES = [
   './',
   './index.html',
