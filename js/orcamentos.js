@@ -354,9 +354,43 @@ const Orcamentos = {
   },
 
   // ── PDF ───────────────────────────────────────────────────
-  gerarPDF() {
+  async gerarPDF() {
     if (!window.jspdf) { alert('Aguarde o app carregar completamente e tente novamente.'); return; }
     document.getElementById('configPanel').classList.remove('open');
+
+    // Salvar no banco antes de gerar o PDF (igual ao WhatsApp)
+    const _nElAtual = document.getElementById('metaNumero');
+    const _jaTemNumero = _nElAtual && _nElAtual.textContent && _nElAtual.textContent !== '—';
+    if (!_jaTemNumero) {
+      try {
+        const _d = this._coletarDados();
+        const _cfg = this._cfg;
+        const _dadosOrc = {
+          cliente: _d.cliente, cnpj_cli: _d.cnpjCli || null,
+          referencia: _d.ref || null, valido_ate: _d.val || null,
+          desconto: _d.discVal, tipo_desc: _d.tipo,
+          itens: _d.itens, obs: _d.obs || null,
+          empresa: _cfg.nome || '', cnpj_emp: _cfg.cnpj || '',
+          tel_emp: _cfg.tel || '', email_emp: _cfg.email || '',
+          solicitante: _d.solicitante || null,
+          total: _d.total, cliente_nome: _d.cliente,
+          status: 'pendente'
+        };
+        const _hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
+        const _res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
+          method: 'POST', headers: _hdrs, body: JSON.stringify(_dadosOrc)
+        });
+        const _rows = await _res.json();
+        const _numero = _rows && _rows[0] && _rows[0].numero;
+        if (_numero) {
+          const nEl = document.getElementById('metaNumero');
+          if (nEl) nEl.textContent = String(_numero).padStart(4, '0');
+          const nRow = document.getElementById('metaNumeroRow');
+          if (nRow) nRow.style.display = '';
+        }
+      } catch(e) { /* continua mesmo sem número */ }
+    }
+
     const d   = this._coletarDados();
     const cfg = this._cfg;
     const nome    = cfg.nome || '1K Beats';
