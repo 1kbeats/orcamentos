@@ -308,6 +308,15 @@ const Orcamentos = {
       });
       const rows = await res.json();
       const id = rows && rows[0] && rows[0].id;
+      const numero = rows && rows[0] && rows[0].numero;
+
+      // Mostrar número no masthead
+      if (numero) {
+        const nEl = document.getElementById('metaNumero');
+        if (nEl) nEl.textContent = String(numero).padStart(4, '0');
+        const nRow = document.getElementById('metaNumeroRow');
+        if (nRow) nRow.style.display = '';
+      }
 
       // 2. Montar mensagem completa com link
       let msg = Utils.saudacao() + ',' + nl + nl;
@@ -372,9 +381,17 @@ const Orcamentos = {
     doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
     doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
     doc.text('Orçamento', pw - mr, 28, { align: 'right' });
+    // Pegar número do masthead se já foi salvo
+    const _nEl = document.getElementById('metaNumero');
+    const _numStr = _nEl && _nEl.textContent && _nEl.textContent !== '—' ? _nEl.textContent : null;
+
     doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 160, 160);
     doc.text('EMISSÃO', pw - mr - 30, 37); doc.text('VALIDADE', pw - mr - 30, 43);
     doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 37, { align: 'right' }); doc.text(valStr, pw - mr, 43, { align: 'right' });
+    if (_numStr) {
+      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 49);
+      doc.setTextColor(217, 26, 114); doc.text(_numStr, pw - mr, 49, { align: 'right' });
+    }
     if (d.ref) {
       doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 49);
       doc.setTextColor(210, 210, 210); doc.text(d.ref.substring(0, 60), pw - mr, 49, { align: 'right' });
