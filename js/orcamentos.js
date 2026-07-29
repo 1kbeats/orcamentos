@@ -416,7 +416,7 @@ const Orcamentos = {
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
 
     // Cabeçalho
-    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 64, 'F');
+    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 62, 'F'); doc.setFillColor(20, 20, 28); doc.rect(0, 62, pw, 14, 'F');
 
         // Logo 1K Beats — grande e proporcional
     doc.setFontSize(36); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
@@ -428,30 +428,36 @@ const Orcamentos = {
     doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
     doc.text('))', ml + _w1k + _wBeats + 4, 35);
 
+    // Lado direito — título maior e reequilibrado
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-    doc.text('DOCUMENTO COMERCIAL', pw - mr, 15, { align: 'right' });
-    doc.setFontSize(24); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-    doc.text('Orçamento', pw - mr, 28, { align: 'right' });
+    doc.text('DOCUMENTO COMERCIAL', pw - mr, 14, { align: 'right' });
+    doc.setFontSize(32); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    doc.text('Orçamento', pw - mr, 32, { align: 'right' });
     // Pegar número do masthead se já foi salvo
     const _nEl = document.getElementById('metaNumero');
     const _numStr = _nEl && _nEl.textContent && _nEl.textContent !== '—' ? _nEl.textContent : null;
 
-    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(160, 160, 160);
-    doc.text('EMISSÃO', pw - mr - 30, 38); doc.text('VALIDADE', pw - mr - 30, 46);
-    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 38, { align: 'right' }); doc.text(valStr, pw - mr, 46, { align: 'right' });
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(140, 140, 140);
+    doc.text('EMISSÃO', pw - mr - 30, 42); doc.text('VALIDADE', pw - mr - 30, 49);
+    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 42, { align: 'right' }); doc.text(valStr, pw - mr, 49, { align: 'right' });
     if (_numStr) {
       doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(160, 160, 160); doc.text('Nº', pw - mr - 30, 54);
-      doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-      doc.text(_numStr, pw - mr, 54, { align: 'right' });
+      doc.setTextColor(140, 140, 140); doc.text('Nº', pw - mr - 30, 56);
+      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
+      doc.text(_numStr, pw - mr, 57, { align: 'right' });
     }
+    // Subtítulo abaixo do logo
+    doc.setFontSize(6.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100);
+    doc.text('ÁUDIO  ·  VÍDEO  ·  PRODUÇÃO DE EVENTOS', ml, 44);
+    // Faixa da REF
     if (d.ref) {
+      doc.setFillColor(20, 20, 28); doc.rect(0, 63, pw, 13, 'F');
       doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(150, 150, 150); doc.text('REF.', ml, 62);
-      doc.setTextColor(200, 200, 200); doc.text(d.ref.substring(0, 70), pw - mr, 62, { align: 'right' });
+      doc.setTextColor(100, 100, 100); doc.text('REF.', ml, 71);
+      doc.setTextColor(190, 190, 190); doc.text(d.ref.substring(0, 72), pw - mr, 71, { align: 'right' });
     }
 
-    let y = 72;
+    let y = 86;
     // Dados do cliente
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(150, 150, 150);
     doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('EMITIDO POR', pw - mr, y, { align: 'right' });
