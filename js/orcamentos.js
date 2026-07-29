@@ -13,8 +13,9 @@ const Orcamentos = {
     this.loadCfg();
     this.bindEvents();
     this.addItem();
-    // Preencher validade com hoje por padrão
-    const hoje = new Date().toISOString().split('T')[0];
+    // Preencher validade com hoje por padrão (usando hora local, não UTC)
+    const _h = new Date();
+    const hoje = _h.getFullYear() + '-' + String(_h.getMonth()+1).padStart(2,'0') + '-' + String(_h.getDate()).padStart(2,'0');
     document.getElementById('validade').value = hoje;
     this.updateMeta();
   },
@@ -284,26 +285,12 @@ const Orcamentos = {
     const cfg = this._cfg;
     const nome = cfg.nome || '1K Beats';
     const nl = '\n';
-    let msg = Utils.saudacao() + ',' + nl + nl;
-    msg += 'Segue o orçamento da *' + nome + '*';
-    if (d.ref) msg += ' referente a:' + nl + 'Ref.: *' + d.ref + '*' + nl;
-    else msg += '.' + nl;
-    if (d.cliente) msg += 'Empresa: *' + d.cliente + '*' + nl;
-    if (d.solicitante) msg += 'Solicitante: *' + d.solicitante + '*' + nl;
-    msg += 'Válido até: ' + Utils.fmtDate(d.val) + nl;
-    msg += nl + '*Itens:*' + nl;
-    d.itens.forEach(it => { msg += '- ' + it.desc + ' · Qtd: ' + it.qty + ' · Total: ' + Utils.fmt(it.tot) + nl; });
-    if (d.discReais > 0) {
-      const ds = d.tipo === 'pct' ? d.discVal.toFixed(1) + '% (' + Utils.fmt(d.discReais) + ')' : Utils.fmt(d.discReais);
-      msg += nl + 'Desconto: ' + ds + nl;
-    }
-    msg += nl + '*Total: ' + Utils.fmt(d.total) + '*';
-    if (d.obs) msg += nl + nl + d.obs;
 
     const btnEl = document.getElementById('btnWpp');
     if (btnEl) { btnEl.textContent = 'Salvando...'; btnEl.disabled = true; }
 
     try {
+      // 1. Salvar primeiro para obter o ID
       const dadosOrc = {
         cliente: d.cliente, cnpj_cli: d.cnpjCli || null,
         referencia: d.ref || null, valido_ate: d.val || null,
@@ -321,13 +308,35 @@ const Orcamentos = {
       });
       const rows = await res.json();
       const id = rows && rows[0] && rows[0].id;
-      if (id) {
-        const linkOrc = 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
-        msg += nl + nl + '🔗 *Visualizar orçamento:*' + nl + linkOrc;
+
+      // 2. Montar mensagem completa com link
+      let msg = Utils.saudacao() + ',' + nl + nl;
+      msg += 'Segue o orçamento da *' + nome + '* referente a:' + nl;
+      if (d.ref) msg += 'Ref.: *' + d.ref + '*' + nl;
+      if (d.cliente) msg += 'Empresa: *' + d.cliente + '*' + nl;
+      if (d.solicitante) msg += 'Solicitante: *' + d.solicitante + '*' + nl;
+      msg += 'Válido até: ' + Utils.fmtDate(d.val) + nl;
+      msg += nl + '*Itens:*' + nl;
+      d.itens.forEach(it => { msg += '- ' + it.desc + ' · Qtd: ' + it.qty + ' · Total: ' + Utils.fmt(it.tot) + nl; });
+      if (d.discReais > 0) {
+        const ds = d.tipo === 'pct' ? d.discVal.toFixed(1) + '% (' + Utils.fmt(d.discReais) + ')' : Utils.fmt(d.discReais);
+        msg += nl + 'Desconto: ' + ds + nl;
       }
+      msg += nl + '*Total: ' + Utils.fmt(d.total) + '*';
+      if (d.obs) msg += nl + nl + d.obs;
+      msg += nl + nl + 'Em caso de dúvidas, estamos à disposição!';
+      if (id) {
+        msg += nl + nl + 'Visualizar orçamento:' + nl;
+        msg += 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
+      }
+
+      // 3. Abrir WhatsApp com mensagem completa
       const telN = (cfg.tel || '').replace(/[^0-9]/g, '');
-      const wUrl = telN ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg) : 'https://wa.me/?text=' + encodeURIComponent(msg);
+      const wUrl = telN
+        ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg)
+        : 'https://wa.me/?text=' + encodeURIComponent(msg);
       window.open(wUrl, '_blank');
+
     } catch(e) {
       Utils.toast('Erro ao salvar orçamento: ' + e.message);
     } finally {
