@@ -550,8 +550,8 @@ const ListaOrcamentos = {
         const num = orc.numero ? String(orc.numero).padStart(4, '0') : '—';
         const data = orc.created_at ? Utils.fmtDate(orc.created_at.split('T')[0]) : '—';
         const valor = Utils.fmt(orc.total || 0);
-        const ref = orc.referencia ? orc.referencia.substring(0, 20) + (orc.referencia.length > 20 ? '...' : '') : '—';
-        const cliente = (orc.cliente_nome || '—').substring(0, 22) + ((orc.cliente_nome || '').length > 22 ? '...' : '');
+        const ref = orc.referencia || '—';
+        const cliente = orc.cliente_nome || '—';
         const statusLabels = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
         const statusStyles = {
           pendente:  'background:#FFFBEB;color:#92400E',
@@ -564,7 +564,7 @@ const ListaOrcamentos = {
         const semNumero = !orc.numero;
 
         const div = document.createElement('div');
-        div.style.cssText = `display:grid;grid-template-columns:52px 1fr 130px 90px 100px 90px 36px;gap:0;padding:11px 16px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center;cursor:pointer`;
+        div.style.cssText = `display:grid;grid-template-columns:52px 1.4fr 1.2fr 86px 110px 110px 36px;gap:0;padding:11px 16px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center;cursor:pointer`;
         div.innerHTML =
           `<span style="font-size:13px;font-weight:700;color:#D91A72">${num}</span>` +
           `<span style="font-size:13px;color:#1A1A22">${cliente}</span>` +
