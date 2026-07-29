@@ -11,47 +11,35 @@
 html, body { height: 100%; }
 body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
-  background: #070709;
-  color: #E8E8F0;
+  background: #F4F4F8;
+  color: #1A1A25;
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
-  background-image:
-    linear-gradient(rgba(217,26,114,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(217,26,114,0.035) 1px, transparent 1px);
-  background-size: 40px 40px;
 }
 a { color: #D91A72; text-decoration: none; }
-a:hover { color: #FF4DA6; }
+a:hover { color: #B8105E; }
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-@keyframes waveMove { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-@keyframes eq1 { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
-@keyframes eq2 { 0%,100%{transform:scaleY(0.7)} 33%{transform:scaleY(0.2)} 66%{transform:scaleY(0.9)} }
-@keyframes eq3 { 0%,100%{transform:scaleY(0.9)} 50%{transform:scaleY(0.15)} }
-@keyframes eq4 { 0%,100%{transform:scaleY(0.4)} 40%{transform:scaleY(1)} }
-@keyframes eq5 { 0%,100%{transform:scaleY(0.6)} 60%{transform:scaleY(0.2)} }
-@keyframes eq6 { 0%,100%{transform:scaleY(0.2)} 50%{transform:scaleY(0.85)} }
-@keyframes blinkDot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none} }
+@keyframes waveMove{ 0%{transform:translateX(0)}100%{transform:translateX(-50%)} }
+@keyframes eq1 { 0%,100%{transform:scaleY(0.3)}50%{transform:scaleY(1)} }
+@keyframes eq2 { 0%,100%{transform:scaleY(0.7)}33%{transform:scaleY(0.2)}66%{transform:scaleY(0.9)} }
+@keyframes eq3 { 0%,100%{transform:scaleY(0.9)}50%{transform:scaleY(0.15)} }
+@keyframes eq4 { 0%,100%{transform:scaleY(0.4)}40%{transform:scaleY(1)} }
+@keyframes eq5 { 0%,100%{transform:scaleY(0.6)}60%{transform:scaleY(0.2)} }
+@keyframes eq6 { 0%,100%{transform:scaleY(0.2)}50%{transform:scaleY(0.85)} }
+@keyframes blinkDot { 0%,100%{opacity:1}50%{opacity:0.3} }
 
 .wrap {
-  position: relative; z-index: 1;
   width: 100%; max-width: 400px;
   animation: fadeUp .5s ease-out both;
 }
 
 /* ── LOGO AREA ── */
-.logo-area { text-align: center; margin-bottom: 32px; }
+.logo-area { text-align: center; margin-bottom: 28px; }
 
-/* Waveform strip */
-.wave-strip {
-  overflow: hidden; height: 28px; margin-bottom: 20px;
-  position: relative;
-}
-.wave-strip svg {
-  width: 200%; height: 100%;
-  animation: waveMove 3s linear infinite;
-}
+.wave-strip { overflow: hidden; height: 24px; margin-bottom: 16px; }
+.wave-strip svg { width: 200%; height: 100%; animation: waveMove 3.5s linear infinite; }
 
 .logo-mark {
   display: inline-flex; align-items: center; gap: 14px; margin-bottom: 12px;
@@ -59,122 +47,117 @@ a:hover { color: #FF4DA6; }
 .logo-icon {
   width: 56px; height: 56px; background: #D91A72; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  filter: drop-shadow(0 0 20px rgba(217,26,114,0.55));
-  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(217,26,114,0.3); flex-shrink: 0;
 }
 .logo-icon svg { width: 36px; height: 36px; }
-.logo-text { text-align: left; }
 .logo-text-main {
-  font-size: 28px; font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+  font-size: 28px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1A1A25;
 }
-.logo-text-main .beats { color: #505065; }
+.logo-text-main .beats { color: #9090B0; }
 .logo-text-main .waves { color: #D91A72; }
 .logo-text-sub {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #404058;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.2em; color: #9090B0;
   text-transform: uppercase; margin-top: 4px; font-family: 'Space Mono', monospace;
 }
 
-/* EQ bars below logo */
 .eq-bars {
   display: flex; align-items: flex-end; justify-content: center;
-  gap: 3px; height: 20px; margin-top: 14px;
+  gap: 3px; height: 18px; margin-top: 10px;
 }
-.eq-bar {
-  width: 4px; background: #D91A72; border-radius: 1px 1px 0 0;
-  transform-origin: bottom;
-}
-.eq-bar:nth-child(1) { animation: eq1 0.7s ease-in-out infinite; }
-.eq-bar:nth-child(2) { animation: eq2 0.5s ease-in-out infinite; }
-.eq-bar:nth-child(3) { animation: eq3 0.9s ease-in-out infinite; }
-.eq-bar:nth-child(4) { animation: eq4 0.6s ease-in-out infinite; color: #FF4DA6; background: #FF4DA6; }
-.eq-bar:nth-child(5) { animation: eq1 0.75s ease-in-out 0.1s infinite; }
-.eq-bar:nth-child(6) { animation: eq5 0.8s ease-in-out infinite; }
-.eq-bar:nth-child(7) { animation: eq3 0.65s ease-in-out infinite; }
-.eq-bar:nth-child(8) { animation: eq6 0.55s ease-in-out infinite; background: #FF4DA6; }
-.eq-bar:nth-child(9) { animation: eq2 0.85s ease-in-out infinite; }
-.eq-bar:nth-child(10){ animation: eq4 0.7s ease-in-out infinite; }
-.eq-bar:nth-child(11){ animation: eq1 0.9s ease-in-out infinite; }
-.eq-bar:nth-child(12){ animation: eq5 0.6s ease-in-out infinite; background: #FF4DA6; }
+.eq-bar { width: 4px; background: #D91A72; border-radius: 1px 1px 0 0; transform-origin: bottom; }
+.eq-bar:nth-child(1)  { animation: eq1 0.7s  ease-in-out infinite; }
+.eq-bar:nth-child(2)  { animation: eq2 0.5s  ease-in-out infinite; }
+.eq-bar:nth-child(3)  { animation: eq3 0.9s  ease-in-out infinite; }
+.eq-bar:nth-child(4)  { animation: eq4 0.6s  ease-in-out infinite; background:#FF4DA6; }
+.eq-bar:nth-child(5)  { animation: eq1 0.75s ease-in-out 0.1s infinite; }
+.eq-bar:nth-child(6)  { animation: eq5 0.8s  ease-in-out infinite; }
+.eq-bar:nth-child(7)  { animation: eq3 0.65s ease-in-out infinite; }
+.eq-bar:nth-child(8)  { animation: eq6 0.55s ease-in-out infinite; background:#FF4DA6; }
+.eq-bar:nth-child(9)  { animation: eq2 0.85s ease-in-out infinite; }
+.eq-bar:nth-child(10) { animation: eq4 0.7s  ease-in-out infinite; }
+.eq-bar:nth-child(11) { animation: eq1 0.9s  ease-in-out infinite; }
+.eq-bar:nth-child(12) { animation: eq5 0.6s  ease-in-out infinite; background:#FF4DA6; }
 
 /* ── CARD ── */
 .card {
-  background: #0E0E14;
-  border: 1px solid rgba(217,26,114,0.2);
-  border-radius: 4px;
+  background: #FFFFFF;
+  border: 1px solid #E4E4EE;
+  border-radius: 12px;
   padding: 32px 28px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(217,26,114,0.05);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
   position: relative; overflow: hidden;
 }
 .card::before {
   content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, #D91A72, transparent);
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #D91A72 50%, transparent 100%);
 }
 
-/* REC indicator */
 .rec-badge {
   display: flex; align-items: center; gap: 6px;
   font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
-  color: #404058; letter-spacing: 0.12em; margin-bottom: 20px;
+  color: #9090B0; letter-spacing: 0.12em; margin-bottom: 18px;
 }
 .rec-dot { width: 6px; height: 6px; background: #D91A72; border-radius: 50%; animation: blinkDot 1.2s ease infinite; }
 
-.card-title { font-size: 18px; font-weight: 700; color: #E8E8F0; margin-bottom: 3px; }
-.card-sub   { font-size: 12px; color: #404058; margin-bottom: 24px; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
+.card-title { font-size: 20px; font-weight: 700; color: #1A1A25; margin-bottom: 3px; }
+.card-sub   { font-size: 11px; color: #9090B0; margin-bottom: 24px; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
 
 /* ── FIELDS ── */
 .field { margin-bottom: 14px; }
 .field label {
   display: block; font-size: 9px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.14em;
-  color: #404058; margin-bottom: 7px; font-family: 'Space Mono', monospace;
+  color: #9090B0; margin-bottom: 7px; font-family: 'Space Mono', monospace;
 }
 .field input {
-  width: 100%; height: 44px;
-  background: #070709; border: 1px solid rgba(255,255,255,0.07); border-radius: 0;
-  padding: 0 14px; font-size: 14px; color: #E8E8F0;
+  width: 100%; height: 46px;
+  background: #F8F8FC; border: 1.5px solid #E4E4EE; border-radius: 6px;
+  padding: 0 14px; font-size: 14px; color: #1A1A25;
   font-family: 'Space Grotesk', sans-serif; outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
-.field input::placeholder { color: #252535; }
+.field input::placeholder { color: #C0C0D0; }
 .field input:focus {
   border-color: #D91A72;
-  box-shadow: 0 0 0 3px rgba(217,26,114,0.12);
+  box-shadow: 0 0 0 3px rgba(217,26,114,0.1);
+  background: #FFFFFF;
 }
 
 /* ── BUTTON ── */
 .btn-login {
   width: 100%; height: 48px;
-  background: #D91A72; border: none; border-radius: 0;
+  background: #D91A72; border: none; border-radius: 6px;
   font-size: 13px; font-weight: 700; color: #fff;
   font-family: 'Space Mono', monospace; cursor: pointer; margin-top: 8px;
   letter-spacing: 0.1em; text-transform: uppercase;
-  box-shadow: 0 0 32px rgba(217,26,114,0.4);
+  box-shadow: 0 4px 20px rgba(217,26,114,0.35);
   transition: background .2s, box-shadow .2s, transform .1s;
 }
-.btn-login:hover { background: #FF4DA6; box-shadow: 0 0 48px rgba(217,26,114,0.55); }
+.btn-login:hover { background: #B8105E; box-shadow: 0 6px 28px rgba(217,26,114,0.4); }
 .btn-login:active { transform: scale(.98); }
-.btn-login:disabled { background: #303045; cursor: not-allowed; box-shadow: none; color: #505068; }
+.btn-login:disabled { background: #E0E0E8; cursor: not-allowed; box-shadow: none; color: #9090B0; }
 
 /* ── ERROR ── */
 .error {
   display: none;
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.25);
-  border-left: 2px solid #EF4444;
-  padding: 10px 14px; font-size: 12px; color: #EF4444;
-  margin-bottom: 16px; font-family: 'Space Mono', monospace;
+  background: rgba(220,38,38,0.05);
+  border: 1px solid rgba(220,38,38,0.2);
+  border-left: 3px solid #DC2626;
+  padding: 10px 14px; font-size: 12px; color: #DC2626;
+  margin-bottom: 16px; border-radius: 4px;
+  font-family: 'Space Mono', monospace;
 }
 
-.forgot { text-align: center; margin-top: 16px; font-size: 11px; color: #404058; font-family: 'Space Mono', monospace; }
+.forgot { text-align: center; margin-top: 16px; font-size: 12px; color: #9090B0; }
 
 /* ── FOOTER ── */
 .footer {
-  text-align: center; margin-top: 24px;
-  font-size: 10px; color: #252535; letter-spacing: 0.08em;
+  text-align: center; margin-top: 20px;
+  font-size: 11px; color: #C0C0D0; letter-spacing: 0.05em;
   font-family: 'Space Mono', monospace; line-height: 1.8;
 }
-.footer strong { color: #404058; }
+.footer strong { color: #9090B0; }
 </style>
 </head>
 <body>
@@ -182,14 +165,12 @@ a:hover { color: #FF4DA6; }
 <div class="wrap">
 
   <div class="logo-area">
-    <!-- Animated waveform -->
     <div class="wave-strip">
-      <svg viewBox="0 0 600 28" preserveAspectRatio="none">
-        <path d="M0,14 Q15,3 30,14 Q45,25 60,14 Q75,3 90,14 Q105,25 120,8 Q135,1 150,14 Q165,25 180,6 Q195,1 210,14 Q225,25 240,10 Q255,3 270,14 Q285,25 300,14 Q315,3 330,14 Q345,25 360,14 Q375,3 390,14 Q405,25 420,8 Q435,1 450,14 Q465,25 480,6 Q495,1 510,14 Q525,25 540,10 Q555,3 570,14 Q585,25 600,14" stroke="#D91A72" fill="none" stroke-width="1.5" opacity="0.35"/>
+      <svg viewBox="0 0 600 24" preserveAspectRatio="none">
+        <path d="M0,12 Q15,3 30,12 Q45,21 60,12 Q75,3 90,12 Q105,21 120,7 Q135,1 150,12 Q165,21 180,5 Q195,1 210,12 Q225,21 240,8 Q255,3 270,12 Q285,21 300,12 Q315,3 330,12 Q345,21 360,12 Q375,3 390,12 Q405,21 420,7 Q435,1 450,12 Q465,21 480,5 Q495,1 510,12 Q525,21 540,8 Q555,3 570,12 Q585,21 600,12" stroke="#D91A72" fill="none" stroke-width="1.5" opacity="0.3"/>
       </svg>
     </div>
 
-    <!-- Logo mark -->
     <div class="logo-mark">
       <div class="logo-icon">
         <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -198,26 +179,25 @@ a:hover { color: #FF4DA6; }
           <path d="M52 20 C58 26 58 30 52 36" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
         </svg>
       </div>
-      <div class="logo-text">
+      <div>
         <div class="logo-text-main">1K<span class="beats">beats</span><span class="waves">))</span></div>
         <div class="logo-text-sub">Sistema de Orçamentos</div>
       </div>
     </div>
 
-    <!-- EQ bars -->
     <div class="eq-bars">
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
-      <div class="eq-bar" style="height:20px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
+      <div class="eq-bar" style="height:18px"></div>
     </div>
   </div>
 
@@ -251,8 +231,7 @@ a:hover { color: #FF4DA6; }
 
   <div class="footer">
     Desenvolvido por <strong>Alessandro Lima</strong><br>
-    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v4.0</span><br>
-    v3.3
+    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v4.1</span> · v3.3
   </div>
 </div>
 
@@ -265,9 +244,7 @@ var sess = localStorage.getItem('1kbeats_session');
 if (sess) {
   try {
     var s = JSON.parse(sess);
-    if (s.expires_at && Date.now() / 1000 < s.expires_at) {
-      window.location.href = './index.html';
-    }
+    if (s.expires_at && Date.now() / 1000 < s.expires_at) window.location.href = './index.html';
   } catch(e) { localStorage.removeItem('1kbeats_session'); }
 }
 
@@ -277,51 +254,36 @@ function login() {
   var btn     = document.getElementById('btnLogin');
   var err     = document.getElementById('errMsg');
 
-  if (!usuario || !senha) {
-    err.style.display = 'block';
-    err.textContent = 'Preencha usuário e senha.';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'CONECTANDO...';
-  err.style.display = 'none';
-
-  var email = usuario + DOMAIN;
+  if (!usuario || !senha) { err.style.display='block'; err.textContent='Preencha usuário e senha.'; return; }
+  btn.disabled = true; btn.textContent = 'CONECTANDO...'; err.style.display = 'none';
 
   fetch(SURL + '/auth/v1/token?grant_type=password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'apikey': SKEY },
-    body: JSON.stringify({ email: email, password: senha })
+    body: JSON.stringify({ email: usuario + DOMAIN, password: senha })
   })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
+  .then(function(r){ return r.json(); })
+  .then(function(data){
     if (data.access_token) {
       localStorage.setItem('1kbeats_session', JSON.stringify({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600),
-        user: data.user
+        access_token: data.access_token, refresh_token: data.refresh_token,
+        expires_at: Math.floor(Date.now()/1000) + (data.expires_in || 3600), user: data.user
       }));
       window.location.href = './index.html';
     } else {
-      err.style.display = 'block';
-      err.textContent = 'Usuário ou senha incorretos.';
-      btn.disabled = false;
-      btn.textContent = 'ENTRAR';
+      err.style.display = 'block'; err.textContent = 'Usuário ou senha incorretos.';
+      btn.disabled = false; btn.textContent = 'ENTRAR';
     }
   })
-  .catch(function() {
-    err.style.display = 'block';
-    err.textContent = 'Erro de conexão. Tente novamente.';
-    btn.disabled = false;
-    btn.textContent = 'ENTRAR';
+  .catch(function(){
+    err.style.display = 'block'; err.textContent = 'Erro de conexão. Tente novamente.';
+    btn.disabled = false; btn.textContent = 'ENTRAR';
   });
 }
 
 document.getElementById('btnLogin').addEventListener('click', login);
-document.getElementById('senha').addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
-document.getElementById('usuario').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('senha').focus(); });
+document.getElementById('senha').addEventListener('keydown', function(e){ if(e.key==='Enter') login(); });
+document.getElementById('usuario').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('senha').focus(); });
 </script>
 </body>
 </html>
