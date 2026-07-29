@@ -158,6 +158,7 @@
           + '<div class="meta">'
             + '<div><strong>Emissão</strong> &nbsp;'+new Date().toLocaleDateString('pt-BR')+'</div>'
             + '<div><strong>Validade</strong> &nbsp;'+fmtDate(v)+'</div>'
+            + (d.numero ? '<div><strong>Nº</strong> &nbsp;<span style="color:#D91A72;font-weight:700">'+String(d.numero).padStart(4,'0')+'</span></div>' : '')
             + (d.r||d.referencia ? '<div><strong>Ref.</strong> &nbsp;'+(d.r||d.referencia)+'</div>' : '')
           + '</div>'
         + '</div>'
