@@ -90,28 +90,26 @@
 
         <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
     <div class="panel active" id="panelListaOrcamentos">
-      <div class="admin-wrap">
-        <div class="admin-header">
+      <div style="padding:2rem 2rem 5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
           <div>
-            <h2>Orçamentos</h2>
-            <div style="font-size:12px;color:#AAA;margin-top:2px">Últimos enviados</div>
+            <h2 style="font-size:22px;font-weight:600;color:#1A1A22">Orçamentos</h2>
+            <div style="font-size:13px;color:#AAA;margin-top:3px">Últimos enviados</div>
           </div>
-          <button class="btn-novo" id="btnNovoOrcamento">
-            + Novo orçamento
-          </button>
+          <button id="btnNovoOrcamento" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button>
         </div>
 
         <!-- CABEÇALHO DA LISTA -->
-        <div style="display:grid;grid-template-columns:60px 1fr 110px 140px 120px 36px;gap:0;padding:10px 24px;background:#F0F0F5;border-radius:8px 8px 0 0;margin-bottom:0">
+        <div style="display:grid;grid-template-columns:60px 1fr 110px 150px 130px 40px;gap:0;padding:10px 24px;background:#F0F0F5;border-radius:10px 10px 0 0;border:0.5px solid #E0E0EA;border-bottom:none">
           <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Nº</span>
           <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Cliente</span>
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA;padding-left:12px">Data</span>
+          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Data</span>
           <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:right">Valor</span>
           <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:center">Status</span>
           <span></span>
         </div>
 
-        <div class="card" id="listaOrcamentos">
+        <div id="listaOrcamentos" style="background:#fff;border-radius:0 0 10px 10px;border:0.5px solid #E0E0EA;border-top:none">
           <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>
         </div>
       </div>
