@@ -50,17 +50,27 @@ const Auth = {
     window.location.href = './login.html';
   },
 
-  // Configura visibilidade de elementos admin
+  // Configura visibilidade de elementos admin e perfil
   _configurarPerfil(user) {
     const email = user.email || '';
+    const meta = user.user_metadata || {};
     const isAdmin = email.includes('admin');
-    const adminEls = document.querySelectorAll('.admin-only');
-    adminEls.forEach(el => el.style.display = isAdmin ? '' : 'none');
+    const plano = meta.plano || 'basico';
 
+    // Configurar menu com perfil
+    if (typeof Nav !== 'undefined') {
+      Nav.configurarMenu(isAdmin, plano);
+    }
+
+    // Nome do usuário na sidebar
     const nomeEl = document.getElementById('userNome');
-    if (nomeEl) {
-      const meta = user.user_metadata || {};
-      nomeEl.textContent = meta.nome || email.split('@')[0];
+    if (nomeEl) nomeEl.textContent = meta.nome || email.split('@')[0];
+
+    // Avatar inicial
+    const avatarEl = document.querySelector('.sidebar-avatar');
+    if (avatarEl) {
+      const nome = meta.nome || email.split('@')[0];
+      avatarEl.textContent = nome.charAt(0).toUpperCase();
     }
   },
 
