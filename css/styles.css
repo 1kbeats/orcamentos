@@ -464,3 +464,18 @@ select:-webkit-autofill {
   -webkit-text-fill-color: var(--ink) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ── MENU PRO ── */
+.badge-pro { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(217,26,114,0.2); color: #D91A72; margin-left: auto; flex-shrink: 0; }
+.nav-item.pro-item { display: flex; align-items: center; gap: 10px; }
+.nav-item.pro-item span:first-of-type { flex: 1; }
+.nav-item.pro-bloqueado { opacity: 0.4; cursor: pointer; }
+.nav-section.pro-section { display: block; }
+
+/* ── TELA DE BLOQUEIO PRO ── */
+.pro-lock { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 2rem; }
+.pro-lock-icon { width: 64px; height: 64px; border-radius: 50%; background: #fff; border: 1px solid #E0E0EA; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 20px; }
+.pro-lock-title { font-size: 20px; font-weight: 600; color: #1A1A22; margin-bottom: 8px; }
+.pro-lock-desc { font-size: 14px; color: #888; line-height: 1.7; max-width: 320px; margin-bottom: 24px; }
+.pro-lock-btn { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #fff; text-decoration: none; border-radius: 8px; padding: 11px 22px; font-size: 13px; font-weight: 600; font-family: inherit; border: none; cursor: pointer; }
+.pro-lock-preco { margin-top: 12px; font-size: 12px; color: #AAA; }
