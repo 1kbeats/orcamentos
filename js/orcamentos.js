@@ -564,7 +564,7 @@ const ListaOrcamentos = {
         const semNumero = !orc.numero;
 
         const div = document.createElement('div');
-        div.style.cssText = `display:grid;grid-template-columns:60px 1fr 110px 140px 120px 36px;gap:0;padding:14px 24px;background:${bg};border-bottom:0.5px solid #F0F0F5;align-items:center`;
+        div.style.cssText = `display:grid;grid-template-columns:60px 1fr 110px 150px 130px 40px;gap:0;padding:16px 24px;background:${bg};border-bottom:0.5px solid #EBEBF0;align-items:center`;
         div.innerHTML =
           `<span style="font-size:14px;font-weight:700;color:#D91A72">${num}</span>` +
           `<div style="min-width:0;padding-right:16px">` +
