@@ -39,7 +39,11 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Operacional</div>
-      <div class="nav-item active" id="navOrcamentos" onclick="Nav.showPanel('listaOrcamentos')">
+      <div class="nav-item" id="navDashboard" class="active" onclick="Nav.showPanel('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" id="navOrcamentos" onclick="Nav.showPanel('listaOrcamentos')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Orçamentos
       </div>
@@ -117,7 +121,95 @@
       </button>
     </div>
 
-        <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
+        <!-- ══ PAINEL: DASHBOARD ══ -->
+    <div class="panel active" id="panelDashboard">
+      <div style="padding:24px 28px 5rem">
+
+        <!-- SAUDAÇÃO -->
+        <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:22px;font-weight:600;color:#1A1A22" id="dashSaudacao">Olá!</div>
+            <div style="font-size:13px;color:#AAA;margin-top:3px" id="dashData"></div>
+          </div>
+          <button onclick="Nav.showPanel('listaOrcamentos'); document.getElementById('btnNovoOrcamento').click()" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button>
+        </div>
+
+        <!-- KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+          <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;margin-bottom:10px">Orçamentos no mês</div>
+            <div style="font-size:30px;font-weight:500;color:#1A1A22" id="kpiTotal">—</div>
+            <div style="font-size:12px;color:#AAA;margin-top:4px">emitidos</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;margin-bottom:10px">Valor total emitido</div>
+            <div style="font-size:22px;font-weight:500;color:#1A1A22" id="kpiValor">—</div>
+            <div style="font-size:12px;color:#AAA;margin-top:4px">no mês corrente</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;margin-bottom:10px">Aprovados</div>
+            <div style="font-size:30px;font-weight:500;color:#2E7D32" id="kpiAprovados">—</div>
+            <div style="font-size:12px;color:#AAA;margin-top:4px" id="kpiAprovadosVal">—</div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;margin-bottom:10px">Pendentes</div>
+            <div style="font-size:30px;font-weight:500;color:#92400E" id="kpiPendentes">—</div>
+            <div style="font-size:12px;color:#AAA;margin-top:4px" id="kpiPendentesVal">—</div>
+          </div>
+        </div>
+
+        <!-- LINHA INFERIOR -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+          <!-- ÚLTIMOS ORÇAMENTOS -->
+          <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:0.5px solid #E0E0EA;display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:14px;font-weight:600;color:#1A1A22">Últimos orçamentos</div>
+              <span onclick="Nav.showPanel('listaOrcamentos')" style="font-size:12px;color:#D91A72;cursor:pointer">Ver todos →</span>
+            </div>
+            <div id="dashUltimos">
+              <div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Carregando...</div>
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+
+            <!-- AÇÕES RÁPIDAS -->
+            <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+              <div style="font-size:14px;font-weight:600;color:#1A1A22;margin-bottom:12px">Ações rápidas</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button onclick="Nav.showPanel('listaOrcamentos'); setTimeout(()=>document.getElementById('btnNovoOrcamento').click(),100)" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                  📄 Novo orçamento
+                </button>
+                <button onclick="Nav.showPanel('clientes'); setTimeout(()=>Clientes.abrirNovo(),100)" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                  👥 Cadastrar cliente
+                </button>
+                <button onclick="Nav.showPanel('catalogo'); setTimeout(()=>Catalogo.abrirNovo(),100)" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                  📦 Adicionar ao catálogo
+                </button>
+              </div>
+            </div>
+
+            <!-- TAXA DE APROVAÇÃO -->
+            <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
+              <div style="font-size:14px;font-weight:600;color:#1A1A22;margin-bottom:2px">Taxa de aprovação</div>
+              <div style="font-size:12px;color:#AAA;margin-bottom:12px" id="dashMesLabel">—</div>
+              <div style="background:#F0F0F5;border-radius:20px;height:8px;overflow:hidden">
+                <div id="dashTaxaBarra" style="background:#D91A72;height:100%;width:0%;border-radius:20px;transition:width .6s ease"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px">
+                <span style="font-size:12px;color:#AAA" id="dashTaxaPct">—</span>
+                <span style="font-size:12px;font-weight:600;color:#D91A72" id="dashTaxaNum">—</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
     <div class="panel active" id="panelListaOrcamentos">
       <div style="padding:2rem 2rem 5rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
@@ -515,7 +607,7 @@
     Auth.verificarSessao();
     Orcamentos.init();
     ListaOrcamentos.bindEvents();
-    ListaOrcamentos.carregar();
+    Dashboard.carregar();
     Clientes.bindEvents();
     Catalogo.bindEvents();
     Usuarios.bindEvents();
