@@ -12,31 +12,52 @@ const Nav = {
     this._plano = isAdmin ? 'admin' : (plano || 'basico');
     const isPro = this._plano === 'profissional' || this._plano === 'admin';
 
-    // Seções PRO
+    // Seções PRO sempre visíveis
     document.querySelectorAll('.pro-section').forEach(el => {
       el.style.display = 'block';
     });
 
-    // Seção Financeiro label
+    // Labels das seções
     const secFin = document.getElementById('navSectionFinanceiro');
     if (secFin) secFin.textContent = isPro ? 'Financeiro' : 'Upgrade disponível';
 
-    // Seção Operações label
     const secOp = document.getElementById('navSectionOperacoes');
     if (secOp) secOp.textContent = isPro ? 'Operações' : '';
 
-    // Badges PRO — aparecem só no básico
-    ['Gastos','Equipe','Fornecedores'].forEach(m => {
-      const badge = document.getElementById('badge' + m);
-      const item = document.getElementById('nav' + m);
-      if (badge) badge.style.display = isPro ? 'none' : 'inline';
-      if (item) {
-        if (!isPro) item.classList.add('pro-bloqueado');
-        else item.classList.remove('pro-bloqueado');
-      }
-    });
+    // Badges por perfil
+    const badgeGastos = document.getElementById('badgeGastos');
+    const badgeEquipe = document.getElementById('badgeEquipe');
+    const badgeFornecedores = document.getElementById('badgeFornecedores');
 
-    // Admin
+    if (isAdmin) {
+      // Admin vê badges BUILD
+      if (badgeGastos) { badgeGastos.style.display = 'inline'; badgeGastos.textContent = 'BUILD'; badgeGastos.style.background = 'rgba(255,165,0,0.2)'; badgeGastos.style.color = 'orange'; }
+      if (badgeEquipe) { badgeEquipe.style.display = 'inline'; badgeEquipe.textContent = 'BUILD'; badgeEquipe.style.background = 'rgba(255,165,0,0.2)'; badgeEquipe.style.color = 'orange'; }
+      if (badgeFornecedores) { badgeFornecedores.style.display = 'inline'; badgeFornecedores.textContent = 'BUILD'; badgeFornecedores.style.background = 'rgba(255,165,0,0.2)'; badgeFornecedores.style.color = 'orange'; }
+      // Admin também vê Ordem de serviço FUTURO
+      const itemOS = document.getElementById('navOrdemServico');
+      if (itemOS) itemOS.style.display = 'flex';
+    } else if (isPro) {
+      // PRO — sem badges
+      if (badgeGastos) badgeGastos.style.display = 'none';
+      if (badgeEquipe) badgeEquipe.style.display = 'none';
+      if (badgeFornecedores) badgeFornecedores.style.display = 'none';
+      const itemOS = document.getElementById('navOrdemServico');
+      if (itemOS) itemOS.style.display = 'none';
+    } else {
+      // Básico — badges PRO
+      if (badgeGastos) { badgeGastos.style.display = 'inline'; badgeGastos.textContent = 'PRO'; badgeGastos.style.background = 'rgba(217,26,114,0.2)'; badgeGastos.style.color = '#D91A72'; }
+      if (badgeEquipe) { badgeEquipe.style.display = 'inline'; badgeEquipe.textContent = 'PRO'; badgeEquipe.style.background = 'rgba(217,26,114,0.2)'; badgeEquipe.style.color = '#D91A72'; }
+      if (badgeFornecedores) { badgeFornecedores.style.display = 'inline'; badgeFornecedores.textContent = 'PRO'; badgeFornecedores.style.background = 'rgba(217,26,114,0.2)'; badgeFornecedores.style.color = '#D91A72'; }
+      ['navGastos','navEquipe','navFornecedores'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('pro-bloqueado');
+      });
+      const itemOS = document.getElementById('navOrdemServico');
+      if (itemOS) itemOS.style.display = 'none';
+    }
+
+    // Admin — mostrar Administração
     document.querySelectorAll('.admin-only').forEach(el => {
       el.style.display = isAdmin ? '' : 'none';
     });
