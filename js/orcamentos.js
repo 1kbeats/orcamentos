@@ -626,3 +626,90 @@ const ListaOrcamentos = {
     if (btnNovo) btnNovo.addEventListener('click', () => Nav.showPanel('orcamentos'));
   }
 };
+
+// ════════════════════════════════════════════════════════════
+// Dashboard
+// ════════════════════════════════════════════════════════════
+
+const Dashboard = {
+
+  carregar() {
+    // Saudação e data
+    const h = new Date().getHours();
+    const saud = h >= 6 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite';
+    const nomeEl = document.getElementById('userNome');
+    const nome = nomeEl ? nomeEl.textContent : '';
+    const saudEl = document.getElementById('dashSaudacao');
+    if (saudEl) saudEl.textContent = saud + (nome ? ', ' + nome : '') + '!';
+
+    const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+    const agora = new Date();
+    const dataEl = document.getElementById('dashData');
+    if (dataEl) dataEl.textContent = dias[agora.getDay()] + ', ' + agora.getDate() + ' de ' + meses[agora.getMonth()] + ' de ' + agora.getFullYear();
+
+    const mesLabel = document.getElementById('dashMesLabel');
+    if (mesLabel) mesLabel.textContent = meses[agora.getMonth()].charAt(0).toUpperCase() + meses[agora.getMonth()].slice(1) + ' ' + agora.getFullYear();
+
+    // Buscar orçamentos do mês atual
+    const inicio = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-01';
+    fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?select=*&created_at=gte.' + inicio + 'T00:00:00&order=created_at.desc', {
+      headers: CONFIG.headers()
+    })
+    .then(r => r.json())
+    .then(lista => {
+      lista = lista || [];
+
+      // KPIs
+      const total = lista.length;
+      const valorTotal = lista.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+      const aprovados = lista.filter(o => o.status === 'aprovado');
+      const pendentes = lista.filter(o => o.status === 'pendente');
+      const valorAprov = aprovados.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+      const valorPend = pendentes.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      set('kpiTotal', total);
+      set('kpiValor', Utils.fmt(valorTotal));
+      set('kpiAprovados', aprovados.length);
+      set('kpiAprovadosVal', Utils.fmt(valorAprov));
+      set('kpiPendentes', pendentes.length);
+      set('kpiPendentesVal', Utils.fmt(valorPend));
+
+      // Taxa de aprovação
+      const finalizados = lista.filter(o => o.status === 'aprovado' || o.status === 'recusado').length;
+      const taxa = finalizados > 0 ? Math.round(aprovados.length / finalizados * 100) : 0;
+      const barra = document.getElementById('dashTaxaBarra');
+      if (barra) setTimeout(() => barra.style.width = taxa + '%', 100);
+      set('dashTaxaPct', taxa + '% aprovados');
+      set('dashTaxaNum', aprovados.length + ' de ' + finalizados);
+
+      // Últimos 3
+      const container = document.getElementById('dashUltimos');
+      if (!container) return;
+      if (lista.length === 0) {
+        container.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Nenhum orçamento este mês.</div>';
+        return;
+      }
+      const stStyles = { pendente:'background:#FFFBEB;color:#92400E', aprovado:'background:#E8F5E9;color:#2E7D32', recusado:'background:#FFEBEE;color:#C62828', cancelado:'background:#F5F5F5;color:#666' };
+      const stLabels = { pendente:'Pendente', aprovado:'Aprovado', recusado:'Recusado', cancelado:'Cancelado' };
+      container.innerHTML = lista.slice(0, 4).map((o, i) => {
+        const num = o.numero ? String(o.numero).padStart(4,'0') : '—';
+        const st = o.status || 'pendente';
+        const bg = i % 2 === 0 ? '#fff' : '#FAFAFA';
+        return `<div style="display:grid;grid-template-columns:44px 1fr 90px;padding:12px 18px;border-bottom:0.5px solid #F0F0F5;align-items:center;background:${bg}">
+          <span style="font-size:13px;font-weight:700;color:#D91A72">${num}</span>
+          <div>
+            <div style="font-size:12px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.cliente_nome || '—'}</div>
+            ${o.referencia ? `<div style="font-size:11px;color:#D91A72;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.referencia}</div>` : ''}
+          </div>
+          <span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;${stStyles[st]||stStyles.pendente};text-align:center">${stLabels[st]||'Pendente'}</span>
+        </div>`;
+      }).join('');
+    })
+    .catch(() => {
+      const container = document.getElementById('dashUltimos');
+      if (container) container.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Erro ao carregar.</div>';
+    });
+  }
+};

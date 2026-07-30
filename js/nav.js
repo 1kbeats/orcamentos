@@ -4,7 +4,7 @@
 
 const Nav = {
 
-  painelAtual: 'listaOrcamentos',
+  painelAtual: 'dashboard',
   _plano: 'basico', // 'basico', 'profissional', 'admin'
 
   // Configura o menu de acordo com o perfil
@@ -78,6 +78,7 @@ const Nav = {
     this.closeSidebar();
 
     // Carregar dados do painel ao entrar
+    if (panel === 'dashboard') Dashboard.carregar();
     if (panel === 'listaOrcamentos') ListaOrcamentos.carregar();
     if (panel === 'clientes')  Clientes.renderLista();
     if (panel === 'catalogo')  Catalogo.renderLista();
