@@ -564,14 +564,14 @@ const ListaOrcamentos = {
         const semNumero = !orc.numero;
 
         const div = document.createElement('div');
-        div.style.cssText = `display:grid;grid-template-columns:60px 1fr 110px 150px 130px 40px;gap:0;padding:16px 24px;background:${bg};border-bottom:0.5px solid #EBEBF0;align-items:center`;
+        div.style.cssText = `display:grid;grid-template-columns:60px 2fr 100px 140px 120px 40px;gap:0;padding:16px 24px;background:${bg};border-bottom:0.5px solid #EBEBF0;align-items:center`;
         div.innerHTML =
           `<span style="font-size:14px;font-weight:700;color:#D91A72">${num}</span>` +
-          `<div style="min-width:0;padding-right:16px">` +
+          `<div style="min-width:0;padding-right:20px">` +
             `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cliente}</div>` +
             (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ref}</div>` : '') +
           `</div>` +
-          `<span style="font-size:12px;color:#AAA;padding-left:8px">${data}</span>` +
+          `<span style="font-size:12px;color:#AAA">${data}</span>` +
           `<span style="font-size:14px;font-weight:500;color:#1A1A22;text-align:right">${valor}</span>` +
           `<div style="text-align:center">` +
             `<select class="orc-status-sel" data-id="${orc.id}" style="border:none;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;${statusStyles[st]}">` +
