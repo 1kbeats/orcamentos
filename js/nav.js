@@ -95,26 +95,70 @@ const Nav = {
     }
   },
 
-  // Tela de bloqueio
+  // Tela de teaser por módulo
+  _teasers: {
+    gastos: {
+      titulo: 'Controle de Gastos Diários',
+      desc: 'Registre todas as despesas da sua operação e tenha controle total do que entra e sai no seu negócio.',
+      recursos: [
+        { icone: '🧾', titulo: 'Notas fiscais', desc: 'Registre notas por data, descrição e valor' },
+        { icone: '⛽', titulo: 'Gastos de veículos', desc: 'Abastecimentos e manutenções por carro' },
+        { icone: '📊', titulo: 'Total por período', desc: 'Veja quanto gastou no mês ou por evento' },
+        { icone: '🏷️', titulo: 'Por categoria', desc: 'Separe por combustível, alimentação, material' },
+      ]
+    },
+    equipe: {
+      titulo: 'Equipe e Freelancers',
+      desc: 'Cadastre seus técnicos e freelancers, controle diárias e saiba quem trabalhou em cada evento.',
+      recursos: [
+        { icone: '👤', titulo: 'Cadastro completo', desc: 'Nome, RG, CPF e filiação de cada técnico' },
+        { icone: '💰', titulo: 'Registro de diárias', desc: 'Valor e evento de cada trabalho realizado' },
+        { icone: '📋', titulo: 'Histórico por técnico', desc: 'Veja todos os eventos que cada um participou' },
+        { icone: '📞', titulo: 'Contato rápido', desc: 'Acesso direto ao WhatsApp de cada profissional' },
+      ]
+    },
+    fornecedores: {
+      titulo: 'Controle de Fornecedores',
+      desc: 'Registre carregadores, fornecedores externos e prestadores de serviço por evento.',
+      recursos: [
+        { icone: '🚚', titulo: 'Cadastro por evento', desc: 'Vincule o fornecedor ao evento correspondente' },
+        { icone: '🕐', titulo: 'Horário e valor', desc: 'Registre horário de chegada e valor contratado' },
+        { icone: '📝', titulo: 'Histórico completo', desc: 'Veja todos os fornecedores por evento' },
+        { icone: '⭐', titulo: 'Avaliação', desc: 'Marque os melhores para usar novamente' },
+      ]
+    }
+  },
+
   showPanelBloqueado(panel) {
     this.painelAtual = panel;
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-    const nomes = { gastos: 'Gastos Diários', equipe: 'Equipe e Freelancers', fornecedores: 'Fornecedores' };
     const navEl = document.getElementById('nav' + panel.charAt(0).toUpperCase() + panel.slice(1));
     if (navEl) navEl.classList.add('active');
+
+    const t = this._teasers[panel] || {};
+    const recursos = (t.recursos || []).map(r =>
+      '<div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">' +
+        '<div style="font-size:22px;flex-shrink:0">' + r.icone + '</div>' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:600;color:#1A1A22;margin-bottom:3px">' + r.titulo + '</div>' +
+          '<div style="font-size:12px;color:#666;line-height:1.5">' + r.desc + '</div>' +
+        '</div>' +
+      '</div>'
+    ).join('');
 
     const painelEl = document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1));
     if (painelEl) {
       painelEl.classList.add('active');
       painelEl.querySelector('div').innerHTML =
-        '<div class="pro-lock">' +
-          '<div class="pro-lock-icon">🔒</div>' +
-          '<div class="pro-lock-title">Módulo Profissional</div>' +
-          '<div class="pro-lock-desc">O módulo <strong>' + nomes[panel] + '</strong> faz parte do <strong style="color:#D91A72">Plano Profissional</strong>. Entre em contato para fazer o upgrade.</div>' +
-          '<a href="https://wa.me/5521999999999" class="pro-lock-btn" target="_blank">💬 Falar com Alessandro</a>' +
-          '<div class="pro-lock-preco">R$ 2.000 implantação + R$ 250/mês</div>' +
+        '<div style="padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh">' +
+          '<div style="background:rgba(217,26,114,0.1);border:1px solid rgba(217,26,114,0.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700;color:#D91A72;letter-spacing:.08em;margin-bottom:20px">PLANO PROFISSIONAL</div>' +
+          '<div style="font-size:22px;font-weight:600;color:#1A1A22;margin-bottom:8px;text-align:center">' + (t.titulo || '') + '</div>' +
+          '<div style="font-size:14px;color:#666;margin-bottom:28px;text-align:center;max-width:400px;line-height:1.7">' + (t.desc || '') + '</div>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:560px;margin-bottom:28px">' + recursos + '</div>' +
+          '<a href="https://wa.me/5521999999999" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:600;font-family:inherit">💬 Quero fazer o upgrade</a>' +
+          '<div style="font-size:12px;color:#AAA;margin-top:10px">Fale com Alessandro e ative agora</div>' +
         '</div>';
     }
     this.closeSidebar();
