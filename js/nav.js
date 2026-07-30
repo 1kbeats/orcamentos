@@ -85,12 +85,13 @@ const Nav = {
     if (panel === 'admin')     Usuarios.carregar();
   },
 
-  // Mostra painel PRO ou tela de bloqueio
+  // Mostra painel PRO ou teaser
   showPanelPro(panel) {
-    const isPro = this._plano === 'profissional' || this._plano === 'admin';
+    const isPro = this._plano === 'profissional';
     if (isPro) {
       this.showPanel(panel);
     } else {
+      // Admin e básico veem o teaser (admin vê por ser módulo em construção)
       this.showPanelBloqueado(panel);
     }
   },
