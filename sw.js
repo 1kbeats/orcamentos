@@ -1,87 +1,76 @@
-var CACHE = '1kbeats-orcamentos-v44';
-var FILES = [
+const CACHE_NAME = '1kbeats-v6-secure-1';
+const APP_SHELL = [
   './',
   './index.html',
-  './ver.html',
   './login.html',
+  './reset-password.html',
+  './ver.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './css/styles.css',
+  './css/secure.css',
   './js/config.js',
+  './js/api.js',
   './js/utils.js',
   './js/auth.js',
+  './js/login.js',
+  './js/reset-password.js',
   './js/nav.js',
+  './js/nav-events.js',
   './js/clientes.js',
   './js/financeiro.js',
   './js/usuarios.js',
   './js/catalogo.js',
-  './js/orcamentos.js'
+  './js/orcamentos.js',
+  './js/secure-overrides.js',
+  './js/public-quote.js',
+  './js/app.js'
 ];
 
-self.addEventListener('install', function(e) {
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then(function(cache) {
-      return cache.addAll(FILES);
-    })
-  );
 });
 
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    })
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', function(e) {
-  // Ignorar requisições não-GET (POST, PATCH, DELETE)
-  if (e.request.method !== 'GET') return;
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin || url.hostname.endsWith('supabase.co')) return;
 
-  // Ignorar requisições ao Supabase
-  if (e.request.url.indexOf('supabase.co') !== -1) return;
-
-  var isHTML = e.request.url.endsWith('.html') || e.request.url.endsWith('/');
-
-  if (isHTML) {
-    // HTML: rede primeiro, cache como fallback
-    e.respondWith(
-      fetch(e.request)
-        .then(function(response) {
-          var clone = response.clone();
-          caches.open(CACHE).then(function(cache) {
-            cache.put(e.request, clone);
-          });
+  const isHtml = event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok && !url.pathname.endsWith('/ver.html')) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
           return response;
         })
-        .catch(function() {
-          return caches.match(e.request);
+        .catch(() => {
+          if (url.pathname.endsWith('/ver.html')) return caches.match('./ver.html');
+          return caches.match(event.request).then(cached => cached || caches.match('./index.html'));
         })
     );
-  } else {
-    // Assets: cache primeiro
-    e.respondWith(
-      caches.match(e.request).then(function(cached) {
-        return cached || fetch(e.request).then(function(response) {
-          var clone = response.clone();
-          caches.open(CACHE).then(function(cache) {
-            cache.put(e.request, clone);
-          });
-          return response;
-        });
-      })
-    );
+    return;
   }
-});
 
-self.addEventListener('message', function(e) {
-  if (e.data && e.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      }
+      return response;
+    }))
+  );
 });

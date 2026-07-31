@@ -1,97 +1,117 @@
-// ════════════════════════════════════════════════════════════
-// auth.js — Autenticação e controle de sessão
-// ════════════════════════════════════════════════════════════
-
 const Auth = {
+  user: null,
 
-  // Verifica sessão ao carregar o app
   async verificarSessao() {
-    const sess = CONFIG.getSession();
-
-    // Sem sessão — vai para login
-    if (!sess || !sess.access_token) {
-      window.location.href = './login.html';
-      return;
+    let session = CONFIG.getSession();
+    if (!session?.access_token) {
+      this.redirectToLogin();
+      return false;
     }
-
-    // Token ainda válido localmente — usa sem chamar o servidor
-    const agora = Math.floor(Date.now() / 1000);
-    if (sess.expires_at && agora < sess.expires_at - 60) {
-      if (sess.user) this._configurarPerfil(sess.user);
-      return;
+    const now = Math.floor(Date.now() / 1000);
+    if (!session.expires_at || now >= session.expires_at - 60) {
+      session = await this.renovarSessao(session);
+      if (!session) {
+        this.redirectToLogin();
+        return false;
+      }
     }
-
-    // Token expirado — tenta renovar com refresh_token
-    if (sess.refresh_token) {
-      try {
-        const res = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
-          method: 'POST',
-          headers: { 'apikey': CONFIG.SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: sess.refresh_token })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.access_token) {
-            CONFIG.setSession({
-              access_token: data.access_token,
-              refresh_token: data.refresh_token,
-              expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
-              user: data.user
-            });
-            if (data.user) this._configurarPerfil(data.user);
-            return;
-          }
-        }
-      } catch(e) { /* segue para login */ }
-    }
-
-    // Sem renovação possível — limpa e redireciona
-    CONFIG.clearSession();
-    window.location.href = './login.html';
-  },
-
-  // Configura visibilidade de elementos admin e perfil
-  _configurarPerfil(user) {
-    const email = user.email || '';
-    const meta = user.user_metadata || {};
-    const isAdmin = email.includes('admin');
-    const plano = meta.plano || 'basico';
-
-    // Configurar menu com perfil
-    if (typeof Nav !== 'undefined') {
-      Nav.configurarMenu(isAdmin, plano);
-    }
-
-    // Nome do usuário na sidebar
-    const nomeEl = document.getElementById('userNome');
-    if (nomeEl) nomeEl.textContent = meta.nome || email.split('@')[0];
-
-    // Avatar inicial
-    const avatarEl = document.querySelector('.sidebar-avatar');
-    if (avatarEl) {
-      const nome = meta.nome || email.split('@')[0];
-      avatarEl.textContent = nome.charAt(0).toUpperCase();
+    try {
+      const user = await Api.request('/auth/v1/user');
+      this.user = user;
+      await this.carregarContexto(user);
+      this.configurarPerfil(user);
+      return true;
+    } catch (error) {
+      CONFIG.clearSession();
+      sessionStorage.setItem('1kbeats_login_message', Api.friendlyError(error, 'Usuário sem acesso a uma empresa.'));
+      this.redirectToLogin();
+      return false;
     }
   },
 
-  // Logout
-  logout() {
-    CONFIG.clearSession();
-    window.location.href = './login.html';
+  async renovarSessao(session) {
+    if (!session?.refresh_token) return null;
+    try {
+      const response = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST',
+        headers: CONFIG.anonymousHeaders(),
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      const renewed = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+        user: data.user
+      };
+      CONFIG.setSession(renewed);
+      return renewed;
+    } catch (_) {
+      return null;
+    }
   },
 
-  // Alterar senha do próprio usuário
-  async alterarSenha(novaSenha) {
-    const sess = CONFIG.getSession();
-    const res = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/user', {
-      method: 'PUT',
-      headers: {
-        'apikey': CONFIG.SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + sess.access_token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ password: novaSenha })
+  async buscarMembro(userId) {
+    const path = '/rest/v1/organization_members' +
+      '?select=organization_id,role,organizations(id,name,slug,plan,status)' +
+      '&user_id=eq.' + encodeURIComponent(userId) +
+      '&limit=1';
+    const memberships = await Api.request(path);
+    return memberships?.[0] || null;
+  },
+
+  async carregarContexto(user) {
+    let membership = await this.buscarMembro(user.id);
+    if (!membership) {
+      const suggestedName = user.user_metadata?.company_name || user.user_metadata?.empresa || '1000 Beats';
+      await Api.request('/rest/v1/rpc/bootstrap_organization', {
+        method: 'POST',
+        body: JSON.stringify({ p_name: suggestedName })
+      });
+      membership = await this.buscarMembro(user.id);
+    }
+    if (!membership?.organization_id || membership.organizations?.status !== 'active') {
+      throw new Error('Seu usuário ainda não foi vinculado a uma empresa ativa.');
+    }
+    CONFIG.setContext({
+      organization_id: membership.organization_id,
+      role: membership.role,
+      organization: membership.organizations
     });
-    return res.ok;
+  },
+
+  configurarPerfil(user) {
+    Nav.configurarMenu(CONFIG.isAdmin, CONFIG.plan);
+    const name = user.user_metadata?.name || user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário';
+    const nameElement = document.getElementById('userNome');
+    const avatar = document.querySelector('.sidebar-avatar');
+    if (nameElement) nameElement.textContent = name;
+    if (avatar) avatar.textContent = name.charAt(0).toUpperCase();
+    const company = document.getElementById('activeCompanyName');
+    if (company) company.textContent = CONFIG.context.organization?.name || '';
+  },
+
+  redirectToLogin() {
+    if (!window.location.pathname.endsWith('/login.html')) window.location.replace('./login.html');
+  },
+
+  async logout() {
+    if (CONFIG.getSession()?.access_token) {
+      try {
+        await fetch(CONFIG.SUPABASE_URL + '/auth/v1/logout', { method: 'POST', headers: CONFIG.headers() });
+      } catch (_) {}
+    }
+    CONFIG.clearSession();
+    window.location.replace('./login.html');
+  },
+
+  async alterarSenha(newPassword) {
+    if (!newPassword || newPassword.length < 8) throw new Error('Use pelo menos 8 caracteres.');
+    await Api.request('/auth/v1/user', {
+      method: 'PUT',
+      body: JSON.stringify({ password: newPassword })
+    });
+    return true;
   }
 };

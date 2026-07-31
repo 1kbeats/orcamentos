@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>1K Beats — Orçamentos</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#D91A72">
@@ -10,9 +11,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/secure.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
+<div class="app-loading" id="appLoading" role="status">CARREGANDO AMBIENTE SEGURO…</div>
 
 <div class="app-shell">
 
@@ -34,33 +37,33 @@
     <div class="sidebar-user">
       <div class="sidebar-avatar">U</div>
       <div>
-        <div class="sidebar-username" id="userNome">—</div>
+        <div class="sidebar-username" id="userNome">—</div><div id="activeCompanyName" style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px"></div>
       </div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Operacional</div>
-      <div class="nav-item" id="navDashboard" class="active" onclick="Nav.showPanel('dashboard')">
+      <div class="nav-item active" id="navDashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </div>
-      <div class="nav-item" id="navOrcamentos" onclick="Nav.showPanel('listaOrcamentos')">
+      <div class="nav-item" id="navOrcamentos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Orçamentos
       </div>
 
       <div class="nav-section">Cadastros</div>
-      <div class="nav-item" id="navClientes" onclick="Nav.showPanel('clientes')">
+      <div class="nav-item" id="navClientes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Clientes
       </div>
-      <div class="nav-item" id="navCatalogo" onclick="Nav.showPanel('catalogo')">
+      <div class="nav-item" id="navCatalogo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="7" height="9"/><rect x="15" y="3" width="7" height="5"/><rect x="15" y="12" width="7" height="9"/><rect x="2" y="16" width="7" height="5"/></svg>
         Catálogo
       </div>
 
       <!-- FINANCEIRO — visível para PRO e admin -->
       <div class="nav-section pro-section" id="navSectionFinanceiro"></div>
-      <div class="nav-item pro-item" id="navGastos" onclick="Nav.showPanelPro('gastos')">
+      <div class="nav-item pro-item" id="navGastos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span>Gastos</span>
         <span class="badge-pro" id="badgeGastos" style="display:none">PRO</span>
@@ -68,12 +71,12 @@
 
       <!-- OPERAÇÕES -->
       <div class="nav-section pro-section" id="navSectionOperacoes"></div>
-      <div class="nav-item pro-item" id="navEquipe" onclick="Nav.showPanelPro('equipe')">
+      <div class="nav-item pro-item" id="navEquipe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span>Equipe/Freelancers</span>
         <span class="badge-pro" id="badgeEquipe" style="display:none">PRO</span>
       </div>
-      <div class="nav-item pro-item" id="navFornecedores" onclick="Nav.showPanelPro('fornecedores')">
+      <div class="nav-item pro-item" id="navFornecedores">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         <span>Fornecedores</span>
         <span class="badge-pro" id="badgeFornecedores" style="display:none">PRO</span>
@@ -86,17 +89,17 @@
 
       <!-- ADMINISTRAÇÃO — só admin -->
       <div class="nav-section admin-only" id="navSectionAdmin" style="display:none">Administração</div>
-      <div class="nav-item admin-only" id="navAdmin" onclick="Nav.showPanel('admin')" style="display:none">
+      <div class="nav-item admin-only" id="navAdmin" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
         Usuários
       </div>
     </nav>
     <div class="sidebar-footer">
-      <div class="nav-item" onclick="Usuarios.abrirAlterarSenha()">
+      <div class="nav-item" id="btnSidebarPassword">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span style="color:rgba(255,255,255,0.5);font-size:13px">Alterar senha</span>
       </div>
-      <div class="nav-item danger" onclick="Auth.logout()">
+      <div class="nav-item danger" id="btnLogout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sair
       </div>
@@ -104,7 +107,7 @@
   </aside>
 
   <!-- ══ OVERLAY MOBILE ══ -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="Nav.closeSidebar()"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- ══ MAIN ══ -->
   <main class="main-content">
@@ -116,7 +119,7 @@
         <text x="40" y="28" font-family="'Space Grotesk',sans-serif" font-weight="400" font-size="20" fill="rgba(255,255,255,0.45)">beats</text>
         <text x="115" y="26" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="18" fill="#D91A72">))</text>
       </svg>
-      <button class="btn-menu" id="btnMenuMobile" onclick="Nav.openSidebar()">
+      <button class="btn-menu" id="btnMenuMobile" type="button" aria-label="Abrir menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
     </div>
@@ -131,7 +134,7 @@
             <div style="font-size:22px;font-weight:600;color:#1A1A22" id="dashSaudacao">Olá!</div>
             <div style="font-size:13px;color:#AAA;margin-top:3px" id="dashData"></div>
           </div>
-          <button onclick="Nav.showPanel('listaOrcamentos'); document.getElementById('btnNovoOrcamento').click()" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button>
+          <button id="btnDashNewQuote" type="button" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button>
         </div>
 
         <!-- KPIs -->
@@ -165,7 +168,7 @@
           <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;overflow:hidden">
             <div style="padding:14px 18px;border-bottom:0.5px solid #E0E0EA;display:flex;justify-content:space-between;align-items:center">
               <div style="font-size:14px;font-weight:600;color:#1A1A22">Últimos orçamentos</div>
-              <span onclick="Nav.showPanel('listaOrcamentos')" style="font-size:12px;color:#D91A72;cursor:pointer">Ver todos →</span>
+              <span id="btnDashViewAll" role="button" tabindex="0" style="font-size:12px;color:#D91A72;cursor:pointer">Ver todos →</span>
             </div>
             <div id="dashUltimos">
               <div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Carregando...</div>
@@ -179,13 +182,13 @@
             <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
               <div style="font-size:14px;font-weight:600;color:#1A1A22;margin-bottom:12px">Ações rápidas</div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <button onclick="Nav.showPanel('listaOrcamentos'); setTimeout(()=>document.getElementById('btnNovoOrcamento').click(),100)" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                <button id="btnQuickQuote" type="button" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
                   📄 Novo orçamento
                 </button>
-                <button onclick="Nav.showPanel('clientes'); setTimeout(()=>Clientes.abrirNovo(),100)" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                <button id="btnQuickClient" type="button" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
                   👥 Cadastrar cliente
                 </button>
-                <button onclick="Nav.showPanel('catalogo'); setTimeout(()=>Catalogo.abrirNovo(),100)" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
+                <button id="btnQuickCatalog" type="button" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
                   📦 Adicionar ao catálogo
                 </button>
               </div>
@@ -210,14 +213,14 @@
     </div>
 
     <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
-    <div class="panel active" id="panelListaOrcamentos">
+    <div class="panel" id="panelListaOrcamentos">
       <div style="padding:2rem 2rem 5rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
           <div>
             <h2 style="font-size:22px;font-weight:600;color:#1A1A22">Orçamentos</h2>
             <div style="font-size:13px;color:#AAA;margin-top:3px">Últimos enviados</div>
           </div>
-          <button id="btnNovoOrcamento" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button>
+          <div style="display:flex;gap:8px"><button id="btnExportarOrcamentos" type="button" class="btn-cancel">Exportar CSV</button><button id="btnNovoOrcamento" type="button" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button></div>
         </div>
 
         <!-- CABEÇALHO DA LISTA -->
@@ -281,10 +284,6 @@
               <input type="text" id="cnpjCliente" placeholder="00.000.000/0001-00">
             </div>
             <div class="cf">
-              <label>Telefone / WhatsApp</label>
-              <input type="text" id="telCliente" placeholder="(21) 99999-9999">
-            </div>
-            <div class="cf">
               <label>Válido até</label>
               <input type="date" id="validade">
             </div>
@@ -339,8 +338,8 @@
                   <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#AAA;margin-bottom:7px">Desconto</div>
                   <div style="display:flex;gap:5px;align-items:center">
                     <div style="display:flex;border:1px solid #DDD;border-radius:6px;overflow:hidden;flex-shrink:0">
-                      <button id="btnDiscPct" onclick="Orcamentos.setDiscTipo('pct')" style="padding:5px 11px;font-size:12px;font-weight:600;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
-                      <button id="btnDiscVal" onclick="Orcamentos.setDiscTipo('val')" style="padding:5px 11px;font-size:12px;font-weight:600;background:#F5F5FA;color:#AAA;border:none;cursor:pointer;font-family:inherit">R$</button>
+                      <button id="btnDiscPct" type="button" style="padding:5px 11px;font-size:12px;font-weight:600;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
+                      <button id="btnDiscVal" type="button" style="padding:5px 11px;font-size:12px;font-weight:600;background:#F5F5FA;color:#AAA;border:none;cursor:pointer;font-family:inherit">R$</button>
                     </div>
                     <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1;border:1px solid #DDD;border-radius:6px;padding:5px 10px;font-size:13px;text-align:right;background:#F5F5FA;color:#404050;outline:none;font-family:monospace">
                     <input type="hidden" id="descontoTipo" value="pct">
@@ -407,7 +406,7 @@
       <div class="admin-wrap">
         <div class="admin-header">
           <h2>Clientes</h2>
-          <button class="btn-novo" id="btnNovoCliente">+ Novo cliente</button>
+          <div style="display:flex;gap:8px"><button class="btn-cancel" id="btnExportarClientes" type="button">Exportar CSV</button><button class="btn-novo" id="btnNovoCliente" type="button">+ Novo cliente</button></div>
         </div>
         <div class="card" id="listaClientes">
           <div style="color:#999;padding:2rem;text-align:center">Carregando...</div>
@@ -492,7 +491,7 @@
 <div class="toast" id="toastBox"></div>
 
 <!-- ══ UPDATE BANNER ══ -->
-<div class="update-banner" id="updateBanner" onclick="location.reload()">
+<div class="update-banner" id="updateBanner" role="button" tabindex="0">
   🔄 Nova versão disponível — clique para atualizar
 </div>
 
@@ -561,8 +560,8 @@
     <div class="modal-title">Novo Usuário</div>
     <div class="modal-field"><label>Nome</label><input type="text" id="novoUsuarioNome" placeholder="Ex: joao"></div>
     <div class="modal-field" style="margin-bottom:4px"><label>E-mail gerado</label></div>
-    <div style="font-size:12px;color:#888;margin-bottom:12px;padding:0 2px">nome@1kbeats.interno</div>
-    <div class="modal-field"><label>Senha</label><input type="password" id="novoUsuarioSenha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="off"></div><div class="modal-field"><label for="novoUsuarioRole">Perfil</label><select id="novoUsuarioRole"><option value="member">Colaborador</option><option value="admin">Administrador</option></select></div>
+    <div class="modal-field"><label>Senha</label><input type="password" id="novoUsuarioSenha" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="btnCancelarNovoUsuario">Cancelar</button>
       <button class="btn-save" id="btnCriarUsuario">Criar</button>
@@ -574,7 +573,7 @@
 <div class="modal-edit-bg" id="modalEditSenha">
   <div class="modal-box">
     <div class="modal-title">Alterar senha — <span id="editSenhaNome"></span></div>
-    <div class="modal-field"><label>Nova senha</label><input type="password" id="editSenhaInput" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-field"><label>Nova senha</label><input type="password" id="editSenhaInput" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="btnCancelarSenha">Cancelar</button>
       <button class="btn-save" id="btnSalvarSenha">Salvar</button>
@@ -586,7 +585,7 @@
 <div class="modal-edit-bg" id="modalAlterarSenha">
   <div class="modal-box">
     <div class="modal-title">Alterar minha senha</div>
-    <div class="modal-field"><label>Nova senha</label><input type="password" id="novaSenhaInput" placeholder="Mínimo 6 caracteres"></div>
+    <div class="modal-field"><label>Nova senha</label><input type="password" id="novaSenhaInput" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="btnCancelAlterarSenha">Cancelar</button>
       <button class="btn-save" id="btnConfAlterarSenha">Confirmar</button>
@@ -596,43 +595,19 @@
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
 <script src="./js/config.js"></script>
+<script src="./js/api.js"></script>
 <script src="./js/utils.js"></script>
 <script src="./js/auth.js"></script>
 <script src="./js/nav.js"></script>
+<script src="./js/nav-events.js"></script>
 <script src="./js/clientes.js"></script>
 <script src="./js/financeiro.js"></script>
 <script src="./js/usuarios.js"></script>
 <script src="./js/catalogo.js"></script>
 <script src="./js/orcamentos.js"></script>
+<script src="./js/secure-overrides.js"></script>
 
-<script>
-  // ── Inicialização ──────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', function() {
-    Auth.verificarSessao();
-    Orcamentos.init();
-    ListaOrcamentos.bindEvents();
-    Dashboard.carregar();
-    Clientes.bindEvents();
-    Catalogo.bindEvents();
-    Usuarios.bindEvents();
-  });
-
-  // ── PWA: Service Worker ────────────────────────────────────
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then(reg => {
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              document.getElementById('updateBanner').classList.add('show');
-            }
-          });
-        });
-      });
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-  }
-</script>
+<script src="./js/app.js"></script>
 
 </body>
 </html>

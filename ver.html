@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Orçamento — 1K Beats</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -79,7 +81,6 @@
     .client-grid > div:last-child { grid-column: 1 / -1; }
   }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div class="card" id="cardOrc">
@@ -94,173 +95,9 @@
   </div>
 </div>
 
-<script>
-(function() {
-  var SURL = 'https://hcjbfdspmqlyzkgypacb.supabase.co';
-  var SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjamJmZHNwbXFseXprZ3lwYWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDkzMzAsImV4cCI6MjEwMDMyNTMzMH0.tQMrsJ7pMCvUNb2CobEhn6vvFgiKHGDtFFPM_QJFYCQ';
-  var LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" width="220" height="52"><text x="0" y="40" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="42" fill="white" letter-spacing="-1">1K</text><text x="66" y="40" font-family="Arial,sans-serif" font-weight="400" font-size="30" fill="rgba(255,255,255,0.65)">beats</text><text x="170" y="38" font-family="Arial,sans-serif" font-weight="700" font-size="28" fill="#D91A72">))</text></svg>`;;
-
-  function fmt(v) {
-    return 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
-  }
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    var s = String(iso).substring(0,10);
-    var p = s.split('-');
-    return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : iso;
-  }
-
-  function montarOrcamento(d) {
-    var it = d.it || [];
-    var sub = 0;
-    var rows = '';
-    it.forEach(function(item, i) {
-      var q = parseFloat(item.q || item.qty || 0);
-      var u = parseFloat(item.u || item.unit || 0);
-      var tot = q * u;
-      sub += tot;
-      var bg = i%2===1 ? 'background:#F9F9F9' : '';
-      rows += '<tr style="'+bg+'">'
-        + '<td style="padding:9px 10px;font-size:13px;color:#111;border-bottom:1px solid #EEE">'+(item.d||item.desc||'—')+'</td>'
-        + '<td style="padding:9px 10px;font-size:13px;text-align:center;border-bottom:1px solid #EEE">'+q+'</td>'
-        + '<td style="padding:9px 10px;font-size:13px;text-align:right;border-bottom:1px solid #EEE">'+fmt(u)+'</td>'
-        + '<td style="padding:9px 10px;font-size:13px;font-weight:700;text-align:right;border-bottom:1px solid #EEE">'+fmt(tot)+'</td>'
-        + '</tr>';
-    });
-    var dv = parseFloat(d.dv||d.desconto||0);
-    var dt = d.dt||d.tipo_desc||'pct';
-    var dr = dt==='pct' ? (sub*dv/100) : dv;
-    var total = Math.max(0, sub-dr);
-    var discRow = '';
-    if (dr > 0) {
-      var dl = dt==='pct' ? dv.toFixed(1)+'%' : fmt(dr);
-      discRow = '<tr><td style="padding:5px 10px;font-size:12px;color:#888">Desconto ('+dl+')</td>'
-              + '<td style="padding:5px 10px;font-size:12px;color:#D84040;text-align:right">- '+fmt(dr)+'</td></tr>';
-    }
-    var obs = d.o||d.obs||'';
-    var obsBlock = obs ? '<div style="margin-top:28px;padding:12px 16px;border-left:3px solid #D91A72;background:#FDF5F9;border-radius:0 6px 6px 0">'
-      + '<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#AAA;margin-bottom:6px">Observações</div>'
-      + '<div style="font-size:12px;color:#444;line-height:1.7;white-space:pre-wrap">'+obs+'</div></div>' : '';
-    var en = d.en||d.empresa||'1K Beats';
-    var ec = d.ec||d.cnpj_emp||'';
-    var et = d.et||d.tel_emp||'';
-    var ee = d.ee||d.email_emp||'';
-    var f1 = en + (ec ? ' · CNPJ: '+ec : '');
-    var f2 = et + (ee ? (et?' · ':'')+ee : '');
-    var v = d.v||d.valido_ate||'';
-
-    document.getElementById('cardOrc').innerHTML =
-      '<div class="hdr">'
-        + '<div style="display:inline-block">'+LOGO_SVG+'</div>'
-        + '<div class="hdr-right">'
-          + '<div class="doc-label">Documento Comercial</div>'
-          + '<div class="doc-title">Orçamento</div>'
-          + '<div class="meta">'
-            + '<div><strong>Emissão</strong> &nbsp;'+new Date().toLocaleDateString('pt-BR')+'</div>'
-            + '<div><strong>Validade</strong> &nbsp;'+fmtDate(v)+'</div>'
-            + (d.num ? '<div><strong>Nº</strong> &nbsp;<span style="color:#D91A72;font-weight:700">'+String(d.num).padStart(4,'0')+'</span></div>' : '')
-            + (d.r||d.referencia ? '<div><strong>Ref.</strong> &nbsp;'+(d.r||d.referencia)+'</div>' : '')
-          + '</div>'
-        + '</div>'
-      + '</div>'
-      + '<div class="body">'
-        + '<div class="client-grid">'
-          + '<div><div class="cf-label">Cliente</div><div class="cf-val">'+(d.c||d.cliente||'—')+(d.sol ? '<br><span style="font-size:11px;color:#888;font-weight:400">Solicitante: '+d.sol+'</span>' : '')+'</div></div>'
-          + '<div><div class="cf-label">CNPJ / CPF</div><div class="cf-val">'+(d.cc||d.cnpj_cli||'—')+'</div></div>'
-          + '<div style="text-align:right"><div class="cf-label">Emitido por</div>'
-            + '<div class="cf-val" style="font-size:12px">'+en+(ec?'<br><span style="font-size:10px;color:#888;font-weight:400">'+ec+'</span>':'')+'</div>'
-          + '</div>'
-        + '</div>'
-        + '<div class="sec-label">Itens do orçamento</div>'
-        + '<table><thead><tr>'
-          + '<th style="width:50%">Descrição</th>'
-          + '<th style="width:8%;text-align:center">Qtd.</th>'
-          + '<th style="width:20%">Val. unitário</th>'
-          + '<th style="width:20%">Total</th>'
-        + '</tr></thead><tbody>'+rows+'</tbody></table>'
-        + '<div style="display:flex;justify-content:flex-end;margin-top:14px">'
-          + '<div style="width:260px"><table width="100%" cellpadding="0" cellspacing="0">'
-            + '<tbody>'
-              + '<tr><td style="padding:5px 10px;font-size:12px;color:#888">Subtotal</td><td style="padding:5px 10px;font-size:12px;text-align:right;color:#111;font-weight:500">'+fmt(sub)+'</td></tr>'
-              + discRow
-            + '</tbody>'
-            + '<tbody><tr><td style="font-size:16px;font-weight:700;color:#111;border-top:2px solid #111;padding:10px">Total</td>'
-              + '<td style="font-size:16px;font-weight:700;color:#D91A72;border-top:2px solid #111;padding:10px;text-align:right">'+fmt(total)+'</td></tr>'
-            + '</tbody>'
-          + '</table></div>'
-        + '</div>'
-        + obsBlock
-        + '<div class="footer"><div>'+f1+'</div><div>'+f2+'</div></div>'
-      + '</div>';
-
-    var btn = document.getElementById('btnRodape');
-    if (btn) btn.style.display = 'block';
-  }
-
-  // Verificar tipo de link
-  var params = new URLSearchParams(window.location.search);
-  var orcId = params.get('id');
-
-  function iniciar() {
-    if (orcId) {
-      carregarOrcamento();
-    } else {
-      document.getElementById('loading').style.display='none';
-      document.getElementById('error').style.display='block';
-    }
-  }
-
-  function carregarOrcamento() {
-    document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Carregando...</h2><p>Buscando orçamento...</p></div>';
-    fetch(SURL+'/rest/v1/orcamentos?id=eq.'+orcId+'&select=id,numero,cliente_nome,cnpj_cli,referencia,valido_ate,desconto_tipo,desconto_valor,itens,observacoes,empresa,cnpj_emp,tel_emp,email_emp,solicitante,total,status,created_at', {
-      headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY, 'Accept': 'application/json' }
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(rows) {
-      if (!rows || rows.length === 0) {
-        document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Orçamento #'+orcId+' não encontrado</h2><p>Verifique o link e tente novamente.</p></div>';
-        return;
-      }
-      var row = rows[0];
-      var itens = (row.itens||[]).map(function(i) {
-        return { d: i.desc||i.d||'', q: parseFloat(i.qty||i.q||0), u: parseFloat(i.unit||i.u||0) };
-      });
-      montarOrcamento({
-        c: row.cliente_nome, cc: row.cnpj_cli, r: row.referencia,
-        v: row.valido_ate, dv: row.desconto_valor, dt: row.desconto_tipo,
-        it: itens, o: row.observacoes,
-        en: row.empresa, ec: row.cnpj_emp, et: row.tel_emp, ee: row.email_emp,
-        sol: row.solicitante, num: row.numero
-      });
-    })
-    .catch(function(e) {
-      document.getElementById('cardOrc').innerHTML = '<div class="empty"><h2>Erro ao carregar</h2><p>'+e.message+'</p></div>';
-    });
-    return;
-  }
-
-  // Iniciar carregamento
-  iniciar();
-
-  // Formato legado Base64
-  var hash = window.location.hash;
-  if (!hash) return;
-  try {
-    var raw = hash.replace('#orc=','').replace('#','');
-    var parsed = JSON.parse(decodeURIComponent(escape(atob(raw))));
-    var d;
-    if (Array.isArray(parsed)) {
-      d = { c:parsed[0], cc:parsed[1], r:parsed[2], v:parsed[3], dv:parsed[4], dt:parsed[5],
-            it:(parsed[6]||[]).map(function(i){ return {d:i[0],q:i[1],u:i[2]}; }),
-            en:parsed[7]||'', ec:parsed[8]||'' };
-    } else {
-      d = parsed;
-      d.it = (d.it||[]).map(function(i){ return Array.isArray(i)?{d:i[0],q:i[1],u:i[2]}:i; });
-    }
-    montarOrcamento(d);
-  } catch(e) { console.log('Erro link legado:', e); }
-
-})();
-</script>
+<script src="./js/config.js"></script>
+<script src="./js/api.js"></script>
+<script src="./js/utils.js"></script>
+<script src="./js/public-quote.js"></script>
 </body>
 </html>

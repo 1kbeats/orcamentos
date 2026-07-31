@@ -271,7 +271,6 @@ const Orcamentos = {
     return {
       cliente:    document.getElementById('nomeCliente').value.trim() || 'Cliente',
       cnpjCli:    document.getElementById('cnpjCliente').value.trim(),
-      telCli:     document.getElementById('telCliente') ? document.getElementById('telCliente').value.trim() : '',
       ref:        document.getElementById('refEvento').value.trim(),
       val:        document.getElementById('validade').value,
       obs:        document.getElementById('obs').value.trim(),
@@ -344,17 +343,15 @@ const Orcamentos = {
       if (id) {
         msg += nl + nl + 'Visualizar orçamento:' + nl;
         // Usar número curto se disponível, senão usar UUID
-        // Usa sempre o UUID no link público — não enumerável
-        if (id) {
-          msg += 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
-        }
+        const linkId = numero ? numero : id;
+        const paramName = numero ? 'n' : 'id';
+        if (rows[0].public_token) msg += CONFIG.publicQuoteUrl(rows[0].public_token);
       }
 
       // 3. Abrir WhatsApp com mensagem completa
-      // Se tem telefone do cliente, abre direto para ele — senão escolhe na hora
-      const telCli = (d.telCli || '').replace(/[^0-9]/g, '');
-      const wUrl = telCli
-        ? 'https://wa.me/55' + telCli + '?text=' + encodeURIComponent(msg)
+      const telN = (cfg.tel || '').replace(/[^0-9]/g, '');
+      const wUrl = telN
+        ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg)
         : 'https://wa.me/?text=' + encodeURIComponent(msg);
       window.open(wUrl, '_blank');
 
@@ -524,7 +521,7 @@ const Orcamentos = {
     doc.text(f1, ml, ph - 12);
     if (f2) doc.text(f2, pw - mr, ph - 12, { align: 'right' });
 
-    doc.save('1K Beats - Orcamento.pdf');
+    doc.save((nome || 'Orcamento').replace(/[^a-zA-Z0-9_-]+/g, '-') + '-Orcamento.pdf');
   }
 };
 
@@ -571,8 +568,8 @@ const ListaOrcamentos = {
         div.innerHTML =
           `<span style="font-size:14px;font-weight:700;color:#D91A72">${num}</span>` +
           `<div style="min-width:0;padding-right:20px">` +
-            `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.sanitize(cliente)}</div>` +
-            (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.sanitize(ref)}</div>` : '') +
+            `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cliente}</div>` +
+            (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ref}</div>` : '') +
           `</div>` +
           `<span style="font-size:12px;color:#AAA">${data}</span>` +
           `<span style="font-size:14px;font-weight:500;color:#1A1A22;text-align:right">${valor}</span>` +
@@ -583,7 +580,7 @@ const ListaOrcamentos = {
           `</div>` +
           `<div style="text-align:center">` +
             (semNumero ? `<button class="orc-del-btn" data-id="${orc.id}" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:16px;padding:0" title="Excluir">✕</button>` : '') +
-            (orc.numero ? `<a href="ver.html?n=${orc.numero}" target="_blank" style="color:#D91A72;text-decoration:none;font-size:18px;display:flex;align-items:center;justify-content:center" title="Visualizar orçamento">↗</a>` : '') +
+            (orc.numero ? `<a href="ver.html?t=${orc.public_token}" target="_blank" rel="noopener" style="color:#D91A72;text-decoration:none;font-size:18px;display:flex;align-items:center;justify-content:center" title="Visualizar orçamento">↗</a>` : '') +
           `</div>`;
 
         // Hover

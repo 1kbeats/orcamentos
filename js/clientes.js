@@ -1,121 +1,143 @@
-// ════════════════════════════════════════════════════════════
-// clientes.js — Módulo de clientes
-// ════════════════════════════════════════════════════════════
-
 const Clientes = {
-
   _editId: null,
 
-  // Busca todos os clientes do Supabase
-  getAll(cb) {
-    fetch(CONFIG.SUPABASE_URL + '/rest/v1/clientes?select=*&order=nome.asc', { headers: CONFIG.headers() })
-      .then(r => r.json())
-      .then(lista => cb(lista || []))
-      .catch(() => cb([]));
+  async getAll(callback) {
+    try {
+      const data = await Api.request(Api.orgFilter('/rest/v1/clientes?select=*&order=nome.asc'));
+      callback(data || []);
+    } catch (error) {
+      callback([], error);
+    }
   },
 
-  // Renderiza a lista no painel de clientes
   renderLista() {
     const container = document.getElementById('listaClientes');
     if (!container) return;
-    container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Carregando...</div>';
-    this.getAll(lista => {
-      if (lista.length === 0) {
-        container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Nenhum cliente cadastrado ainda.</div>';
+    container.innerHTML = '<div class="empty-state">Carregando clientes...</div>';
+    this.getAll((clients, error) => {
+      if (error) {
+        container.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>';
+        return;
+      }
+      if (!clients.length) {
+        container.innerHTML = '<div class="empty-state">Nenhum cliente cadastrado.</div>';
         return;
       }
       container.innerHTML = '';
-      lista.forEach((c, idx) => {
-        const div = document.createElement('div');
-        div.className = 'card cli-card';
-        div.innerHTML =
+      clients.forEach(client => {
+        const card = document.createElement('div');
+        card.className = 'card cli-card';
+        card.innerHTML =
           '<div class="cli-info">' +
-            '<div class="cli-nome">' + (c.nome || '') + '</div>' +
-            (c.cnpj ? '<div class="cli-doc">' + c.cnpj + '</div>' : '') +
-            (c.tel  ? '<div class="cli-doc">' + c.tel + '</div>' : '') +
-            (c.email ? '<div class="cli-doc">' + c.email + '</div>' : '') +
+            '<div class="cli-nome">' + Utils.escapeHTML(client.nome || '') + '</div>' +
+            (client.cnpj ? '<div class="cli-doc">' + Utils.escapeHTML(client.cnpj) + '</div>' : '') +
+            (client.tel ? '<div class="cli-doc">' + Utils.escapeHTML(client.tel) + '</div>' : '') +
+            (client.email ? '<div class="cli-doc">' + Utils.escapeHTML(client.email) + '</div>' : '') +
           '</div>' +
           '<div class="cli-actions">' +
-            '<button class="btn-edit-cli" data-id="' + c.id + '">Editar</button>' +
-            '<button class="btn-del-cli" data-id="' + c.id + '">Excluir</button>' +
+            '<button class="btn-edit-cli" type="button">Editar</button>' +
+            '<button class="btn-del-cli" type="button">Excluir</button>' +
           '</div>';
-        div.querySelector('.btn-edit-cli').addEventListener('click', () => this.abrirEditar(c));
-        div.querySelector('.btn-del-cli').addEventListener('click', () => this.excluir(c.id));
-        container.appendChild(div);
+        card.querySelector('.btn-edit-cli').addEventListener('click', () => this.abrirEditar(client));
+        card.querySelector('.btn-del-cli').addEventListener('click', () => this.excluir(client.id));
+        container.appendChild(card);
       });
     });
   },
 
-  // Abre modal para novo cliente ou edição
   abrirNovo() {
     this._editId = null;
-    document.getElementById('modalCliente2Titulo').textContent = 'Novo Cliente';
-    ['cliNome','cliCnpj','cliTel','cliEmail','cliEnd'].forEach(id => {
-      document.getElementById(id).value = '';
+    const title = document.getElementById('modalCliente2Titulo');
+    if (title) title.textContent = 'Novo cliente';
+    ['cliNome', 'cliCnpj', 'cliTel', 'cliEmail', 'cliEnd'].forEach(id => {
+      const input = document.getElementById(id);
+      if (input) input.value = '';
     });
-    document.getElementById('modalCliente2').classList.add('open');
-    document.getElementById('cliNome').focus();
+    document.getElementById('modalCliente2')?.classList.add('open');
+    document.getElementById('cliNome')?.focus();
   },
 
-  abrirEditar(c) {
-    this._editId = c.id;
-    document.getElementById('modalCliente2Titulo').textContent = 'Editar Cliente';
-    document.getElementById('cliNome').value  = c.nome  || '';
-    document.getElementById('cliCnpj').value  = c.cnpj  || '';
-    document.getElementById('cliTel').value   = c.tel   || '';
-    document.getElementById('cliEmail').value = c.email || '';
-    document.getElementById('cliEnd').value   = c.endereco || '';
-    document.getElementById('modalCliente2').classList.add('open');
-    document.getElementById('cliNome').focus();
+  abrirEditar(client) {
+    this._editId = client.id;
+    const title = document.getElementById('modalCliente2Titulo');
+    if (title) title.textContent = 'Editar cliente';
+    const values = {
+      cliNome: client.nome,
+      cliCnpj: client.cnpj,
+      cliTel: client.tel,
+      cliEmail: client.email,
+      cliEnd: client.endereco
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      const input = document.getElementById(id);
+      if (input) input.value = value || '';
+    });
+    document.getElementById('modalCliente2')?.classList.add('open');
   },
 
   fecharModal() {
-    document.getElementById('modalCliente2').classList.remove('open');
+    document.getElementById('modalCliente2')?.classList.remove('open');
+    this._editId = null;
   },
 
-  salvar(dadosExterno, id, cb) {
-    // Permite chamada interna (do módulo orcamentos) ou do próprio módulo
-    const dados = dadosExterno || {
-      nome:     document.getElementById('cliNome').value.trim(),
-      cnpj:     document.getElementById('cliCnpj').value.trim() || null,
-      tel:      document.getElementById('cliTel').value.trim() || null,
-      email:    document.getElementById('cliEmail').value.trim() || null,
-      endereco: document.getElementById('cliEnd').value.trim() || null
+  async salvar(externalData, id, callback) {
+    const data = externalData || {
+      nome: Utils.sanitizeText(document.getElementById('cliNome')?.value, 150),
+      cnpj: Utils.sanitizeText(document.getElementById('cliCnpj')?.value, 20),
+      tel: Utils.sanitizeText(document.getElementById('cliTel')?.value, 30),
+      email: Utils.sanitizeText(document.getElementById('cliEmail')?.value, 150),
+      endereco: Utils.sanitizeText(document.getElementById('cliEnd')?.value, 250)
     };
     const editId = id || this._editId;
-    if (!dados.nome) { Utils.toast('Informe o nome do cliente.'); return; }
-
-    const url    = editId ? CONFIG.SUPABASE_URL + '/rest/v1/clientes?id=eq.' + editId : CONFIG.SUPABASE_URL + '/rest/v1/clientes';
-    const method = editId ? 'PATCH' : 'POST';
-    fetch(url, { method, headers: CONFIG.headers(), body: JSON.stringify(dados) })
-      .then(() => {
+    if (!data.nome) {
+      Utils.toast('Informe o nome do cliente.', 'erro');
+      return;
+    }
+    try {
+      const path = editId
+        ? Api.orgFilter('/rest/v1/clientes?id=eq.' + encodeURIComponent(editId))
+        : '/rest/v1/clientes';
+      await Api.request(path, {
+        method: editId ? 'PATCH' : 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(Api.orgPayload(data))
+      });
+      if (!externalData) {
         this.fecharModal();
         this.renderLista();
-        Utils.toast(editId ? 'Cliente atualizado!' : 'Cliente cadastrado!');
-        if (cb) cb();
-      })
-      .catch(() => Utils.toast('Erro ao salvar cliente.'));
+      }
+      Utils.toast(editId ? 'Cliente atualizado.' : 'Cliente cadastrado.');
+      if (callback) callback();
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao salvar cliente.'), 'erro');
+    }
   },
 
-  excluir(id) {
-    if (!confirm('Excluir este cliente?')) return;
-    fetch(CONFIG.SUPABASE_URL + '/rest/v1/clientes?id=eq.' + id, { method: 'DELETE', headers: CONFIG.headers() })
-      .then(() => { this.renderLista(); Utils.toast('Cliente excluído.'); })
-      .catch(() => Utils.toast('Erro ao excluir cliente.'));
+  async excluir(id) {
+    if (!confirm('Excluir este cliente? Essa ação não poderá ser desfeita.')) return;
+    try {
+      await Api.request(Api.orgFilter('/rest/v1/clientes?id=eq.' + encodeURIComponent(id)), { method: 'DELETE' });
+      this.renderLista();
+      Utils.toast('Cliente excluído.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao excluir cliente.'), 'erro');
+    }
   },
 
-  // Liga eventos dos botões do painel
+  exportar() {
+    this.getAll(clients => Utils.downloadCSV('clientes.csv', clients.map(client => ({
+      Nome: client.nome,
+      Documento: client.cnpj,
+      Telefone: client.tel,
+      Email: client.email,
+      Endereço: client.endereco
+    }))));
+  },
+
   bindEvents() {
-    const btnNovo = document.getElementById('btnNovoCliente');
-    if (btnNovo) btnNovo.addEventListener('click', () => this.abrirNovo());
-
-    const btnSalvar = document.getElementById('btnSalvarCliente');
-    if (btnSalvar) btnSalvar.addEventListener('click', () => this.salvar());
-
-    const btnCancel = document.getElementById('btnCancelarCliente');
-    if (btnCancel) btnCancel.addEventListener('click', () => this.fecharModal());
-
-    const modal = document.getElementById('modalCliente2');
-    if (modal) modal.addEventListener('click', e => { if (e.target === modal) this.fecharModal(); });
+    document.getElementById('btnNovoCliente')?.addEventListener('click', () => this.abrirNovo());
+    document.getElementById('btnSalvarCliente')?.addEventListener('click', () => this.salvar());
+    document.getElementById('btnCancelarCliente')?.addEventListener('click', () => this.fecharModal());
+    document.getElementById('btnExportarClientes')?.addEventListener('click', () => this.exportar());
   }
 };

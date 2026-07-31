@@ -5,12 +5,12 @@
 const Nav = {
 
   painelAtual: 'dashboard',
-  _plano: 'basico', // 'basico', 'profissional', 'admin'
+  _plano: 'basico', // 'basico', 'professional', 'admin'
 
   // Configura o menu de acordo com o perfil
   configurarMenu(isAdmin, plano) {
     this._plano = isAdmin ? 'admin' : (plano || 'basico');
-    const isPro = this._plano === 'profissional' || this._plano === 'admin';
+    const isPro = this._plano === 'professional' || this._plano === 'admin';
 
     // Seções PRO sempre visíveis
     document.querySelectorAll('.pro-section').forEach(el => {
@@ -87,7 +87,7 @@ const Nav = {
 
   // Mostra painel PRO ou teaser
   showPanelPro(panel) {
-    const isPro = this._plano === 'profissional';
+    const isPro = this._plano === 'professional';
     if (isPro) {
       this.showPanel(panel);
     } else {
@@ -158,8 +158,7 @@ const Nav = {
           '<div style="font-size:22px;font-weight:600;color:#1A1A22;margin-bottom:8px;text-align:center">' + (t.titulo || '') + '</div>' +
           '<div style="font-size:14px;color:#666;margin-bottom:28px;text-align:center;max-width:400px;line-height:1.7">' + (t.desc || '') + '</div>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:560px;margin-bottom:28px">' + recursos + '</div>' +
-          '<a href="https://wa.me/5521999999999" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:600;font-family:inherit">💬 Quero fazer o upgrade</a>' +
-          '<div style="font-size:12px;color:#AAA;margin-top:10px">Fale com Alessandro e ative agora</div>' +
+          '<div style="padding:12px 20px;background:#F5F5FA;border-radius:8px;color:#555;font-size:13px">Solicite o upgrade ao responsável pela sua conta.</div>' +
         '</div>';
     }
     this.closeSidebar();

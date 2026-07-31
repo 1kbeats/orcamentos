@@ -1,101 +1,114 @@
-// ════════════════════════════════════════════════════════════
-// financeiro.js — Módulo financeiro
-// ════════════════════════════════════════════════════════════
-
 const Financeiro = {
-
   _dados: [],
 
-  carregar() {
+  async carregar() {
     const container = document.getElementById('financeiroLista');
-    if (container) container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Carregando...</div>';
-
-    fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?select=*&order=created_at.desc', { headers: CONFIG.headers() })
-      .then(r => r.json())
-      .then(dados => {
-        this._dados = dados || [];
-        this.renderKPIs();
-        this.renderLista();
-      })
-      .catch(() => {
-        if (container) container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Erro ao carregar dados.</div>';
-      });
+    if (container) container.innerHTML = '<div class="empty-state">Carregando financeiro...</div>';
+    try {
+      this._dados = await Api.request(
+        Api.orgFilter('/rest/v1/orcamentos?select=id,numero,cliente_nome,referencia,total,status,created_at&order=created_at.desc')
+      ) || [];
+      this.renderKPIs();
+      this.renderLista();
+    } catch (error) {
+      if (container) container.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>';
+    }
   },
 
   renderKPIs() {
-    const total   = this._dados.reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-    const aprov   = this._dados.filter(o => o.status === 'aprovado').reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-    const pendente = this._dados.filter(o => o.status === 'pendente').reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
-
-    const elTotal   = document.getElementById('kpiTotal');
-    const elAprov   = document.getElementById('kpiAprovado');
-    const elPend    = document.getElementById('kpiPendente');
-    const elQtd     = document.getElementById('kpiQtd');
-
-    if (elTotal)   elTotal.textContent   = Utils.fmt(total);
-    if (elAprov)   elAprov.textContent   = Utils.fmt(aprov);
-    if (elPend)    elPend.textContent    = Utils.fmt(pendente);
-    if (elQtd)     elQtd.textContent     = this._dados.length;
-  },
-
-  renderLista(filtroStatus) {
-    const container = document.getElementById('financeiroLista');
-    if (!container) return;
-
-    const lista = filtroStatus ? this._dados.filter(o => o.status === filtroStatus) : this._dados;
-
-    if (lista.length === 0) {
-      container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Nenhum orçamento encontrado.</div>';
-      return;
-    }
-
-    container.innerHTML = '';
-    lista.forEach(orc => {
-      const div = document.createElement('div');
-      div.className = 'card fin-card';
-      const statusLabel = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
-      div.innerHTML =
-        '<div class="fin-info">' +
-          '<div class="fin-cliente">' + (orc.cliente || '—') + '</div>' +
-          '<div class="fin-data">' + Utils.fmtDate((orc.created_at || '').split('T')[0]) + '</div>' +
-          (orc.referencia ? '<div class="fin-ref">Ref.: ' + orc.referencia + '</div>' : '') +
-        '</div>' +
-        '<div class="fin-right">' +
-          '<div class="fin-total">' + Utils.fmt(orc.total || 0) + '</div>' +
-          '<select class="fin-status status-' + (orc.status || 'pendente') + '" data-id="' + orc.id + '">' +
-            Object.entries(statusLabel).map(([v, l]) => '<option value="' + v + '"' + (orc.status === v ? ' selected' : '') + '>' + l + '</option>').join('') +
-          '</select>' +
-        '</div>';
-      div.querySelector('.fin-status').addEventListener('change', (e) => {
-        this.atualizarStatus(orc.id, e.target.value, e.target);
-      });
-      container.appendChild(div);
+    const total = this._dados.reduce((sum, quote) => sum + (Number(quote.total) || 0), 0);
+    const approved = this._dados.filter(quote => quote.status === 'aprovado')
+      .reduce((sum, quote) => sum + (Number(quote.total) || 0), 0);
+    const pending = this._dados.filter(quote => quote.status === 'pendente')
+      .reduce((sum, quote) => sum + (Number(quote.total) || 0), 0);
+    const values = {
+      kpiTotal: Utils.fmt(total),
+      kpiAprovado: Utils.fmt(approved),
+      kpiPendente: Utils.fmt(pending),
+      kpiQtd: this._dados.length
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
     });
   },
 
-  atualizarStatus(id, status, selectEl) {
-    selectEl.className = 'fin-status status-' + status;
-    fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos?id=eq.' + id, {
-      method: 'PATCH', headers: CONFIG.headers(), body: JSON.stringify({ status })
-    })
-    .then(() => {
-      const orc = this._dados.find(o => o.id === id);
-      if (orc) orc.status = status;
+  renderLista(statusFilter) {
+    const container = document.getElementById('financeiroLista');
+    if (!container) return;
+    const quotes = statusFilter ? this._dados.filter(quote => quote.status === statusFilter) : this._dados;
+    if (!quotes.length) {
+      container.innerHTML = '<div class="empty-state">Nenhum orçamento encontrado.</div>';
+      return;
+    }
+    const statusLabels = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
+    container.innerHTML = '';
+    quotes.forEach(quote => {
+      const card = document.createElement('div');
+      card.className = 'card fin-card';
+      const safeStatus = Object.hasOwn(statusLabels, quote.status) ? quote.status : 'pendente';
+      card.innerHTML =
+        '<div class="fin-info">' +
+          '<div class="fin-cliente">' + Utils.escapeHTML(quote.cliente_nome || '—') + '</div>' +
+          '<div class="fin-data">#' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + ' · ' +
+            Utils.escapeHTML(Utils.fmtDate(quote.created_at)) + '</div>' +
+          (quote.referencia ? '<div class="fin-ref">Ref.: ' + Utils.escapeHTML(quote.referencia) + '</div>' : '') +
+        '</div>' +
+        '<div class="fin-right">' +
+          '<div class="fin-total">' + Utils.escapeHTML(Utils.fmt(quote.total)) + '</div>' +
+          '<select class="fin-status status-' + safeStatus + '">' +
+            Object.entries(statusLabels).map(([value, label]) =>
+              '<option value="' + value + '"' + (safeStatus === value ? ' selected' : '') + '>' + label + '</option>'
+            ).join('') +
+          '</select>' +
+        '</div>';
+      card.querySelector('.fin-status').addEventListener('change', event => {
+        this.atualizarStatus(quote.id, event.target.value, event.target);
+      });
+      container.appendChild(card);
+    });
+  },
+
+  async atualizarStatus(id, status, selectElement) {
+    const allowed = ['pendente', 'aprovado', 'recusado', 'cancelado'];
+    if (!allowed.includes(status)) return;
+    const previous = this._dados.find(quote => quote.id === id)?.status || 'pendente';
+    selectElement.className = 'fin-status status-' + status;
+    try {
+      await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(id)), {
+        method: 'PATCH',
+        body: JSON.stringify({ status })
+      });
+      const quote = this._dados.find(item => item.id === id);
+      if (quote) quote.status = status;
       this.renderKPIs();
-      Utils.toast('Status atualizado!');
-    })
-    .catch(() => Utils.toast('Erro ao atualizar status.'));
+      Utils.toast('Status atualizado.');
+    } catch (error) {
+      selectElement.value = previous;
+      selectElement.className = 'fin-status status-' + previous;
+      Utils.toast(Api.friendlyError(error), 'erro');
+    }
+  },
+
+  exportar() {
+    Utils.downloadCSV('financeiro-orcamentos.csv', this._dados.map(quote => ({
+      Número: quote.numero,
+      Cliente: quote.cliente_nome,
+      Referência: quote.referencia,
+      Total: Number(quote.total || 0).toFixed(2),
+      Status: quote.status,
+      Data: Utils.fmtDate(quote.created_at)
+    })));
   },
 
   bindEvents() {
-    // Filtros por status
-    document.querySelectorAll('.fin-filtro').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.fin-filtro').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filtro = btn.dataset.status || null;
-        this.renderLista(filtro);
+    document.querySelectorAll('.fin-filtro').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.fin-filtro').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        this.renderLista(button.dataset.status || null);
       });
     });
+    document.getElementById('btnExportarFinanceiro')?.addEventListener('click', () => this.exportar());
   }
 };
