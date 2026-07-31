@@ -271,6 +271,7 @@ const Orcamentos = {
     return {
       cliente:    document.getElementById('nomeCliente').value.trim() || 'Cliente',
       cnpjCli:    document.getElementById('cnpjCliente').value.trim(),
+      telCli:     document.getElementById('telCliente') ? document.getElementById('telCliente').value.trim() : '',
       ref:        document.getElementById('refEvento').value.trim(),
       val:        document.getElementById('validade').value,
       obs:        document.getElementById('obs').value.trim(),
@@ -350,9 +351,10 @@ const Orcamentos = {
       }
 
       // 3. Abrir WhatsApp com mensagem completa
-      const telN = (cfg.tel || '').replace(/[^0-9]/g, '');
-      const wUrl = telN
-        ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg)
+      // Se tem telefone do cliente, abre direto para ele — senão escolhe na hora
+      const telCli = (d.telCli || '').replace(/[^0-9]/g, '');
+      const wUrl = telCli
+        ? 'https://wa.me/55' + telCli + '?text=' + encodeURIComponent(msg)
         : 'https://wa.me/?text=' + encodeURIComponent(msg);
       window.open(wUrl, '_blank');
 
