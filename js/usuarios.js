@@ -1,163 +1,164 @@
-// ════════════════════════════════════════════════════════════
-// usuarios.js — Módulo de administração de usuários
-// ════════════════════════════════════════════════════════════
-
 const Usuarios = {
-
   _editUserId: null,
 
-  carregar() {
-    const container = document.getElementById('listaUsuarios');
-    if (!container) return;
-    container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Carregando...</div>';
-    fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios?acao=listar', {
-      headers: { 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY }
-    })
-      .then(r => r.json())
-      .then(data => {
-        const users = data.users || [];
-        if (users.length === 0) { container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Nenhum usuário.</div>'; return; }
-        container.innerHTML = '';
-        users.forEach(u => {
-          const div = document.createElement('div');
-          div.className = 'card user-card';
-          const meta = u.user_metadata || {};
-          const nome = meta.nome || u.email.split('@')[0];
-          const ativo = !u.banned_until;
-          div.innerHTML =
-            '<div class="user-info">' +
-              '<div class="user-nome">' + nome + '</div>' +
-              '<div class="user-email">' + u.email + '</div>' +
-              '<div class="user-status ' + (ativo ? 'ativo' : 'inativo') + '">' + (ativo ? '● Ativo' : '● Inativo') + '</div>' +
-            '</div>' +
-            '<div class="user-actions">' +
-              '<button class="btn-edit-senha" data-id="' + u.id + '" data-nome="' + nome + '">Senha</button>' +
-              '<button class="btn-toggle-user" data-id="' + u.id + '" data-desativar="' + ativo + '">' + (ativo ? 'Desativar' : 'Ativar') + '</button>' +
-            '</div>';
-          div.querySelector('.btn-edit-senha').addEventListener('click', (e) => {
-            this.abrirEditSenha(e.target.dataset.id, e.target.dataset.nome);
-          });
-          div.querySelector('.btn-toggle-user').addEventListener('click', (e) => {
-            this.toggleUsuario(e.target.dataset.id, e.target.dataset.desativar === 'true');
-          });
-          container.appendChild(div);
-        });
+  async callAdmin(action, payload = {}) {
+    return Api.request('/functions/v1/admin-user', {
+      method: 'POST',
+      body: JSON.stringify({
+        action,
+        organization_id: CONFIG.organizationId,
+        ...payload
       })
-      .catch(() => { container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Erro ao carregar usuários.</div>'; });
+    });
   },
 
-  abrirNovoUsuario() {
-    document.getElementById('novoUsuarioEmail').value = '';
-    document.getElementById('novoUsuarioNome').value = '';
-    document.getElementById('novoUsuarioSenha').value = '';
-    document.getElementById('modalNovoUsuario').classList.add('open');
-    document.getElementById('novoUsuarioNome').focus();
-  },
-
-  fecharModalNovoUsuario() {
-    document.getElementById('modalNovoUsuario').classList.remove('open');
-  },
-
-  async criarUsuario() {
-    const nome  = document.getElementById('novoUsuarioNome').value.trim();
-    const senha = document.getElementById('novoUsuarioSenha').value;
-    if (!nome || !senha) { Utils.toast('Informe nome e senha.'); return; }
-    const email = nome.toLowerCase().replace(/\s+/g, '.') + '@1kbeats.interno';
+  async carregar() {
+    const container = document.getElementById('listaUsuarios');
+    if (!container || !CONFIG.isAdmin) return;
+    container.innerHTML = '<div class="empty-state">Carregando usuários...</div>';
     try {
-      const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/criar-usuario', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY },
-        body: JSON.stringify({ email, password: senha, nome })
+      const data = await this.callAdmin('list');
+      const users = data.users || [];
+      if (!users.length) {
+        container.innerHTML = '<div class="empty-state">Nenhum usuário cadastrado.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      users.forEach(user => {
+        const name = user.name || user.email.split('@')[0];
+        const roleLabel = { owner: 'Proprietário', admin: 'Administrador', member: 'Colaborador' }[user.role] || 'Colaborador';
+        const card = document.createElement('div');
+        card.className = 'card user-card';
+        card.innerHTML =
+          '<div class="user-info">' +
+            '<div class="user-nome">' + Utils.escapeHTML(name) + '</div>' +
+            '<div class="user-email">' + Utils.escapeHTML(user.email) + '</div>' +
+            '<div class="user-status ' + (user.active ? 'ativo' : 'inativo') + '">' +
+              (user.active ? '● Ativo' : '● Inativo') + ' · ' + Utils.escapeHTML(roleLabel) +
+            '</div>' +
+          '</div>' +
+          '<div class="user-actions">' +
+            (user.role !== 'owner' ? '<button class="btn-edit-senha" type="button">Senha</button>' : '') +
+            (user.role !== 'owner' ? '<button class="btn-toggle-user" type="button">' + (user.active ? 'Desativar' : 'Ativar') + '</button>' : '') +
+          '</div>';
+        const passwordButton = card.querySelector('.btn-edit-senha');
+        const toggleButton = card.querySelector('.btn-toggle-user');
+        if (passwordButton) passwordButton.addEventListener('click', () => this.abrirEditSenha(user.id, name));
+        if (toggleButton) toggleButton.addEventListener('click', () => this.toggleUsuario(user.id, user.active));
+        container.appendChild(card);
       });
-      const data = await res.json();
-      if (data.error) { Utils.toast('Erro: ' + data.error); return; }
-      this.fecharModalNovoUsuario();
-      this.carregar();
-      Utils.toast('Usuário criado: ' + email);
-    } catch(e) {
-      Utils.toast('Erro ao criar usuário.');
+    } catch (error) {
+      container.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>';
     }
   },
 
-  abrirEditSenha(userId, nome) {
+  abrirNovoUsuario() {
+    if (!CONFIG.isAdmin) return;
+    ['novoUsuarioNome', 'novoUsuarioEmail', 'novoUsuarioSenha'].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.value = '';
+    });
+    const role = document.getElementById('novoUsuarioRole');
+    if (role) role.value = 'member';
+    document.getElementById('modalNovoUsuario')?.classList.add('open');
+    document.getElementById('novoUsuarioNome')?.focus();
+  },
+
+  fecharModalNovoUsuario() {
+    document.getElementById('modalNovoUsuario')?.classList.remove('open');
+  },
+
+  async criarUsuario() {
+    const name = Utils.sanitizeText(document.getElementById('novoUsuarioNome')?.value, 100);
+    const email = String(document.getElementById('novoUsuarioEmail')?.value || '').trim().toLowerCase();
+    const password = document.getElementById('novoUsuarioSenha')?.value || '';
+    const role = document.getElementById('novoUsuarioRole')?.value || 'member';
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Utils.toast('Informe nome e e-mail válidos.', 'erro');
+      return;
+    }
+    if (password.length < 8) {
+      Utils.toast('A senha deve ter pelo menos 8 caracteres.', 'erro');
+      return;
+    }
+    try {
+      await this.callAdmin('create', { name, email, password, role });
+      this.fecharModalNovoUsuario();
+      await this.carregar();
+      Utils.toast('Usuário criado com segurança.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao criar usuário.'), 'erro');
+    }
+  },
+
+  abrirEditSenha(userId, name) {
     this._editUserId = userId;
-    document.getElementById('editSenhaNome').textContent = nome;
-    document.getElementById('editSenhaInput').value = '';
-    document.getElementById('modalEditSenha').classList.add('open');
-    document.getElementById('editSenhaInput').focus();
+    const label = document.getElementById('editSenhaNome');
+    if (label) label.textContent = name;
+    const input = document.getElementById('editSenhaInput');
+    if (input) input.value = '';
+    document.getElementById('modalEditSenha')?.classList.add('open');
+    input?.focus();
   },
 
   fecharEditSenha() {
-    document.getElementById('modalEditSenha').classList.remove('open');
+    document.getElementById('modalEditSenha')?.classList.remove('open');
     this._editUserId = null;
   },
 
   async salvarNovaSenha() {
-    const senha = document.getElementById('editSenhaInput').value;
-    if (!senha || senha.length < 6) { Utils.toast('Mínimo 6 caracteres.'); return; }
+    const password = document.getElementById('editSenhaInput')?.value || '';
+    if (password.length < 8) {
+      Utils.toast('Use pelo menos 8 caracteres.', 'erro');
+      return;
+    }
     try {
-      const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY },
-        body: JSON.stringify({ acao: 'alterar-senha', userId: this._editUserId, password: senha })
-      });
-      if (res.ok) { this.fecharEditSenha(); Utils.toast('Senha alterada!'); }
-      else Utils.toast('Erro ao alterar senha.');
-    } catch(e) { Utils.toast('Erro ao alterar senha.'); }
+      await this.callAdmin('update_password', { user_id: this._editUserId, password });
+      this.fecharEditSenha();
+      Utils.toast('Senha atualizada.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error), 'erro');
+    }
   },
 
-  async toggleUsuario(userId, desativar) {
-    const payload = desativar ? { banned_until: '2099-01-01T00:00:00Z' } : { banned_until: null };
+  async toggleUsuario(userId, active) {
     try {
-      const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY },
-        body: JSON.stringify({ acao: 'toggle-usuario', userId: userId, payload: payload })
-      });
-      if (res.ok) { this.carregar(); Utils.toast(desativar ? 'Usuário desativado.' : 'Usuário ativado.'); }
-      else Utils.toast('Erro ao alterar usuário.');
-    } catch(e) { Utils.toast('Erro ao alterar usuário.'); }
+      await this.callAdmin('set_active', { user_id: userId, active: !active });
+      await this.carregar();
+      Utils.toast(active ? 'Usuário desativado.' : 'Usuário ativado.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error), 'erro');
+    }
   },
 
-  // Alterar a própria senha
   abrirAlterarSenha() {
-    document.getElementById('novaSenhaInput').value = '';
-    document.getElementById('modalAlterarSenha').classList.add('open');
-    document.getElementById('novaSenhaInput').focus();
+    const input = document.getElementById('novaSenhaInput');
+    if (input) input.value = '';
+    document.getElementById('modalAlterarSenha')?.classList.add('open');
+    input?.focus();
   },
 
   fecharAlterarSenha() {
-    document.getElementById('modalAlterarSenha').classList.remove('open');
+    document.getElementById('modalAlterarSenha')?.classList.remove('open');
   },
 
   async confirmarAlterarSenha() {
-    const senha = document.getElementById('novaSenhaInput').value;
-    if (!senha || senha.length < 6) { Utils.toast('Mínimo 6 caracteres.'); return; }
-    const ok = await Auth.alterarSenha(senha);
-    if (ok) { this.fecharAlterarSenha(); Utils.toast('Senha alterada com sucesso!'); }
-    else Utils.toast('Erro ao alterar senha.');
+    try {
+      await Auth.alterarSenha(document.getElementById('novaSenhaInput')?.value || '');
+      this.fecharAlterarSenha();
+      Utils.toast('Senha alterada com sucesso.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error), 'erro');
+    }
   },
 
   bindEvents() {
-    const btnNovo = document.getElementById('btnNovoUsuario');
-    if (btnNovo) btnNovo.addEventListener('click', () => this.abrirNovoUsuario());
-
-    const btnCriar = document.getElementById('btnCriarUsuario');
-    if (btnCriar) btnCriar.addEventListener('click', () => this.criarUsuario());
-
-    const btnCancelarNovo = document.getElementById('btnCancelarNovoUsuario');
-    if (btnCancelarNovo) btnCancelarNovo.addEventListener('click', () => this.fecharModalNovoUsuario());
-
-    const btnSalvarSenha = document.getElementById('btnSalvarSenha');
-    if (btnSalvarSenha) btnSalvarSenha.addEventListener('click', () => this.salvarNovaSenha());
-
-    const btnCancelarSenha = document.getElementById('btnCancelarSenha');
-    if (btnCancelarSenha) btnCancelarSenha.addEventListener('click', () => this.fecharEditSenha());
-
-    const btnConfAlterarSenha = document.getElementById('btnConfAlterarSenha');
-    if (btnConfAlterarSenha) btnConfAlterarSenha.addEventListener('click', () => this.confirmarAlterarSenha());
-
-    const btnCancelAlterarSenha = document.getElementById('btnCancelAlterarSenha');
-    if (btnCancelAlterarSenha) btnCancelAlterarSenha.addEventListener('click', () => this.fecharAlterarSenha());
+    document.getElementById('btnNovoUsuario')?.addEventListener('click', () => this.abrirNovoUsuario());
+    document.getElementById('btnCriarUsuario')?.addEventListener('click', () => this.criarUsuario());
+    document.getElementById('btnCancelarNovoUsuario')?.addEventListener('click', () => this.fecharModalNovoUsuario());
+    document.getElementById('btnSalvarSenha')?.addEventListener('click', () => this.salvarNovaSenha());
+    document.getElementById('btnCancelarSenha')?.addEventListener('click', () => this.fecharEditSenha());
+    document.getElementById('btnConfAlterarSenha')?.addEventListener('click', () => this.confirmarAlterarSenha());
+    document.getElementById('btnCancelAlterarSenha')?.addEventListener('click', () => this.fecharAlterarSenha());
   }
 };

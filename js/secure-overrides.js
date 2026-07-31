@@ -1,0 +1,336 @@
+(function secureQuoteModule() {
+  const originalPdf = Orcamentos.gerarPDF.bind(Orcamentos);
+
+  Orcamentos.loadCfg = async function loadCfg() {
+    try {
+      const rows = await Api.request(Api.orgFilter('/rest/v1/config?select=*&limit=1'));
+      const config = rows?.[0] || {};
+      this._cfg = {
+        id: config.id || null,
+        nome: config.nome || CONFIG.context?.organization?.name || '1000 Beats',
+        cnpj: config.cnpj || '',
+        tel: config.tel || '',
+        email: config.email || '',
+        end: config.endereco || ''
+      };
+      const values = {
+        cfgNome: this._cfg.nome,
+        cfgCnpj: this._cfg.cnpj,
+        cfgTelefone: this._cfg.tel,
+        cfgEmail: this._cfg.email,
+        cfgEndereco: this._cfg.end
+      };
+      Object.entries(values).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.value = value;
+      });
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Não foi possível carregar os dados da empresa.'), 'erro');
+    }
+  };
+
+  Orcamentos.salvarConfig = async function salvarConfig() {
+    if (!CONFIG.isAdmin) {
+      Utils.toast('Somente administradores podem alterar a empresa.', 'erro');
+      return;
+    }
+    const data = {
+      nome: Utils.sanitizeText(document.getElementById('cfgNome')?.value, 150),
+      cnpj: Utils.sanitizeText(document.getElementById('cfgCnpj')?.value, 20) || null,
+      tel: Utils.sanitizeText(document.getElementById('cfgTelefone')?.value, 30) || null,
+      email: Utils.sanitizeText(document.getElementById('cfgEmail')?.value, 150) || null,
+      endereco: Utils.sanitizeText(document.getElementById('cfgEndereco')?.value, 250) || null
+    };
+    if (!data.nome) {
+      Utils.toast('Informe o nome da empresa.', 'erro');
+      return;
+    }
+    try {
+      const path = this._cfg.id
+        ? Api.orgFilter('/rest/v1/config?id=eq.' + encodeURIComponent(this._cfg.id))
+        : '/rest/v1/config';
+      const rows = await Api.request(path, {
+        method: this._cfg.id ? 'PATCH' : 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(Api.orgPayload(data))
+      });
+      this._cfg = {
+        id: rows?.[0]?.id || this._cfg.id,
+        nome: data.nome,
+        cnpj: data.cnpj || '',
+        tel: data.tel || '',
+        email: data.email || '',
+        end: data.endereco || ''
+      };
+      document.getElementById('configPanel')?.classList.remove('open');
+      Utils.toast('Dados da empresa salvos.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao salvar configurações.'), 'erro');
+    }
+  };
+
+  Orcamentos.renderDropdown = function renderDropdown(filter) {
+    const term = String(filter || '').toLowerCase();
+    const dropdown = document.getElementById('clienteDropdown');
+    if (!dropdown) return;
+    const show = clients => {
+      dropdown.innerHTML = '';
+      const filtered = term
+        ? clients.filter(client => String(client.nome || '').toLowerCase().includes(term))
+        : clients;
+      if (!filtered.length) {
+        dropdown.innerHTML = '<div class="cliente-item-vazio">Nenhum cliente cadastrado</div>';
+      } else {
+        filtered.forEach(client => {
+          const item = document.createElement('div');
+          item.className = 'cliente-item';
+          item.innerHTML =
+            '<div class="cliente-item-nome">' + Utils.escapeHTML(client.nome) + '</div>' +
+            (client.cnpj ? '<div class="cliente-item-cnpj">' + Utils.escapeHTML(client.cnpj) + '</div>' : '');
+          item.addEventListener('click', () => {
+            document.getElementById('nomeCliente').value = client.nome || '';
+            document.getElementById('cnpjCliente').value = client.cnpj || '';
+            dropdown.classList.remove('open');
+          });
+          dropdown.appendChild(item);
+        });
+      }
+      dropdown.classList.add('open');
+    };
+    if (this._dropCache.length) show(this._dropCache);
+    else Clientes.getAll(clients => {
+      this._dropCache = clients;
+      show(clients);
+    });
+  };
+
+  Orcamentos.dadosSeguros = function dadosSeguros() {
+    const data = this._coletarDados();
+    if (!data.itens.length) throw new Error('Adicione pelo menos um item ao orçamento.');
+    if (!data.cliente || data.cliente === 'Cliente') throw new Error('Informe o cliente.');
+    return {
+      cliente_nome: Utils.sanitizeText(data.cliente, 150),
+      cnpj_cli: Utils.sanitizeText(data.cnpjCli, 20) || null,
+      referencia: Utils.sanitizeText(data.ref, 150) || null,
+      valido_ate: data.val || null,
+      desconto_tipo: data.tipo === 'val' ? 'val' : 'pct',
+      desconto_valor: Math.max(0, Number(data.discVal) || 0),
+      itens: data.itens.slice(0, 100).map(item => ({
+        desc: Utils.sanitizeText(item.desc, 300),
+        qty: Math.max(0, Number(item.qty) || 0),
+        unit: Math.max(0, Number(item.unit) || 0),
+        tot: Math.max(0, Number(item.tot) || 0)
+      })),
+      observacoes: Utils.sanitizeText(data.obs, 3000) || null,
+      empresa: Utils.sanitizeText(this._cfg.nome, 150) || null,
+      cnpj_emp: Utils.sanitizeText(this._cfg.cnpj, 20) || null,
+      tel_emp: Utils.sanitizeText(this._cfg.tel, 30) || null,
+      email_emp: Utils.sanitizeText(this._cfg.email, 150) || null,
+      solicitante: Utils.sanitizeText(data.solicitante, 150) || null,
+      total: Math.max(0, Number(data.total) || 0),
+      status: this._currentQuote?.status || 'pendente'
+    };
+  };
+
+  Orcamentos.salvarAtual = async function salvarAtual() {
+    const payload = this.dadosSeguros();
+    if (this._currentQuote?.id) {
+      const rows = await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(this._currentQuote.id)), {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(payload)
+      });
+      this._currentQuote = rows?.[0] || { ...this._currentQuote, ...payload };
+    } else {
+      const rows = await Api.request('/rest/v1/orcamentos', {
+        method: 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(Api.orgPayload({ ...payload, created_by: Auth.user?.id || null }))
+      });
+      this._currentQuote = rows?.[0];
+    }
+    if (!this._currentQuote?.id || !this._currentQuote?.public_token) {
+      throw new Error('O servidor não retornou o identificador do orçamento.');
+    }
+    const numberElement = document.getElementById('metaNumero');
+    const numberRow = document.getElementById('metaNumeroRow');
+    if (numberElement) numberElement.textContent = Utils.fmtNumero(this._currentQuote.numero);
+    if (numberRow) numberRow.style.display = '';
+    return this._currentQuote;
+  };
+
+  Orcamentos.gerarWhatsApp = async function gerarWhatsApp() {
+    const button = document.getElementById('btnWpp');
+    if (button) {
+      button.textContent = 'Preparando...';
+      button.disabled = true;
+    }
+    try {
+      const quote = await this.salvarAtual();
+      const data = this._coletarDados();
+      const newline = '\n';
+      let message = Utils.saudacao() + ',' + newline + newline;
+      message += 'Segue o orçamento da *' + (this._cfg.nome || 'nossa empresa') + '*.' + newline;
+      if (data.ref) message += 'Referência: *' + data.ref + '*' + newline;
+      message += 'Cliente: *' + data.cliente + '*' + newline;
+      if (data.solicitante) message += 'Solicitante: *' + data.solicitante + '*' + newline;
+      if (data.val) message += 'Válido até: ' + Utils.fmtDate(data.val) + newline;
+      message += newline + '*Total: ' + Utils.fmt(data.total) + '*' + newline + newline;
+      message += 'Visualizar orçamento:' + newline + CONFIG.publicQuoteUrl(quote.public_token);
+      Utils.openExternal('https://wa.me/?text=' + encodeURIComponent(message));
+      Utils.toast('Orçamento salvo e pronto para compartilhar.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao preparar o orçamento.'), 'erro');
+    } finally {
+      if (button) {
+        button.textContent = 'WhatsApp';
+        button.disabled = false;
+      }
+    }
+  };
+
+  Orcamentos.gerarPDF = async function gerarPDFSeguro() {
+    try {
+      await this.salvarAtual();
+      await originalPdf();
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Erro ao gerar o PDF.'), 'erro');
+    }
+  };
+
+  ListaOrcamentos.carregar = async function carregarLista() {
+    const container = document.getElementById('listaOrcamentos');
+    if (!container) return;
+    container.innerHTML = '<div class="empty-state">Carregando orçamentos...</div>';
+    try {
+      const quotes = await Api.request(Api.orgFilter(
+        '/rest/v1/orcamentos?select=id,numero,cliente_nome,referencia,total,status,created_at,public_token&order=created_at.desc&limit=50'
+      )) || [];
+      this._dados = quotes;
+      if (!quotes.length) {
+        container.innerHTML = '<div class="empty-state">Nenhum orçamento enviado.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      quotes.forEach((quote, index) => {
+        const statusLabels = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
+        const safeStatus = Object.hasOwn(statusLabels, quote.status) ? quote.status : 'pendente';
+        const row = document.createElement('div');
+        row.className = 'quote-list-row';
+        row.innerHTML =
+          '<span class="quote-number">' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</span>' +
+          '<div class="quote-client"><strong>' + Utils.escapeHTML(quote.cliente_nome || '—') + '</strong>' +
+            (quote.referencia ? '<small>' + Utils.escapeHTML(quote.referencia) + '</small>' : '') + '</div>' +
+          '<span class="quote-date">' + Utils.escapeHTML(Utils.fmtDate(quote.created_at)) + '</span>' +
+          '<span class="quote-total">' + Utils.escapeHTML(Utils.fmt(quote.total)) + '</span>' +
+          '<select class="orc-status-sel">' +
+            Object.entries(statusLabels).map(([value, label]) =>
+              '<option value="' + value + '"' + (safeStatus === value ? ' selected' : '') + '>' + label + '</option>'
+            ).join('') +
+          '</select>' +
+          '<div class="quote-actions">' +
+            '<a class="quote-view" target="_blank" rel="noopener" href="' +
+              Utils.escapeHTML('ver.html?t=' + encodeURIComponent(quote.public_token)) + '" title="Visualizar">↗</a>' +
+            (CONFIG.isAdmin ? '<button class="quote-delete" type="button" title="Excluir">✕</button>' : '') +
+          '</div>';
+        row.style.setProperty('--row-index', index);
+        const select = row.querySelector('.orc-status-sel');
+        select.addEventListener('change', async event => {
+          const previous = quote.status;
+          try {
+            await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(quote.id)), {
+              method: 'PATCH',
+              body: JSON.stringify({ status: event.target.value })
+            });
+            quote.status = event.target.value;
+            Utils.toast('Status atualizado.');
+          } catch (error) {
+            event.target.value = previous;
+            Utils.toast(Api.friendlyError(error), 'erro');
+          }
+        });
+        row.querySelector('.quote-delete')?.addEventListener('click', async () => {
+          if (!confirm('Excluir definitivamente este orçamento?')) return;
+          try {
+            await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(quote.id)), { method: 'DELETE' });
+            this.carregar();
+            Utils.toast('Orçamento excluído.');
+          } catch (error) {
+            Utils.toast(Api.friendlyError(error), 'erro');
+          }
+        });
+        container.appendChild(row);
+      });
+    } catch (error) {
+      container.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>';
+    }
+  };
+
+  ListaOrcamentos.exportar = function exportarOrcamentos() {
+    Utils.downloadCSV('orcamentos.csv', (this._dados || []).map(quote => ({
+      Número: quote.numero,
+      Cliente: quote.cliente_nome,
+      Referência: quote.referencia,
+      Total: Number(quote.total || 0).toFixed(2),
+      Status: quote.status,
+      Data: Utils.fmtDate(quote.created_at)
+    })));
+  };
+
+  Dashboard.carregar = async function carregarDashboard() {
+    const now = new Date();
+    const name = document.getElementById('userNome')?.textContent || '';
+    const greeting = document.getElementById('dashSaudacao');
+    const date = document.getElementById('dashData');
+    if (greeting) greeting.textContent = Utils.saudacao() + (name ? ', ' + name : '') + '!';
+    if (date) date.textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const start = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01T00:00:00`;
+    try {
+      const quotes = await Api.request(Api.orgFilter(
+        '/rest/v1/orcamentos?select=numero,cliente_nome,referencia,total,status,created_at' +
+        '&created_at=gte.' + encodeURIComponent(start) + '&order=created_at.desc'
+      )) || [];
+      const approved = quotes.filter(quote => quote.status === 'aprovado');
+      const pending = quotes.filter(quote => quote.status === 'pendente');
+      const completed = quotes.filter(quote => ['aprovado', 'recusado'].includes(quote.status));
+      const set = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+      };
+      set('kpiTotal', quotes.length);
+      set('kpiValor', Utils.fmt(quotes.reduce((sum, quote) => sum + Number(quote.total || 0), 0)));
+      set('kpiAprovados', approved.length);
+      set('kpiAprovadosVal', Utils.fmt(approved.reduce((sum, quote) => sum + Number(quote.total || 0), 0)));
+      set('kpiPendentes', pending.length);
+      set('kpiPendentesVal', Utils.fmt(pending.reduce((sum, quote) => sum + Number(quote.total || 0), 0)));
+      const rate = completed.length ? Math.round(approved.length / completed.length * 100) : 0;
+      set('dashTaxaPct', rate + '% aprovados');
+      set('dashTaxaNum', approved.length + ' de ' + completed.length);
+      const bar = document.getElementById('dashTaxaBarra');
+      if (bar) bar.style.width = rate + '%';
+      set('dashMesLabel', now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }));
+      const recent = document.getElementById('dashUltimos');
+      if (!recent) return;
+      if (!quotes.length) {
+        recent.innerHTML = '<div class="empty-state">Nenhum orçamento neste mês.</div>';
+        return;
+      }
+      recent.innerHTML = '';
+      quotes.slice(0, 4).forEach(quote => {
+        const row = document.createElement('div');
+        row.className = 'dash-quote-row';
+        row.innerHTML =
+          '<span>' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</span>' +
+          '<div><strong>' + Utils.escapeHTML(quote.cliente_nome || '—') + '</strong>' +
+          (quote.referencia ? '<small>' + Utils.escapeHTML(quote.referencia) + '</small>' : '') + '</div>' +
+          '<em class="status-' + Utils.safeId(quote.status || 'pendente') + '">' +
+            Utils.escapeHTML(({ pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' })[quote.status] || 'Pendente') +
+          '</em>';
+        recent.appendChild(row);
+      });
+    } catch (error) {
+      const recent = document.getElementById('dashUltimos');
+      if (recent) recent.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>';
+    }
+  };
+})();
