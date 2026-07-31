@@ -5,6 +5,19 @@ body:not(.app-ready) .app-shell { visibility: hidden; }
   letter-spacing: .08em; z-index: 9999;
 }
 body.app-ready .app-loading { display: none; }
+.password-input-wrap { position: relative; width: 100%; }
+.password-input-wrap > input { padding-right: 48px !important; }
+.password-toggle,
+.reset-card .password-toggle {
+  position: absolute; top: 50%; right: 5px; transform: translateY(-50%);
+  display: grid; place-items: center; width: 38px !important; height: 38px !important;
+  margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 7px;
+  background: transparent !important; box-shadow: none !important; color: #77778d;
+  cursor: pointer; z-index: 2;
+}
+.password-toggle:hover { color: #d91a72; background: rgba(217,26,114,.08) !important; }
+.password-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
 .empty-state { padding: 2rem; text-align: center; color: #999; font-size: 13px; }
 .error-state { color: #b42318; background: #fff6f5; }
 .catalog-row {
