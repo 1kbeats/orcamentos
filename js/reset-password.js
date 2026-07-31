@@ -30,7 +30,7 @@
       const response = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/user', {
         method: 'PUT',
         headers: {
-          apikey: CONFIG.SUPABASE_ANON_KEY,
+          apikey: CONFIG.SUPABASE_PUBLISHABLE_KEY,
           Authorization: 'Bearer ' + accessToken,
           'Content-Type': 'application/json'
         },
