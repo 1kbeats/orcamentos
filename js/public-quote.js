@@ -17,7 +17,6 @@
   try {
     const quote = await Api.anonymous('/rest/v1/rpc/get_public_quote', {
       method: 'POST',
-      headers: { 'Cache-Control': 'no-store' },
       body: JSON.stringify({ p_token: token })
     });
     if (!quote || !quote.numero) {
