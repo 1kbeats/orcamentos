@@ -5,11 +5,10 @@
 
 const CONFIG = {
   EMPRESA: '1K Beats',
-  APP_VERSION: 'v5.6',
+  APP_VERSION: 'v5.7',
 
   SUPABASE_URL: 'https://hcjbfdspmqlyzkgypacb.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjamJmZHNwbXFseXprZ3lwYWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NDkzMzAsImV4cCI6MjEwMDMyNTMzMH0.tQMrsJ7pMCvUNb2CobEhn6vvFgiKHGDtFFPM_QJFYCQ',
-  SUPABASE_SERVICE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjamJmZHNwbXFseXprZ3lwYWNiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDc0OTMzMCwiZXhwIjoyMTAwMzI1MzMwfQ.glyjZXNs4jUBHDEH0XcIqQU-7PK0np5i490YY2nArEw',
 
   STORAGE_PREFIX: '1kbeats_',
 
@@ -24,13 +23,7 @@ const CONFIG = {
     };
   },
 
-  headersService() {
-    return {
-      'apikey': this.SUPABASE_SERVICE_KEY,
-      'Authorization': 'Bearer ' + this.SUPABASE_SERVICE_KEY,
-      'Content-Type': 'application/json'
-    };
-  },
+
 
   getSession() {
     try {

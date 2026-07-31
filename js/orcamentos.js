@@ -343,9 +343,10 @@ const Orcamentos = {
       if (id) {
         msg += nl + nl + 'Visualizar orçamento:' + nl;
         // Usar número curto se disponível, senão usar UUID
-        const linkId = numero ? numero : id;
-        const paramName = numero ? 'n' : 'id';
-        msg += 'https://1kbeats.github.io/orcamentos/ver.html?' + paramName + '=' + linkId;
+        // Usa sempre o UUID no link público — não enumerável
+        if (id) {
+          msg += 'https://1kbeats.github.io/orcamentos/ver.html?id=' + id;
+        }
       }
 
       // 3. Abrir WhatsApp com mensagem completa
@@ -568,8 +569,8 @@ const ListaOrcamentos = {
         div.innerHTML =
           `<span style="font-size:14px;font-weight:700;color:#D91A72">${num}</span>` +
           `<div style="min-width:0;padding-right:20px">` +
-            `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cliente}</div>` +
-            (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ref}</div>` : '') +
+            `<div style="font-size:13px;font-weight:500;color:#1A1A22;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.sanitize(cliente)}</div>` +
+            (ref !== '—' ? `<div style="font-size:11px;color:#D91A72;font-weight:500;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.sanitize(ref)}</div>` : '') +
           `</div>` +
           `<span style="font-size:12px;color:#AAA">${data}</span>` +
           `<span style="font-size:14px;font-weight:500;color:#1A1A22;text-align:right">${valor}</span>` +

@@ -10,7 +10,9 @@ const Usuarios = {
     const container = document.getElementById('listaUsuarios');
     if (!container) return;
     container.innerHTML = '<div style="color:#999;padding:2rem;text-align:center">Carregando...</div>';
-    fetch(CONFIG.SUPABASE_URL + '/auth/v1/admin/users', { headers: CONFIG.headersService() })
+    fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios?acao=listar', {
+      headers: { 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY }
+    })
       .then(r => r.json())
       .then(data => {
         const users = data.users || [];
@@ -94,8 +96,10 @@ const Usuarios = {
     const senha = document.getElementById('editSenhaInput').value;
     if (!senha || senha.length < 6) { Utils.toast('Mínimo 6 caracteres.'); return; }
     try {
-      const res = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/admin/users/' + this._editUserId, {
-        method: 'PUT', headers: CONFIG.headersService(), body: JSON.stringify({ password: senha })
+      const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY },
+        body: JSON.stringify({ acao: 'alterar-senha', userId: this._editUserId, password: senha })
       });
       if (res.ok) { this.fecharEditSenha(); Utils.toast('Senha alterada!'); }
       else Utils.toast('Erro ao alterar senha.');
@@ -105,8 +109,10 @@ const Usuarios = {
   async toggleUsuario(userId, desativar) {
     const payload = desativar ? { banned_until: '2099-01-01T00:00:00Z' } : { banned_until: null };
     try {
-      const res = await fetch(CONFIG.SUPABASE_URL + '/auth/v1/admin/users/' + userId, {
-        method: 'PUT', headers: CONFIG.headersService(), body: JSON.stringify(payload)
+      const res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/admin-usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (CONFIG.getSession() ? CONFIG.getSession().access_token : ''), 'apikey': CONFIG.SUPABASE_ANON_KEY },
+        body: JSON.stringify({ acao: 'toggle-usuario', userId: userId, payload: payload })
       });
       if (res.ok) { this.carregar(); Utils.toast(desativar ? 'Usuário desativado.' : 'Usuário ativado.'); }
       else Utils.toast('Erro ao alterar usuário.');

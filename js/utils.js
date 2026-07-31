@@ -45,6 +45,17 @@ const Utils = {
     );
   },
 
+
+  // Sanitiza texto para uso em innerHTML — previne XSS
+  sanitize(str) {
+    if (!str && str !== 0) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
   // Abre link externo
   abrirLink(url) {
     window.open(url, '_blank');
