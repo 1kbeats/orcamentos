@@ -161,34 +161,54 @@
 
   Orcamentos.gerarWhatsApp = async function gerarWhatsApp() {
     const button = document.getElementById('btnWpp');
-    if (button) {
-      button.textContent = 'Preparando...';
-      button.disabled = true;
-    }
-    try {
-      const quote = await this.salvarAtual();
-      const data = this._coletarDados();
-      const newline = '\n';
+    const buttonHtml = button?.innerHTML || 'WhatsApp';
+    const data = this._coletarDados();
+    const newline = '\n';
+    const buildMessage = quote => {
       let message = Utils.saudacao() + ',' + newline + newline;
       message += 'Segue o orçamento da *' + (this._cfg.nome || 'nossa empresa') + '*.' + newline;
       if (data.ref) message += 'Referência: *' + data.ref + '*' + newline;
       message += 'Cliente: *' + data.cliente + '*' + newline;
       if (data.solicitante) message += 'Solicitante: *' + data.solicitante + '*' + newline;
       if (data.val) message += 'Válido até: ' + Utils.fmtDate(data.val) + newline;
-      message += newline + '*Total: ' + Utils.fmt(data.total) + '*' + newline + newline;
-      message += 'Visualizar orçamento:' + newline + CONFIG.publicQuoteUrl(quote.public_token);
-      Utils.openExternal('https://wa.me/?text=' + encodeURIComponent(message));
-      Utils.toast('Orçamento salvo e pronto para compartilhar.');
+      message += newline + '*Total: ' + Utils.fmt(data.total) + '*';
+      if (quote?.public_token) {
+        message += newline + newline + 'Visualizar orçamento:' + newline + CONFIG.publicQuoteUrl(quote.public_token);
+      }
+      return message;
+    };
+
+    const initialMessage = buildMessage(null);
+    this.abrirModalWhatsApp(initialMessage);
+    const shareButton = document.getElementById('btnAbrirWhatsApp');
+    if (shareButton) {
+      shareButton.textContent = 'Preparando link...';
+      shareButton.disabled = true;
+    }
+    if (button) {
+      button.textContent = 'Preparando...';
+      button.disabled = true;
+    }
+    try {
+      const quote = await this.salvarAtual();
+      const finalMessage = buildMessage(quote);
+      const preview = document.getElementById('whatsappMensagem');
+      if (preview?.value === initialMessage) preview.value = finalMessage;
+      this._whatsappPadrao = finalMessage;
+      Utils.toast('Orçamento salvo. Revise a mensagem antes de enviar.');
     } catch (error) {
-      Utils.toast(Api.friendlyError(error, 'Erro ao preparar o orçamento.'), 'erro');
+      Utils.toast(Api.friendlyError(error, 'A prévia foi aberta, mas não foi possível gerar o link.'), 'erro');
     } finally {
       if (button) {
-        button.textContent = 'WhatsApp';
+        button.innerHTML = buttonHtml;
         button.disabled = false;
+      }
+      if (shareButton) {
+        shareButton.textContent = 'Abrir WhatsApp';
+        shareButton.disabled = false;
       }
     }
   };
-
   Orcamentos.gerarPDF = async function gerarPDFSeguro() {
     try {
       await this.salvarAtual();
