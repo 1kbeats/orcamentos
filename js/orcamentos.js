@@ -99,7 +99,7 @@ const Orcamentos = {
         resultados.slice(0, 6).forEach(item => {
           const opt = document.createElement('div');
           opt.className = 'cat-opt';
-          opt.innerHTML = '<span class="cat-opt-nome">' + item.nome + '</span><span class="cat-opt-val">' + Utils.fmt(item.valor) + '</span>';
+          opt.innerHTML = '<span class="cat-opt-nome">' + Utils.escapeHTML(item.nome) + '</span><span class="cat-opt-val">' + Utils.escapeHTML(Utils.fmt(item.valor)) + '</span>';
           opt.addEventListener('mousedown', (e) => {
             e.preventDefault();
             descInput.value = item.nome;

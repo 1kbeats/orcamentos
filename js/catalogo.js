@@ -15,11 +15,15 @@ const Catalogo = {
 
   buscar(term, callback) {
     const normalized = String(term || '').toLowerCase();
-    const source = this._cache || [];
-    callback(source.filter(item =>
+    const filter = source => callback((source || []).filter(item =>
       String(item.nome || '').toLowerCase().includes(normalized) ||
       String(item.categoria || '').toLowerCase().includes(normalized)
     ));
+    if (this._cache.length) {
+      filter(this._cache);
+      return;
+    }
+    this.getAll((items, error) => filter(error ? [] : items));
   },
 
   renderLista(category) {
