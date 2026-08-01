@@ -83,6 +83,7 @@ const Nav = {
     if (panel === 'clientes')  Clientes.renderLista();
     if (panel === 'catalogo')  Catalogo.renderLista();
     if (panel === 'admin')     Usuarios.carregar();
+    if (panel === 'producoes') Producoes.carregar();
     if (['gastos', 'equipe', 'fornecedores'].includes(panel)) Operacoes.carregar();
   },
 
