@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.2.0">
-  <link rel="stylesheet" href="./css/secure.css?v=6.2.0">
+  <link rel="stylesheet" href="./css/styles.css?v=6.2.1">
+  <link rel="stylesheet" href="./css/secure.css?v=6.2.1">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -187,13 +187,13 @@
               <div style="font-size:14px;font-weight:600;color:#1A1A22;margin-bottom:12px">Ações rápidas</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <button id="btnQuickQuote" type="button" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
-                  📄 Novo orçamento
+                  Novo orçamento
                 </button>
                 <button id="btnQuickClient" type="button" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
-                  👥 Cadastrar cliente
+                  Cadastrar cliente
                 </button>
                 <button id="btnQuickCatalog" type="button" style="background:#F5F5FA;color:#1A1A22;border:0.5px solid #E0E0EA;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit">
-                  📦 Adicionar ao catálogo
+                  Adicionar serviço ao catálogo
                 </button>
               </div>
             </div>
@@ -221,7 +221,7 @@
       <div class="quotes-page">
         <div class="quotes-head">
           <div><div class="ops-kicker">COMERCIAL</div><h2>Orçamentos</h2><p>Propostas enviadas e acompanhamento comercial.</p></div>
-          <div class="quotes-head-actions"><button id="btnExportarOrcamentos" type="button" class="quotes-export">⇩ <span>Exportar CSV</span></button><button id="btnNovoOrcamento" type="button" class="quotes-new">+ Novo orçamento</button></div>
+          <div class="quotes-head-actions"><button id="btnExportarOrcamentos" type="button" class="quotes-export" aria-label="Exportar orçamentos em CSV">⇩ <span>Exportar CSV</span></button><button id="btnNovoOrcamento" type="button" class="quotes-new">+ Novo orçamento</button></div>
         </div>
         <div class="quotes-toolbar"><label class="quotes-select-all"><input id="checkTodosOrcamentos" type="checkbox"><span></span> Selecionar todos</label><span id="quoteSelectionLabel">Selecione orçamentos para excluir em grupo</span><button id="btnExcluirSelecionados" type="button" class="quotes-delete" disabled>Excluir selecionados</button></div>
         <div class="quotes-table">
@@ -313,7 +313,7 @@
           <div class="bottom-row">
             <div class="obs-block">
               <div class="sec-label" style="margin-bottom:10px">Observações</div>
-              <textarea class="obs-textarea" id="obs" aria-label="Observações" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
+              <textarea class="obs-textarea" id="obs" aria-label="Observações" placeholder="Ex.: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
             <div style="display:flex;flex-direction:column;gap:0">
               <div style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
@@ -414,7 +414,7 @@
           <div class="catalog-head" style="padding:14px 18px;border-bottom:1px solid #E0E0EA;display:flex;align-items:center;justify-content:space-between">
             <div>
               <div style="font-size:15px;font-weight:600;color:#1A1A22">Catálogo</div>
-              <div style="font-size:12px;color:#AAA;margin-top:1px">Produtos e serviços para orçamento</div>
+              <div style="font-size:12px;color:#AAA;margin-top:1px">Serviços e equipamentos usados nos orçamentos</div>
             </div>
             <button id="btnNovoCatalogo" type="button" style="background:#1A1A22;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit">
               + Novo item
@@ -525,7 +525,7 @@
     <div class="modal-title" id="modalCatTitulo">Novo item</div>
     <div class="modal-field">
       <label for="catNome">Nome / descrição</label>
-      <input type="text" id="catNome" placeholder="Ex: Caixa de som ativo 15&quot;">
+      <input type="text" id="catNome" placeholder="Ex.: Caixa de som ativa de 15&quot;">
     </div>
     <div class="modal-field">
       <label for="catCategoria">Categoria</label>
@@ -553,7 +553,7 @@
 <div class="modal-bg" id="modalNovoUsuario">
   <div class="modal-box">
     <div class="modal-title">Novo usuário</div>
-    <div class="modal-field"><label for="novoUsuarioNome">Nome</label><input type="text" id="novoUsuarioNome" autocomplete="name" placeholder="Ex: joao"></div>
+    <div class="modal-field"><label for="novoUsuarioNome">Nome</label><input type="text" id="novoUsuarioNome" autocomplete="name" placeholder="Ex.: João"></div>
     <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="email"></div><div class="modal-field"><label for="novoUsuarioRole">Perfil</label><select id="novoUsuarioRole"><option value="member">Colaborador</option><option value="admin">Administrador</option></select></div>
     <div class="modal-field"><label for="novoUsuarioSenha">Senha</label><input type="password" id="novoUsuarioSenha" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
@@ -588,23 +588,23 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.2.0"></script>
-<script src="./js/password-toggle.js?v=6.2.0"></script>
-<script src="./js/api.js?v=6.2.0"></script>
-<script src="./js/utils.js?v=6.2.0"></script>
-<script src="./js/auth.js?v=6.2.0"></script>
-<script src="./js/nav.js?v=6.2.0"></script>
-<script src="./js/nav-events.js?v=6.2.0"></script>
-<script src="./js/clientes.js?v=6.2.0"></script>
-<script src="./js/financeiro.js?v=6.2.0"></script>
-<script src="./js/operacoes.js?v=6.2.0"></script>
-<script src="./js/producoes.js?v=6.2.0"></script>
-<script src="./js/usuarios.js?v=6.2.0"></script>
-<script src="./js/catalogo.js?v=6.2.0"></script>
-<script src="./js/orcamentos.js?v=6.2.0"></script>
-<script src="./js/secure-overrides.js?v=6.2.0"></script>
+<script src="./js/config.js?v=6.2.1"></script>
+<script src="./js/password-toggle.js?v=6.2.1"></script>
+<script src="./js/api.js?v=6.2.1"></script>
+<script src="./js/utils.js?v=6.2.1"></script>
+<script src="./js/auth.js?v=6.2.1"></script>
+<script src="./js/nav.js?v=6.2.1"></script>
+<script src="./js/nav-events.js?v=6.2.1"></script>
+<script src="./js/clientes.js?v=6.2.1"></script>
+<script src="./js/financeiro.js?v=6.2.1"></script>
+<script src="./js/operacoes.js?v=6.2.1"></script>
+<script src="./js/producoes.js?v=6.2.1"></script>
+<script src="./js/usuarios.js?v=6.2.1"></script>
+<script src="./js/catalogo.js?v=6.2.1"></script>
+<script src="./js/orcamentos.js?v=6.2.1"></script>
+<script src="./js/secure-overrides.js?v=6.2.1"></script>
 
-<script src="./js/app.js?v=6.2.0"></script>
+<script src="./js/app.js?v=6.2.1"></script>
 
 </body>
 </html>
