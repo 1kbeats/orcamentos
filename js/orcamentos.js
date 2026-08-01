@@ -7,6 +7,8 @@ const Orcamentos = {
   _cnt: 0,
   _cfg: {},
   _dropCache: [],
+  _clienteSelecionado: null,
+  _whatsappPadrao: '',
 
   // ── Inicialização ─────────────────────────────────────────
   init() {
@@ -37,7 +39,7 @@ const Orcamentos = {
 
     // Dropdown de clientes
     const clienteInput = document.getElementById('nomeCliente');
-    clienteInput.addEventListener('input', () => { this._dropCache = []; this.renderDropdown(clienteInput.value); });
+    clienteInput.addEventListener('input', () => { this._clienteSelecionado = null; this._dropCache = []; this.renderDropdown(clienteInput.value); });
     clienteInput.addEventListener('focus', () => { this._dropCache = []; this.renderDropdown(clienteInput.value); });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.cliente-wrap')) {
@@ -57,6 +59,14 @@ const Orcamentos = {
       }
     });
     document.getElementById('modalClienteSave').addEventListener('click', () => this.salvarClienteRapido());
+    document.getElementById('btnFecharWhatsApp')?.addEventListener('click', () => this.fecharModalWhatsApp());
+    document.getElementById('btnCancelarWhatsApp')?.addEventListener('click', () => this.fecharModalWhatsApp());
+    document.getElementById('btnRestaurarWhatsApp')?.addEventListener('click', () => this.restaurarMensagemWhatsApp());
+    document.getElementById('btnCopiarWhatsApp')?.addEventListener('click', () => this.copiarMensagemWhatsApp());
+    document.getElementById('btnAbrirWhatsApp')?.addEventListener('click', () => this.abrirWhatsApp());
+    document.getElementById('modalWhatsApp')?.addEventListener('click', event => {
+      if (event.target.id === 'modalWhatsApp') this.fecharModalWhatsApp();
+    });
   },
 
   // ── Tipo de desconto ─────────────────────────────────────
@@ -218,6 +228,7 @@ const Orcamentos = {
           div.className = 'cliente-item';
           div.innerHTML = '<div class="cliente-item-nome">' + (c.nome || '') + '</div>' + (c.cnpj ? '<div class="cliente-item-cnpj">' + c.cnpj + '</div>' : '');
           div.addEventListener('click', () => {
+            this._clienteSelecionado = c;
             document.getElementById('nomeCliente').value = c.nome || '';
             document.getElementById('cnpjCliente').value = c.cnpj || '';
             dropdown.classList.remove('open');
@@ -243,6 +254,7 @@ const Orcamentos = {
     const cnpj = document.getElementById('modalClienteCnpj').value.trim();
     if (!nome) { document.getElementById('modalClienteNome').focus(); return; }
     Clientes.salvar({ nome, cnpj: cnpj || null }, null, () => {
+      this._clienteSelecionado = { nome, cnpj, tel: '' };
       document.getElementById('nomeCliente').value = nome;
       document.getElementById('cnpjCliente').value = cnpj;
       document.getElementById('modalCliente').classList.remove('open');
@@ -281,6 +293,61 @@ const Orcamentos = {
   },
 
   // ── WhatsApp ──────────────────────────────────────────────
+  abrirModalWhatsApp(mensagem) {
+    const modal = document.getElementById('modalWhatsApp');
+    const destino = document.getElementById('whatsappDestino');
+    const preview = document.getElementById('whatsappMensagem');
+    if (!modal || !destino || !preview) return;
+    this._whatsappPadrao = mensagem;
+    destino.value = this._clienteSelecionado?.tel || '';
+    preview.value = mensagem;
+    modal.classList.add('open');
+    setTimeout(() => (destino.value ? preview : destino).focus(), 0);
+  },
+
+  fecharModalWhatsApp() {
+    document.getElementById('modalWhatsApp')?.classList.remove('open');
+  },
+
+  restaurarMensagemWhatsApp() {
+    const preview = document.getElementById('whatsappMensagem');
+    if (preview) preview.value = this._whatsappPadrao;
+  },
+
+  async copiarMensagemWhatsApp() {
+    const preview = document.getElementById('whatsappMensagem');
+    const mensagem = preview?.value || '';
+    if (!mensagem.trim()) { Utils.toast('Não há mensagem para copiar.'); return; }
+    let copiada = false;
+    try {
+      await navigator.clipboard.writeText(mensagem);
+      copiada = true;
+    } catch (_) {
+      preview.focus();
+      preview.select();
+      copiada = document.execCommand('copy');
+    }
+    Utils.toast(copiada ? 'Mensagem copiada.' : 'Não foi possível copiar a mensagem.');
+  },
+
+  normalizarWhatsApp(telefone) {
+    const digitos = String(telefone || '').replace(/[^0-9]/g, '');
+    if (!digitos) return '';
+    if (digitos.startsWith('55') && digitos.length >= 12) return digitos;
+    if (digitos.length === 10 || digitos.length === 11) return '55' + digitos;
+    return digitos;
+  },
+
+  abrirWhatsApp() {
+    const mensagem = document.getElementById('whatsappMensagem')?.value.trim() || '';
+    if (!mensagem) { Utils.toast('A mensagem está vazia.'); return; }
+    const telefone = this.normalizarWhatsApp(document.getElementById('whatsappDestino')?.value);
+    const url = telefone
+      ? 'https://wa.me/' + telefone + '?text=' + encodeURIComponent(mensagem)
+      : 'https://wa.me/?text=' + encodeURIComponent(mensagem);
+    window.open(url, '_blank', 'noopener');
+    this.fecharModalWhatsApp();
+  },
   async gerarWhatsApp() {
     const d = this._coletarDados();
     const cfg = this._cfg;
@@ -288,6 +355,7 @@ const Orcamentos = {
     const nl = '\n';
 
     const btnEl = document.getElementById('btnWpp');
+    const btnHtml = btnEl?.innerHTML || 'WhatsApp';
     if (btnEl) { btnEl.textContent = 'Salvando...'; btnEl.disabled = true; }
 
     try {
@@ -349,17 +417,13 @@ const Orcamentos = {
         if (rows[0].public_token) msg += CONFIG.publicQuoteUrl(rows[0].public_token);
       }
 
-      // 3. Abrir WhatsApp com mensagem completa
-      const telN = (cfg.tel || '').replace(/[^0-9]/g, '');
-      const wUrl = telN
-        ? 'https://wa.me/55' + telN + '?text=' + encodeURIComponent(msg)
-        : 'https://wa.me/?text=' + encodeURIComponent(msg);
-      window.open(wUrl, '_blank');
+      // 3. Permitir revisar o destinatário e a mensagem antes do envio
+      this.abrirModalWhatsApp(msg);
 
     } catch(e) {
       Utils.toast('Erro ao salvar orçamento: ' + e.message);
     } finally {
-      if (btnEl) { btnEl.textContent = 'WhatsApp'; btnEl.disabled = false; }
+      if (btnEl) { btnEl.innerHTML = btnHtml; btnEl.disabled = false; }
     }
   },
 
@@ -453,9 +517,11 @@ const Orcamentos = {
     // Faixa da REF
     if (d.ref) {
       doc.setFillColor(20, 20, 28); doc.rect(0, 63, pw, 13, 'F');
-      doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 100, 100); doc.text('REF.', ml, 71);
-      doc.setTextColor(190, 190, 190); doc.text(d.ref.substring(0, 72), pw - mr, 71, { align: 'right' });
+      doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(110, 110, 118); doc.text('REF.', ml, 71);
+      doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(220, 220, 224);
+      const refLines = doc.splitTextToSize(d.ref, 148).slice(0, 2);
+      doc.text(refLines, pw - mr, refLines.length > 1 ? 68.5 : 71, { align: 'right', lineHeightFactor: 1.15 });
     }
 
     let y = 86;
@@ -464,13 +530,15 @@ const Orcamentos = {
     doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('EMITIDO POR', pw - mr, y, { align: 'right' });
     y += 5;
     doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(42, 42, 53);
-    doc.text(d.cliente.substring(0, 35), ml, y);
+    const clientLines = doc.splitTextToSize(d.cliente || '—', 67).slice(0, 2);
+    doc.text(clientLines, ml, y, { lineHeightFactor: 1.15 });
     doc.setFontSize(10); doc.setFont('helvetica', 'normal');
     doc.text(d.cnpjCli || '—', ml + cw * 0.42, y);
     doc.setFontSize(8); doc.setFont('helvetica', 'bold');
-    doc.text(nome.substring(0, 30), pw - mr, y, { align: 'right' });
-    if (cfg.cnpj) { doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text(cfg.cnpj, pw - mr, y + 5, { align: 'right' }); }
-    if (d.solicitante) { doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text('Solicitante: ' + d.solicitante, ml, y + 5); }
+    const issuerLines = doc.splitTextToSize(nome, 62).slice(0, 2);
+    doc.text(issuerLines, pw - mr, y, { align: 'right', lineHeightFactor: 1.15 });
+    if (cfg.cnpj) { doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text(cfg.cnpj, pw - mr, y + (issuerLines.length * 4.2), { align: 'right' }); }
+    if (d.solicitante) { doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text('Solicitante: ' + d.solicitante, ml, y + (clientLines.length * 4.5)); }
 
     y += 14; doc.setDrawColor(210, 210, 210); doc.setLineWidth(0.3); doc.line(ml, y, pw - mr, y); y += 8;
 

@@ -45,23 +45,28 @@
       : '';
     card.innerHTML =
       '<div class="hdr">' +
-        '<div><div class="doc-label">Documento comercial</div><div class="doc-title">Orçamento</div></div>' +
+        '<div class="brand" aria-label="1K Beats — Áudio, vídeo e produção de eventos">' +
+          '<div class="brand-name"><span class="brand-1k">1K</span><span class="brand-beats">beats</span><span class="brand-wave">))</span></div>' +
+          '<div class="brand-tagline">ÁUDIO &nbsp;·&nbsp; VÍDEO &nbsp;·&nbsp; PRODUÇÃO DE EVENTOS</div>' +
+        '</div>' +
         '<div class="hdr-right"><div class="meta">' +
+          '<div class="doc-label">Documento comercial</div><div class="doc-title">Orçamento</div>' +
           '<div><strong>Nº</strong> ' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</div>' +
           '<div><strong>Emissão</strong> ' + Utils.escapeHTML(Utils.fmtDate(quote.created_at)) + '</div>' +
           '<div><strong>Validade</strong> ' + Utils.escapeHTML(Utils.fmtDate(quote.valido_ate)) + '</div>' +
         '</div></div>' +
       '</div>' +
+      (quote.referencia ? '<div class="ref-band"><span class="ref-band-label">REF.</span><span class="ref-band-value">' + Utils.escapeHTML(quote.referencia) + '</span></div>' : '') +
       '<div class="body">' +
         '<div class="client-grid">' +
           '<div><div class="cf-label">Cliente</div><div class="cf-val">' + Utils.escapeHTML(quote.cliente_nome || '—') +
             (quote.solicitante ? '<br><small>Solicitante: ' + Utils.escapeHTML(quote.solicitante) + '</small>' : '') +
           '</div></div>' +
           '<div><div class="cf-label">CNPJ / CPF</div><div class="cf-val">' + Utils.escapeHTML(quote.cnpj_cli || '—') + '</div></div>' +
-          '<div style="text-align:right"><div class="cf-label">Emitido por</div><div class="cf-val">' +
+          '<div class="issuer"><div class="cf-label">Emitido por</div><div class="cf-val">' +
             Utils.escapeHTML(quote.empresa || '—') + '</div></div>' +
         '</div>' +
-        (quote.referencia ? '<div class="sec-label">Referência: ' + Utils.escapeHTML(quote.referencia) + '</div>' : '') +
+
         '<div class="sec-label">Itens do orçamento</div>' +
         '<table><thead><tr><th>Descrição</th><th>Qtd.</th><th>Valor unitário</th><th>Total</th></tr></thead>' +
           '<tbody>' + rows + '</tbody></table>' +
