@@ -85,3 +85,43 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible, input:focu
 /* Lista comercial de orçamentos */
 .quotes-page{max-width:1540px;margin:0 auto;padding:32px 25px 64px}.quotes-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:20px}.quotes-head h2{font-size:28px;letter-spacing:-.04em;color:var(--ink)}.quotes-head p{margin-top:5px;color:#818192;font-size:13px}.quotes-head-actions{display:flex;gap:9px;flex-wrap:wrap}.quotes-export,.quotes-new,.quotes-delete{border-radius:8px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer}.quotes-export{color:#4f46a5;background:#fff;border:1px solid #dedee8}.quotes-new{color:#fff;background:var(--accent);border:1px solid var(--accent)}.quotes-toolbar{display:flex;align-items:center;gap:14px;min-height:48px;padding:0 15px;border:1px solid var(--border-dim);border-bottom:0;border-radius:10px 10px 0 0;background:#fff;color:#7a7a8b;font-size:12px}.quotes-select-all,.quote-check{display:flex;align-items:center;gap:8px;font-weight:700;color:#464657;cursor:pointer}.quotes-select-all input,.quote-check input{position:absolute;opacity:0;pointer-events:none}.quotes-select-all span,.quote-check span{display:inline-grid;place-items:center;width:17px;height:17px;border:1px solid #c7c7d5;border-radius:5px;background:#fff}.quotes-select-all input:checked+span,.quote-check input:checked+span{border-color:var(--accent);background:var(--accent)}.quotes-select-all input:checked+span::after,.quote-check input:checked+span::after{content:'✓';color:#fff;font-size:12px;font-weight:800}.quotes-toolbar>span{flex:1}.quotes-delete{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}.quotes-delete:disabled{opacity:.45;cursor:not-allowed}.quotes-table{background:#fff;border:1px solid var(--border-dim);border-radius:0 0 10px 10px;overflow:visible}.quote-table-head,.quote-list-row{display:grid;grid-template-columns:34px 62px minmax(260px,2fr) 118px 140px 125px 70px;align-items:center;gap:10px}.quote-table-head{padding:12px 18px;background:#f7f7fb;color:#9696a5;font:700 10px var(--mono);letter-spacing:.07em;text-transform:uppercase}.quote-list-row{padding:15px 18px;border-bottom:1px solid #efeff4;background:#fff;transition:background .15s}.quote-list-row:hover{background:#fff9fc}.quote-list-row:nth-child(even){background:#fff}.quote-number{font-family:var(--mono);font-size:14px}.quote-client strong{font-size:13px;color:var(--ink)}.quote-client small{font-size:11px;color:#8f174f}.quote-date{font-size:12px}.quote-total{font-family:var(--mono);font-size:13px}.quote-status-control{position:relative}.quote-status{border:0;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:700;min-width:108px;display:flex;justify-content:space-between;align-items:center;gap:7px;cursor:pointer}.quote-status.status-pendente{background:#fff7db;color:#9a6700}.quote-status.status-aprovado{background:#eaf8ee;color:#176b36}.quote-status.status-recusado{background:#fff0f0;color:#b42318}.quote-status.status-cancelado{background:#f1f1f4;color:#5b5b68}.quote-status-menu{position:absolute;z-index:40;top:calc(100% + 7px);left:0;min-width:145px;padding:5px;background:#fff;border:1px solid #dedee8;border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.14)}.quote-status-menu button{display:block;width:100%;text-align:left;padding:8px;border:0;border-radius:5px;background:transparent;color:#454554;font:600 12px var(--sans);cursor:pointer}.quote-status-menu button:hover{background:#fff2f7;color:var(--accent)}.quote-actions{gap:4px}.quote-view,.quote-more{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:7px;background:transparent;color:#8a8a9a;font-weight:800;font-size:16px;cursor:pointer;text-decoration:none}.quote-view:hover{background:#fff0f6;color:var(--accent)}.quote-more:hover{background:#f2f2f7;color:var(--ink)}
 @media(max-width:900px){.quotes-page{padding:22px 14px 48px}.quotes-head{display:block}.quotes-head-actions{margin-top:16px}.quote-table-head{display:none}.quotes-table{border-radius:0 0 10px 10px}.quote-list-row{grid-template-columns:26px 54px 1fr 72px;gap:8px;padding:14px}.quote-date{display:none}.quote-total{grid-column:3;font-size:12px;text-align:left}.quote-status-control{grid-column:3}.quote-actions{grid-column:4;grid-row:1/span 2}.quotes-toolbar{gap:8px;padding:8px 10px;flex-wrap:wrap}.quotes-toolbar>span{min-width:150px}.quotes-delete{margin-left:auto}.quotes-export span{display:none}}
+/* Revisão responsiva e de formulários */
+.main-content,.panel,.admin-wrap,.catalog-shell,.ops-page,.ops-head,.ops-actions,.ops-person-grid,.ops-card{min-width:0}
+body:has(.modal-bg.open),body:has(.modal-overlay.open),body:has(.modal-edit-bg.open),body:has(.ops-modal){overflow:hidden}
+.ops-modal-head{position:sticky;top:0;z-index:2;background:#fff}
+.ops-modal-actions{position:sticky;bottom:0;z-index:2;background:#fff}
+
+@media(max-width:800px){
+  html,body,.app-shell,.main-content,.panel{max-width:100%;overflow-x:hidden}
+  .main-content{width:100%}
+  .dashboard-page{padding:20px 16px 44px!important}
+  .dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dashboard-lower{grid-template-columns:minmax(0,1fr)!important}
+  .ops-page{width:100%;max-width:100%}
+  .ops-table-wrap{max-width:100%;overscroll-behavior-x:contain}
+  .ops-person,.ops-card{width:100%;max-width:100%}
+  .ops-icon{width:40px;height:40px;flex:0 0 40px}
+  .catalog-shell{width:100%;max-width:100%}
+  .catalog-table-head{grid-template-columns:minmax(0,1fr) 90px 60px!important;padding:8px 12px!important}
+  .catalog-table-head>span:nth-child(2){display:none}
+  .catalog-row{grid-template-columns:minmax(0,1fr) 90px 60px;padding:11px 12px}
+  .catalog-name{overflow-wrap:anywhere}
+}
+
+@media(max-width:520px){
+  .dashboard-head{align-items:stretch!important;flex-direction:column;gap:14px}
+  .dashboard-head>button{width:100%;min-height:44px}
+  .dashboard-kpis{gap:10px!important}
+  .dashboard-kpis>div{padding:14px!important}
+  .quotes-head-actions{display:grid;grid-template-columns:1fr 1.25fr}
+  .quotes-head-actions>button{width:100%;min-height:44px}
+  .quotes-toolbar>span{font-size:11px;min-width:130px}
+  .catalog-head{align-items:flex-start!important;gap:12px;padding:14px!important}
+  .catalog-head>button{min-height:40px;flex:0 0 auto}
+  .catalog-filters{padding:10px 12px!important}
+  .ops-modal{padding:10px}
+  .ops-modal-box{max-height:calc(100vh - 20px);border-radius:10px}
+  .ops-modal-head,.ops-form-grid,.ops-modal-actions{padding-left:16px;padding-right:16px}
+  .ops-field input,.ops-field select{min-height:44px}
+  .ops-modal-actions .ops-btn{min-height:44px;flex:1}
+}

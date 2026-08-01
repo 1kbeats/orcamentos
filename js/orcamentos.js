@@ -75,11 +75,11 @@ const Orcamentos = {
     div.className = 'item-row';
     div.dataset.id = id;
     div.innerHTML =
-      '<input type="text" placeholder="Descrição do produto ou serviço">' +
-      '<input type="number" class="c" value="1" min="1">' +
-      '<input type="number" class="r" placeholder="0,00" min="0" step="0.01">' +
+      '<input type="text" aria-label="Descrição do item" placeholder="Descrição do produto ou serviço">' +
+      '<input type="number" class="c" aria-label="Quantidade" value="1" min="1" step="1" inputmode="numeric">' +
+      '<input type="number" class="r" aria-label="Valor unitário" placeholder="0,00" min="0" step="0.01" inputmode="decimal">' +
       '<span class="itv empty" id="itv-' + id + '">—</span>' +
-      '<button class="btn-remove no-print" title="Remover">×</button>';
+      '<button class="btn-remove no-print" type="button" title="Remover item" aria-label="Remover item">×</button>';
     document.getElementById('itemsContainer').appendChild(div);
     div.querySelectorAll('input').forEach(i => i.addEventListener('input', () => this.calcTotals()));
     div.querySelector('.btn-remove').addEventListener('click', () => { div.remove(); this.calcTotals(); });
@@ -94,6 +94,7 @@ const Orcamentos = {
       const termo = descInput.value.trim();
       if (!termo) { dropdown.innerHTML = ''; dropdown.classList.remove('open'); return; }
       Catalogo.buscar(termo, resultados => {
+        if (descInput.value.trim() !== termo) return;
         if (resultados.length === 0) { dropdown.innerHTML = ''; dropdown.classList.remove('open'); return; }
         dropdown.innerHTML = '';
         resultados.slice(0, 6).forEach(item => {
