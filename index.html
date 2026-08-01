@@ -218,31 +218,18 @@
 
     <!-- ══ PAINEL: LISTA DE ORÇAMENTOS ══ -->
     <div class="panel" id="panelListaOrcamentos">
-      <div style="padding:2rem 2rem 5rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
-          <div>
-            <h2 style="font-size:22px;font-weight:600;color:#1A1A22">Orçamentos</h2>
-            <div style="font-size:13px;color:#AAA;margin-top:3px">Últimos enviados</div>
-          </div>
-          <div style="display:flex;gap:8px"><button id="btnExportarOrcamentos" type="button" class="btn-cancel">Exportar CSV</button><button id="btnNovoOrcamento" type="button" style="background:#D91A72;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">+ Novo orçamento</button></div>
+      <div class="quotes-page">
+        <div class="quotes-head">
+          <div><div class="ops-kicker">COMERCIAL</div><h2>Orçamentos</h2><p>Propostas enviadas e acompanhamento comercial.</p></div>
+          <div class="quotes-head-actions"><button id="btnExportarOrcamentos" type="button" class="quotes-export">⇩ <span>Exportar CSV</span></button><button id="btnNovoOrcamento" type="button" class="quotes-new">+ Novo orçamento</button></div>
         </div>
-
-        <!-- CABEÇALHO DA LISTA -->
-        <div style="display:grid;grid-template-columns:60px 2fr 100px 140px 120px 40px;gap:0;padding:10px 24px;background:#F0F0F5;border-radius:10px 10px 0 0;border:0.5px solid #E0E0EA;border-bottom:none">
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Nº</span>
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Cliente</span>
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Data</span>
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:right">Valor</span>
-          <span style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#AAA;text-align:center">Status</span>
-          <span></span>
-        </div>
-
-        <div id="listaOrcamentos" style="background:#fff;border-radius:0 0 10px 10px;border:0.5px solid #E0E0EA;border-top:none">
-          <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>
+        <div class="quotes-toolbar"><label class="quotes-select-all"><input id="checkTodosOrcamentos" type="checkbox"><span></span> Selecionar todos</label><span id="quoteSelectionLabel">Selecione orçamentos para organizar</span><button id="btnExcluirSelecionados" type="button" class="quotes-delete" disabled>Excluir selecionados</button></div>
+        <div class="quotes-table">
+          <div class="quote-table-head"><span></span><span>Nº</span><span>Cliente e referência</span><span>Enviado em</span><span>Valor</span><span>Status</span><span></span></div>
+          <div id="listaOrcamentos"><div class="empty-state">Carregando...</div></div>
         </div>
       </div>
     </div>
-
     <!-- ══ PAINEL: ORÇAMENTOS (FORMULÁRIO) ══ -->
     <div class="panel" id="panelOrcamentos">
       <div class="page" id="pageRoot" style="background:var(--bg);min-height:100vh;">

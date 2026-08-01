@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   Dashboard.carregar();
 
   document.getElementById('btnExportarOrcamentos')?.addEventListener('click', () => ListaOrcamentos.exportar());
+  document.getElementById('btnExcluirSelecionados')?.addEventListener('click', () => ListaOrcamentos.excluirSelecionados());
+  document.getElementById('checkTodosOrcamentos')?.addEventListener('change', event => {
+    document.querySelectorAll('.quote-check input').forEach(input => { input.checked = event.target.checked; input.dispatchEvent(new Event('change')); });
+  });
   document.getElementById('updateBanner')?.addEventListener('click', () => window.location.reload());
   document.getElementById('btnDashViewAll')?.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') Nav.showPanel('listaOrcamentos');
