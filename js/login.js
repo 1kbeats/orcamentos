@@ -1,5 +1,6 @@
 (function loginPage() {
   const formButton = document.getElementById('btnLogin');
+  const loginForm = document.getElementById('loginForm');
   const emailInput = document.getElementById('usuario');
   const passwordInput = document.getElementById('senha');
   const errorBox = document.getElementById('errMsg');
@@ -21,7 +22,8 @@
     errorBox.style.display = 'block';
   }
 
-  async function login() {
+  async function login(event) {
+    event?.preventDefault();
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !password) {
@@ -73,12 +75,6 @@
     }
   }
 
-  formButton.addEventListener('click', login);
-  passwordInput.addEventListener('keydown', event => {
-    if (event.key === 'Enter') login();
-  });
-  emailInput.addEventListener('keydown', event => {
-    if (event.key === 'Enter') passwordInput.focus();
-  });
+  loginForm.addEventListener('submit', login);
   forgotLink?.addEventListener('click', recoverPassword);
 })();
