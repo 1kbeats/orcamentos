@@ -238,8 +238,8 @@
 
   ListaOrcamentos.atualizarAcoesLote = function atualizarAcoesLote() {
     const count = this._selecionados?.size || 0; const label = document.getElementById('quoteSelectionLabel'); const button = document.getElementById('btnExcluirSelecionados');
-    if (label) label.textContent = count ? count + (count === 1 ? ' orçamento selecionado' : ' orçamentos selecionados') : 'Selecione orçamentos para organizar';
-    if (button) { button.disabled = !count; button.textContent = count ? 'Excluir ' + count + ' selecionado(s)' : 'Excluir selecionados'; }
+    if (label) label.textContent = count ? count + (count === 1 ? ' orçamento selecionado' : ' orçamentos selecionados') : 'Selecione orçamentos para excluir em grupo';
+    if (button) { button.disabled = !count; button.textContent = count ? 'Excluir ' + count + (count === 1 ? ' selecionado' : ' selecionados') : 'Excluir selecionados'; }
   };
 
   ListaOrcamentos.excluirSelecionados = async function excluirSelecionados() {

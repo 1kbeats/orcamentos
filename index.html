@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.1.1">
-  <link rel="stylesheet" href="./css/secure.css?v=6.1.1">
+  <link rel="stylesheet" href="./css/styles.css?v=6.2.0">
+  <link rel="stylesheet" href="./css/secure.css?v=6.2.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -130,10 +130,10 @@
 
         <!-- ══ PAINEL: DASHBOARD ══ -->
     <div class="panel active" id="panelDashboard">
-      <div style="padding:24px 28px 5rem">
+      <div class="dashboard-page" style="padding:24px 28px 5rem">
 
         <!-- SAUDAÇÃO -->
-        <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+        <div class="dashboard-head" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-size:22px;font-weight:600;color:#1A1A22" id="dashSaudacao">Olá!</div>
             <div style="font-size:13px;color:#AAA;margin-top:3px" id="dashData"></div>
@@ -142,7 +142,7 @@
         </div>
 
         <!-- KPIs -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+        <div class="dashboard-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
           <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;padding:16px">
             <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA;margin-bottom:10px">Orçamentos no mês</div>
             <div style="font-size:30px;font-weight:500;color:#1A1A22" id="kpiTotal">—</div>
@@ -166,7 +166,7 @@
         </div>
 
         <!-- LINHA INFERIOR -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="dashboard-lower" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
           <!-- ÚLTIMOS ORÇAMENTOS -->
           <div style="background:#fff;border:0.5px solid #E0E0EA;border-radius:12px;overflow:hidden">
@@ -223,7 +223,7 @@
           <div><div class="ops-kicker">COMERCIAL</div><h2>Orçamentos</h2><p>Propostas enviadas e acompanhamento comercial.</p></div>
           <div class="quotes-head-actions"><button id="btnExportarOrcamentos" type="button" class="quotes-export">⇩ <span>Exportar CSV</span></button><button id="btnNovoOrcamento" type="button" class="quotes-new">+ Novo orçamento</button></div>
         </div>
-        <div class="quotes-toolbar"><label class="quotes-select-all"><input id="checkTodosOrcamentos" type="checkbox"><span></span> Selecionar todos</label><span id="quoteSelectionLabel">Selecione orçamentos para organizar</span><button id="btnExcluirSelecionados" type="button" class="quotes-delete" disabled>Excluir selecionados</button></div>
+        <div class="quotes-toolbar"><label class="quotes-select-all"><input id="checkTodosOrcamentos" type="checkbox"><span></span> Selecionar todos</label><span id="quoteSelectionLabel">Selecione orçamentos para excluir em grupo</span><button id="btnExcluirSelecionados" type="button" class="quotes-delete" disabled>Excluir selecionados</button></div>
         <div class="quotes-table">
           <div class="quote-table-head"><span></span><span>Nº</span><span>Cliente e referência</span><span>Enviado em</span><span>Valor</span><span>Status</span><span></span></div>
           <div id="listaOrcamentos"><div class="empty-state">Carregando...</div></div>
@@ -263,19 +263,19 @@
           <!-- CLIENTE -->
           <div class="client-row no-print">
             <div class="cf cliente-wrap">
-              <label>Cliente / Empresa</label>
+              <label for="nomeCliente">Cliente / empresa</label>
               <div class="cliente-input-row">
                 <input type="text" id="nomeCliente" placeholder="Buscar ou digitar cliente..." autocomplete="off">
-                <button class="btn-add-cliente no-print" id="btnAddCliente" title="Cadastrar novo cliente">+</button>
+                <button class="btn-add-cliente no-print" id="btnAddCliente" type="button" title="Cadastrar novo cliente" aria-label="Cadastrar novo cliente">+</button>
               </div>
               <div class="cliente-dropdown" id="clienteDropdown"></div>
             </div>
             <div class="cf">
-              <label>CNPJ / CPF</label>
-              <input type="text" id="cnpjCliente" placeholder="00.000.000/0001-00">
+              <label for="cnpjCliente">CNPJ / CPF</label>
+              <input type="text" id="cnpjCliente" placeholder="00.000.000/0001-00" inputmode="numeric">
             </div>
             <div class="cf">
-              <label>Válido até</label>
+              <label for="validade">Válido até</label>
               <input type="date" id="validade">
             </div>
           </div>
@@ -283,13 +283,13 @@
           <!-- SOLICITANTE -->
           <div class="ref-row no-print">
             <div class="sec-label">Solicitante</div>
-            <input class="ref-input" type="text" id="solicitante" placeholder="Nome da pessoa que solicitou o orçamento">
+            <input class="ref-input" type="text" id="solicitante" aria-label="Solicitante" placeholder="Nome da pessoa que solicitou o orçamento">
           </div>
 
           <!-- REFERÊNCIA -->
           <div class="ref-row no-print">
             <div class="sec-label">Referência</div>
-            <input class="ref-input" type="text" id="refEvento" placeholder="Ex: VI 159.26 CVL — Referência do projeto ou evento">
+            <input class="ref-input" type="text" id="refEvento" aria-label="Referência" placeholder="Ex.: VI 159.26 CVL — nome do projeto ou evento">
           </div>
 
           <!-- ITENS -->
@@ -303,7 +303,7 @@
               <span></span>
             </div>
             <div id="itemsContainer"></div>
-            <button class="btn-add-row no-print" id="btnAdd">
+            <button class="btn-add-row no-print" id="btnAdd" type="button">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
               Adicionar item
             </button>
@@ -313,7 +313,7 @@
           <div class="bottom-row">
             <div class="obs-block">
               <div class="sec-label" style="margin-bottom:10px">Observações</div>
-              <textarea class="obs-textarea" id="obs" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
+              <textarea class="obs-textarea" id="obs" aria-label="Observações" placeholder="Ex: Prazo de entrega: 3 dias úteis&#10;Pagamento via PIX&#10;Arte aprovada pelo cliente"></textarea>
             </div>
             <div style="display:flex;flex-direction:column;gap:0">
               <div style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
@@ -332,7 +332,7 @@
                       <button id="btnDiscPct" type="button" style="padding:5px 11px;font-size:12px;font-weight:600;background:#1A1A22;color:#fff;border:none;cursor:pointer;font-family:inherit">%</button>
                       <button id="btnDiscVal" type="button" style="padding:5px 11px;font-size:12px;font-weight:600;background:#F5F5FA;color:#AAA;border:none;cursor:pointer;font-family:inherit">R$</button>
                     </div>
-                    <input type="number" id="desconto" placeholder="0" min="0" step="0.01" style="flex:1;border:1px solid #DDD;border-radius:6px;padding:5px 10px;font-size:13px;text-align:right;background:#F5F5FA;color:#404050;outline:none;font-family:monospace">
+                    <input type="number" id="desconto" aria-label="Desconto" placeholder="0" min="0" step="0.01" inputmode="decimal" style="flex:1;border:1px solid #DDD;border-radius:6px;padding:5px 10px;font-size:13px;text-align:right;background:#F5F5FA;color:#404050;outline:none;font-family:monospace">
                     <input type="hidden" id="descontoTipo" value="pct">
                   </div>
                   <div id="descontoPreview" style="font-size:11px;color:#E24B4A;text-align:right;margin-top:5px;min-height:16px"></div>
@@ -356,11 +356,11 @@
 
           <!-- ACTIONS -->
           <div class="actions-strip no-print">
-            <button class="btn-act btn-wpp" id="btnWpp">
+            <button class="btn-act btn-wpp" id="btnWpp" type="button">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.478 2 12.001c0 1.77.458 3.437 1.268 4.885L2 22l5.237-1.24A9.944 9.944 0 0012 22c5.522 0 10-4.478 10-10S17.522 2 12 2zm0 18.156a8.156 8.156 0 01-4.271-1.206l-.306-.183-3.106.735.774-3.009-.2-.309A8.157 8.157 0 013.844 12c0-4.502 3.654-8.156 8.156-8.156 4.503 0 8.157 3.654 8.157 8.157 0 4.502-3.654 8.155-8.157 8.155z"/></svg>
               WhatsApp
             </button>
-            <button class="btn-act btn-pdf" id="btnPdf">
+            <button class="btn-act btn-pdf" id="btnPdf" type="button">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v3.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
               Salvar PDF
             </button>
@@ -370,22 +370,22 @@
 
         <!-- CONFIG -->
         <div class="cfg-toggle no-print" style="margin-bottom:10px;padding:0 2rem">
-          <button class="btn-cfg" id="btnConfig">⚙ Configurar dados da empresa</button>
+          <button class="btn-cfg" id="btnConfig" type="button">⚙ Configurar dados da empresa</button>
         </div>
         <div class="cfg-panel" id="configPanel" style="padding:0 2rem 2rem">
           <div style="padding-top:1.5rem;border-top:1px solid var(--line);margin-top:0.5rem">
             <div class="sec-label" style="margin-bottom:1.25rem">Dados da empresa</div>
             <div class="cfg-grid">
-              <div class="cfg-fld"><label>Nome</label><input type="text" id="cfgNome" placeholder="1K Beats"></div>
-              <div class="cfg-fld"><label>CNPJ</label><input type="text" id="cfgCnpj" placeholder="00.000.000/0001-00"></div>
-              <div class="cfg-fld"><label>WhatsApp</label><input type="text" id="cfgTelefone" placeholder="(21) 99999-9999"></div>
-              <div class="cfg-fld"><label>E-mail</label><input type="text" id="cfgEmail" placeholder="contato@empresa.com.br"></div>
+              <div class="cfg-fld"><label for="cfgNome">Nome</label><input type="text" id="cfgNome" placeholder="1K Beats" autocomplete="organization"></div>
+              <div class="cfg-fld"><label for="cfgCnpj">CNPJ</label><input type="text" id="cfgCnpj" placeholder="00.000.000/0001-00" inputmode="numeric"></div>
+              <div class="cfg-fld"><label for="cfgTelefone">WhatsApp</label><input type="tel" id="cfgTelefone" placeholder="(21) 99999-9999" autocomplete="tel"></div>
+              <div class="cfg-fld"><label for="cfgEmail">E-mail</label><input type="email" id="cfgEmail" placeholder="contato@empresa.com.br" autocomplete="email"></div>
             </div>
             <div class="cfg-fld" style="margin-bottom:16px">
-              <label>Endereço</label>
-              <input type="text" id="cfgEndereco" placeholder="Rua, número, bairro, cidade">
+              <label for="cfgEndereco">Endereço</label>
+              <input type="text" id="cfgEndereco" placeholder="Rua, número, bairro, cidade" autocomplete="street-address">
             </div>
-            <button class="btn-save-cfg" id="btnSaveConfig">Salvar configurações</button>
+            <button class="btn-save-cfg" id="btnSaveConfig" type="button">Salvar configurações</button>
           </div>
         </div>
 
@@ -408,21 +408,21 @@
     <!-- ══ PAINEL: CATÁLOGO ══ -->
     <div class="panel" id="panelCatalogo">
       <div class="admin-wrap">
-        <div style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
+        <div class="catalog-shell" style="background:#fff;border:1px solid #E0E0EA;border-radius:10px;overflow:hidden">
 
           <!-- Header -->
-          <div style="padding:14px 18px;border-bottom:1px solid #E0E0EA;display:flex;align-items:center;justify-content:space-between">
+          <div class="catalog-head" style="padding:14px 18px;border-bottom:1px solid #E0E0EA;display:flex;align-items:center;justify-content:space-between">
             <div>
               <div style="font-size:15px;font-weight:600;color:#1A1A22">Catálogo</div>
               <div style="font-size:12px;color:#AAA;margin-top:1px">Produtos e serviços para orçamento</div>
             </div>
-            <button id="btnNovoCatalogo" style="background:#1A1A22;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit">
+            <button id="btnNovoCatalogo" type="button" style="background:#1A1A22;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit">
               + Novo item
             </button>
           </div>
 
           <!-- Filtros -->
-          <div style="padding:10px 18px;border-bottom:1px solid #E0E0EA;display:flex;gap:6px;flex-wrap:wrap;background:#FAFAFA">
+          <div class="catalog-filters" style="padding:10px 18px;border-bottom:1px solid #E0E0EA;display:flex;gap:6px;flex-wrap:wrap;background:#FAFAFA">
             <button class="cat-filtro active" data-cat="" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:inherit">Todos</button>
             <button class="cat-filtro" data-cat="Sonorização" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Sonorização</button>
             <button class="cat-filtro" data-cat="Iluminação" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #DDD;background:#fff;color:#888;font-family:inherit">Iluminação</button>
@@ -433,7 +433,7 @@
           </div>
 
           <!-- Cabeçalho colunas -->
-          <div style="display:grid;grid-template-columns:1fr 120px 110px 72px;padding:8px 18px;background:#FAFAFA;border-bottom:1px solid #E0E0EA">
+          <div class="catalog-table-head" style="display:grid;grid-template-columns:1fr 120px 110px 72px;padding:8px 18px;background:#FAFAFA;border-bottom:1px solid #E0E0EA">
             <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Descrição</span>
             <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Categoria</span>
             <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#AAA">Valor padrão</span>
@@ -473,7 +473,7 @@
       <div class="admin-wrap">
         <div class="admin-header">
           <h2>Usuários</h2>
-          <button class="btn-new-user" id="btnNovoUsuario">+ Novo usuário</button>
+          <button class="btn-new-user" id="btnNovoUsuario" type="button">+ Novo usuário</button>
         </div>
         <div class="card" id="listaUsuarios"></div>
       </div>
@@ -493,12 +493,12 @@
 <!-- ══ MODAL: CLIENTE RÁPIDO (no formulário de orçamento) ══ -->
 <div class="modal-overlay" id="modalCliente">
   <div class="modal-box">
-    <div class="modal-title">Novo Cliente</div>
-    <div class="modal-field"><label>Nome / Empresa</label><input type="text" id="modalClienteNome" placeholder="Nome do cliente"></div>
-    <div class="modal-field"><label>CNPJ / CPF</label><input type="text" id="modalClienteCnpj" placeholder="Opcional"></div>
+    <div class="modal-title">Novo cliente</div>
+    <div class="modal-field"><label for="modalClienteNome">Nome / empresa</label><input type="text" id="modalClienteNome" placeholder="Nome do cliente"></div>
+    <div class="modal-field"><label for="modalClienteCnpj">CNPJ / CPF</label><input type="text" inputmode="numeric" id="modalClienteCnpj" placeholder="Opcional"></div>
     <div class="modal-btns">
-      <button class="modal-btn-cancel" id="modalClienteCancel">Cancelar</button>
-      <button class="modal-btn-save" id="modalClienteSave">Salvar</button>
+      <button class="modal-btn-cancel" id="modalClienteCancel" type="button">Cancelar</button>
+      <button class="modal-btn-save" id="modalClienteSave" type="button">Salvar</button>
     </div>
   </div>
 </div>
@@ -506,15 +506,15 @@
 <!-- ══ MODAL: CADASTRO/EDIÇÃO DE CLIENTE ══ -->
 <div class="modal-bg" id="modalCliente2">
   <div class="modal-box">
-    <div class="modal-title" id="modalCliente2Titulo">Novo Cliente</div>
-    <div class="modal-field"><label>Nome / Empresa</label><input type="text" id="cliNome" placeholder="Nome do cliente"></div>
-    <div class="modal-field"><label>CNPJ / CPF</label><input type="text" id="cliCnpj" placeholder="Opcional"></div>
-    <div class="modal-field"><label>Telefone</label><input type="text" id="cliTel" placeholder="Opcional"></div>
-    <div class="modal-field"><label>E-mail</label><input type="text" id="cliEmail" placeholder="Opcional"></div>
-    <div class="modal-field"><label>Endereço</label><input type="text" id="cliEnd" placeholder="Opcional"></div>
+    <div class="modal-title" id="modalCliente2Titulo">Novo cliente</div>
+    <div class="modal-field"><label for="cliNome">Nome / empresa</label><input type="text" id="cliNome" placeholder="Nome do cliente"></div>
+    <div class="modal-field"><label for="cliCnpj">CNPJ / CPF</label><input type="text" inputmode="numeric" id="cliCnpj" placeholder="Opcional"></div>
+    <div class="modal-field"><label for="cliTel">Telefone / WhatsApp</label><input type="tel" id="cliTel" autocomplete="tel" placeholder="Opcional"></div>
+    <div class="modal-field"><label for="cliEmail">E-mail</label><input type="email" id="cliEmail" autocomplete="email" placeholder="Opcional"></div>
+    <div class="modal-field"><label for="cliEnd">Endereço</label><input type="text" id="cliEnd" autocomplete="street-address" placeholder="Opcional"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="btnCancelarCliente">Cancelar</button>
-      <button class="btn-save" id="btnSalvarCliente">Salvar</button>
+      <button class="btn-cancel" id="btnCancelarCliente" type="button">Cancelar</button>
+      <button class="btn-save" id="btnSalvarCliente" type="button">Salvar</button>
     </div>
   </div>
 </div>
@@ -524,11 +524,11 @@
   <div class="modal-box">
     <div class="modal-title" id="modalCatTitulo">Novo item</div>
     <div class="modal-field">
-      <label>Nome / Descrição</label>
+      <label for="catNome">Nome / descrição</label>
       <input type="text" id="catNome" placeholder="Ex: Caixa de som ativo 15&quot;">
     </div>
     <div class="modal-field">
-      <label>Categoria</label>
+      <label for="catCategoria">Categoria</label>
       <select id="catCategoria">
         <option>Sonorização</option>
         <option>Iluminação</option>
@@ -539,12 +539,12 @@
       </select>
     </div>
     <div class="modal-field">
-      <label>Valor padrão (R$)</label>
-      <input type="number" id="catValor" placeholder="0,00" min="0" step="0.01">
+      <label for="catValor">Valor padrão (R$)</label>
+      <input type="number" id="catValor" inputmode="decimal" placeholder="0,00" min="0" step="0.01">
     </div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="btnCancelarCatalogo">Cancelar</button>
-      <button class="btn-save" id="btnSalvarCatalogo">Salvar</button>
+      <button class="btn-cancel" id="btnCancelarCatalogo" type="button">Cancelar</button>
+      <button class="btn-save" id="btnSalvarCatalogo" type="button">Salvar</button>
     </div>
   </div>
 </div>
@@ -552,14 +552,13 @@
 <!-- ══ MODAL: NOVO USUÁRIO ══ -->
 <div class="modal-bg" id="modalNovoUsuario">
   <div class="modal-box">
-    <div class="modal-title">Novo Usuário</div>
-    <div class="modal-field"><label>Nome</label><input type="text" id="novoUsuarioNome" placeholder="Ex: joao"></div>
-    <div class="modal-field" style="margin-bottom:4px"><label>E-mail gerado</label></div>
-    <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="off"></div><div class="modal-field"><label for="novoUsuarioRole">Perfil</label><select id="novoUsuarioRole"><option value="member">Colaborador</option><option value="admin">Administrador</option></select></div>
-    <div class="modal-field"><label>Senha</label><input type="password" id="novoUsuarioSenha" placeholder="Mínimo 8 caracteres"></div>
+    <div class="modal-title">Novo usuário</div>
+    <div class="modal-field"><label for="novoUsuarioNome">Nome</label><input type="text" id="novoUsuarioNome" autocomplete="name" placeholder="Ex: joao"></div>
+    <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="email"></div><div class="modal-field"><label for="novoUsuarioRole">Perfil</label><select id="novoUsuarioRole"><option value="member">Colaborador</option><option value="admin">Administrador</option></select></div>
+    <div class="modal-field"><label for="novoUsuarioSenha">Senha</label><input type="password" id="novoUsuarioSenha" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="btnCancelarNovoUsuario">Cancelar</button>
-      <button class="btn-save" id="btnCriarUsuario">Criar</button>
+      <button class="btn-cancel" id="btnCancelarNovoUsuario" type="button">Cancelar</button>
+      <button class="btn-save" id="btnCriarUsuario" type="button">Criar</button>
     </div>
   </div>
 </div>
@@ -568,10 +567,10 @@
 <div class="modal-edit-bg" id="modalEditSenha">
   <div class="modal-box">
     <div class="modal-title">Alterar senha — <span id="editSenhaNome"></span></div>
-    <div class="modal-field"><label>Nova senha</label><input type="password" id="editSenhaInput" placeholder="Mínimo 8 caracteres"></div>
+    <div class="modal-field"><label for="editSenhaInput">Nova senha</label><input type="password" id="editSenhaInput" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="btnCancelarSenha">Cancelar</button>
-      <button class="btn-save" id="btnSalvarSenha">Salvar</button>
+      <button class="btn-cancel" id="btnCancelarSenha" type="button">Cancelar</button>
+      <button class="btn-save" id="btnSalvarSenha" type="button">Salvar</button>
     </div>
   </div>
 </div>
@@ -580,32 +579,32 @@
 <div class="modal-edit-bg" id="modalAlterarSenha">
   <div class="modal-box">
     <div class="modal-title">Alterar minha senha</div>
-    <div class="modal-field"><label>Nova senha</label><input type="password" id="novaSenhaInput" placeholder="Mínimo 8 caracteres"></div>
+    <div class="modal-field"><label for="novaSenhaInput">Nova senha</label><input type="password" id="novaSenhaInput" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="btnCancelAlterarSenha">Cancelar</button>
-      <button class="btn-save" id="btnConfAlterarSenha">Confirmar</button>
+      <button class="btn-cancel" id="btnCancelAlterarSenha" type="button">Cancelar</button>
+      <button class="btn-save" id="btnConfAlterarSenha" type="button">Confirmar</button>
     </div>
   </div>
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.1.1"></script>
-<script src="./js/password-toggle.js?v=6.1.1"></script>
-<script src="./js/api.js?v=6.1.1"></script>
-<script src="./js/utils.js?v=6.1.1"></script>
-<script src="./js/auth.js?v=6.1.1"></script>
-<script src="./js/nav.js?v=6.1.1"></script>
-<script src="./js/nav-events.js?v=6.1.1"></script>
-<script src="./js/clientes.js?v=6.1.1"></script>
-<script src="./js/financeiro.js?v=6.1.1"></script>
-<script src="./js/operacoes.js?v=6.1.1"></script>
-<script src="./js/producoes.js?v=6.1.1"></script>
-<script src="./js/usuarios.js?v=6.1.1"></script>
-<script src="./js/catalogo.js?v=6.1.1"></script>
-<script src="./js/orcamentos.js?v=6.1.1"></script>
-<script src="./js/secure-overrides.js?v=6.1.1"></script>
+<script src="./js/config.js?v=6.2.0"></script>
+<script src="./js/password-toggle.js?v=6.2.0"></script>
+<script src="./js/api.js?v=6.2.0"></script>
+<script src="./js/utils.js?v=6.2.0"></script>
+<script src="./js/auth.js?v=6.2.0"></script>
+<script src="./js/nav.js?v=6.2.0"></script>
+<script src="./js/nav-events.js?v=6.2.0"></script>
+<script src="./js/clientes.js?v=6.2.0"></script>
+<script src="./js/financeiro.js?v=6.2.0"></script>
+<script src="./js/operacoes.js?v=6.2.0"></script>
+<script src="./js/producoes.js?v=6.2.0"></script>
+<script src="./js/usuarios.js?v=6.2.0"></script>
+<script src="./js/catalogo.js?v=6.2.0"></script>
+<script src="./js/orcamentos.js?v=6.2.0"></script>
+<script src="./js/secure-overrides.js?v=6.2.0"></script>
 
-<script src="./js/app.js?v=6.1.1"></script>
+<script src="./js/app.js?v=6.2.0"></script>
 
 </body>
 </html>
