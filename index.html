@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.2.1">
-  <link rel="stylesheet" href="./css/secure.css?v=6.2.1">
+  <link rel="stylesheet" href="./css/styles.css?v=6.2.3">
+  <link rel="stylesheet" href="./css/secure.css?v=6.2.3">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -503,6 +503,38 @@
   </div>
 </div>
 
+<!-- ══ MODAL: COMPARTILHAR ORÇAMENTO PELO WHATSAPP ══ -->
+<div class="modal-overlay" id="modalWhatsApp" role="dialog" aria-modal="true" aria-labelledby="modalWhatsAppTitulo">
+  <div class="modal-box whatsapp-share-box">
+    <div class="whatsapp-share-head">
+      <div>
+        <span class="whatsapp-share-kicker">WHATSAPP</span>
+        <div class="modal-title" id="modalWhatsAppTitulo">Compartilhar orçamento</div>
+      </div>
+      <button class="whatsapp-share-close" id="btnFecharWhatsApp" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-field">
+      <label for="whatsappDestino">WhatsApp do cliente</label>
+      <input type="tel" id="whatsappDestino" autocomplete="tel" inputmode="tel" placeholder="(21) 99999-9999">
+      <small class="whatsapp-share-hint">Se ficar vazio, o WhatsApp permitirá escolher o contato.</small>
+    </div>
+    <div class="modal-field whatsapp-message-field">
+      <div class="whatsapp-message-label">
+        <label for="whatsappMensagem">Prévia da mensagem</label>
+        <div class="whatsapp-message-tools">
+          <button type="button" id="btnRestaurarWhatsApp">Restaurar padrão</button>
+          <button type="button" id="btnCopiarWhatsApp">Copiar mensagem</button>
+        </div>
+      </div>
+      <textarea id="whatsappMensagem" rows="12"></textarea>
+      <small class="whatsapp-share-hint">As alterações feitas aqui valem somente para este envio.</small>
+    </div>
+    <div class="modal-btns whatsapp-share-actions">
+      <button class="modal-btn-cancel" id="btnCancelarWhatsApp" type="button">Cancelar</button>
+      <button class="modal-btn-save whatsapp-open-btn" id="btnAbrirWhatsApp" type="button">Abrir WhatsApp</button>
+    </div>
+  </div>
+</div>
 <!-- ══ MODAL: CADASTRO/EDIÇÃO DE CLIENTE ══ -->
 <div class="modal-bg" id="modalCliente2">
   <div class="modal-box">
@@ -588,23 +620,23 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.2.1"></script>
-<script src="./js/password-toggle.js?v=6.2.1"></script>
-<script src="./js/api.js?v=6.2.1"></script>
-<script src="./js/utils.js?v=6.2.1"></script>
-<script src="./js/auth.js?v=6.2.1"></script>
-<script src="./js/nav.js?v=6.2.1"></script>
-<script src="./js/nav-events.js?v=6.2.1"></script>
-<script src="./js/clientes.js?v=6.2.1"></script>
-<script src="./js/financeiro.js?v=6.2.1"></script>
-<script src="./js/operacoes.js?v=6.2.1"></script>
-<script src="./js/producoes.js?v=6.2.1"></script>
-<script src="./js/usuarios.js?v=6.2.1"></script>
-<script src="./js/catalogo.js?v=6.2.1"></script>
-<script src="./js/orcamentos.js?v=6.2.1"></script>
-<script src="./js/secure-overrides.js?v=6.2.1"></script>
+<script src="./js/config.js?v=6.2.3"></script>
+<script src="./js/password-toggle.js?v=6.2.3"></script>
+<script src="./js/api.js?v=6.2.3"></script>
+<script src="./js/utils.js?v=6.2.3"></script>
+<script src="./js/auth.js?v=6.2.3"></script>
+<script src="./js/nav.js?v=6.2.3"></script>
+<script src="./js/nav-events.js?v=6.2.3"></script>
+<script src="./js/clientes.js?v=6.2.3"></script>
+<script src="./js/financeiro.js?v=6.2.3"></script>
+<script src="./js/operacoes.js?v=6.2.3"></script>
+<script src="./js/producoes.js?v=6.2.3"></script>
+<script src="./js/usuarios.js?v=6.2.3"></script>
+<script src="./js/catalogo.js?v=6.2.3"></script>
+<script src="./js/orcamentos.js?v=6.2.3"></script>
+<script src="./js/secure-overrides.js?v=6.2.3"></script>
 
-<script src="./js/app.js?v=6.2.1"></script>
+<script src="./js/app.js?v=6.2.3"></script>
 
 </body>
 </html>
