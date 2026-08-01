@@ -27,7 +27,7 @@ const Operacoes = {
   },
 
   semPermissao() {
-    const target = document.getElementById('gastosContent') || document.getElementById('equipeContent') || document.getElementById('fornecedoresContent');
+    const target = document.getElementById((Nav.painelAtual || 'gastos') + 'Content');
     if (target) target.innerHTML = '<div class="ops-page"><div class="ops-empty"><strong>Acesso administrativo necess\u00e1rio</strong><br>Dados operacionais e documentos da equipe s\u00e3o restritos a propriet\u00e1rios e administradores.</div></div>';
   },
 
@@ -105,7 +105,7 @@ const Operacoes = {
     wrap.querySelector('#opsForm').addEventListener('submit', async event => { event.preventDefault(); const button = event.submitter; button.disabled = true; try { await onSave(new FormData(event.currentTarget)); wrap.remove(); await this.carregar(); Utils.toast('Registro salvo.'); } catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); button.disabled = false; } });
   },
 
-  field(label, name, type = 'text', required = false, value = '') { return '<label class="ops-field"><span>' + label + '</span><input name="' + name + '" type="' + type + '" value="' + Utils.escapeHTML(value ?? '') + '"' + (required ? ' required' : '') + '></label>'; },
+  field(label, name, type = 'text', required = false, value = '') { return '<label class="ops-field"><span>' + label + '</span><input name="' + name + '" type="' + type + '"' + (type === 'number' ? ' min="0" step="0.01"' : '') + ' value="' + Utils.escapeHTML(value ?? '') + '"' + (required ? ' required' : '') + '></label>'; },
   text(label, name) { return '<label class="ops-field full"><span>' + label + '</span><textarea name="' + name + '" rows="2"></textarea></label>'; },
   select(label, name, content, required = false) { return '<label class="ops-field"><span>' + label + '</span><select name="' + name + '"' + (required ? ' required' : '') + '>' + content + '</select></label>'; },
   val(form, name, max = 300) { return Utils.sanitizeText(form.get(name), max) || null; },
