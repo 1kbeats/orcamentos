@@ -1,4 +1,4 @@
-const CACHE_NAME = '1kbeats-v6-secure-7';
+const CACHE_NAME = '1kbeats-v6-secure-8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -49,7 +49,8 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || url.hostname.endsWith('supabase.co')) return;
 
   const isHtml = event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
-  if (isHtml) {
+  const isCodeAsset = url.pathname.endsWith('.css') || url.pathname.endsWith('.js');
+  if (isHtml || isCodeAsset) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
