@@ -31,9 +31,9 @@ const Nav = {
 
     if (isAdmin) {
       // Admin vê badges BUILD
-      if (badgeGastos) { badgeGastos.style.display = 'inline'; badgeGastos.textContent = 'BUILD'; badgeGastos.style.background = 'rgba(255,165,0,0.2)'; badgeGastos.style.color = 'orange'; }
-      if (badgeEquipe) { badgeEquipe.style.display = 'inline'; badgeEquipe.textContent = 'BUILD'; badgeEquipe.style.background = 'rgba(255,165,0,0.2)'; badgeEquipe.style.color = 'orange'; }
-      if (badgeFornecedores) { badgeFornecedores.style.display = 'inline'; badgeFornecedores.textContent = 'BUILD'; badgeFornecedores.style.background = 'rgba(255,165,0,0.2)'; badgeFornecedores.style.color = 'orange'; }
+      if (badgeGastos) badgeGastos.style.display = 'none';
+      if (badgeEquipe) badgeEquipe.style.display = 'none';
+      if (badgeFornecedores) badgeFornecedores.style.display = 'none';
       // Admin também vê Ordem de serviço FUTURO
       const itemOS = document.getElementById('navOrdemServico');
       if (itemOS) itemOS.style.display = 'flex';
@@ -83,11 +83,12 @@ const Nav = {
     if (panel === 'clientes')  Clientes.renderLista();
     if (panel === 'catalogo')  Catalogo.renderLista();
     if (panel === 'admin')     Usuarios.carregar();
+    if (['gastos', 'equipe', 'fornecedores'].includes(panel)) Operacoes.carregar();
   },
 
   // Mostra painel PRO ou teaser
   showPanelPro(panel) {
-    const isPro = this._plano === 'professional';
+    const isPro = this._plano === 'professional' || this._plano === 'admin';
     if (isPro) {
       this.showPanel(panel);
     } else {
