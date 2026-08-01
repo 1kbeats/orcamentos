@@ -146,3 +146,20 @@ body:has(.modal-bg.open),body:has(.modal-overlay.open),body:has(.modal-edit-bg.o
 .whatsapp-open-btn{background:#168b55}
 .whatsapp-open-btn:hover{background:#107343}
 @media(max-width:600px){.modal-overlay#modalWhatsApp{align-items:stretch}.whatsapp-share-box{width:100%;max-width:none;max-height:none;height:100dvh;margin:0;border:0;border-radius:0}.whatsapp-share-head{position:sticky;top:0;z-index:2;background:#fff;padding:17px 16px 13px}.whatsapp-share-box>.modal-field{margin-left:16px;margin-right:16px}.whatsapp-message-label{display:block}.whatsapp-message-tools{display:grid;grid-template-columns:1fr 1fr;margin-top:8px}.whatsapp-message-tools button{min-height:40px}.whatsapp-message-field{display:flex;min-height:0;flex-direction:column}.whatsapp-message-field textarea{min-height:300px;font-size:16px}.whatsapp-share-actions{grid-template-columns:1fr 1.35fr;padding:12px 16px calc(12px + env(safe-area-inset-bottom))}.whatsapp-share-actions button{min-height:48px}}
+/* Instalação do aplicativo no celular */
+.btn-install{width:100%;min-height:46px;margin-top:10px;border:1.5px solid #d9d9e5;border-radius:6px;background:#fff;color:#5b5b6e;font:700 11px 'Space Mono',monospace;letter-spacing:.08em;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.btn-install:hover,.btn-install:focus-visible{border-color:#D91A72;color:#D91A72;background:#fff7fb}
+.pwa-install-entry{color:rgba(255,255,255,.72)}
+.pwa-install-entry span{font-size:13px}
+.pwa-install-overlay{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(16,16,25,.68);backdrop-filter:blur(4px)}
+.pwa-install-dialog{width:min(430px,100%);background:#fff;border:1px solid #e3e3ec;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}
+.pwa-install-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 22px 14px}
+.pwa-install-dialog-head small{display:block;margin-bottom:5px;color:#D91A72;font:700 9px 'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase}
+.pwa-install-dialog-head h2{margin:0;color:#1A1A25;font-size:21px;line-height:1.2}
+.pwa-install-close{width:34px;height:34px;border:0;border-radius:8px;background:#f3f3f7;color:#696979;font-size:22px;cursor:pointer}
+.pwa-install-dialog-body{padding:0 22px 22px;color:#5f5f70;font-size:14px;line-height:1.55}
+.pwa-install-steps{margin:14px 0 0;padding:14px 16px 14px 34px;border:1px solid #e7e7ef;border-radius:10px;background:#fafafd;color:#30303d}
+.pwa-install-steps li+li{margin-top:7px}
+.pwa-install-dialog-actions{display:flex;justify-content:flex-end;padding:14px 22px 20px;border-top:1px solid #ececf2}
+.pwa-install-ok{min-height:42px;padding:0 18px;border:0;border-radius:8px;background:#D91A72;color:#fff;font-weight:700;cursor:pointer}
+@media(max-width:600px){.pwa-install-overlay{align-items:end;padding:0}.pwa-install-dialog{width:100%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom)}}

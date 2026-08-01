@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Entrar — 1K Beats Orçamentos</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#D91A72">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/secure.css">
+<link rel="stylesheet" href="./css/secure.css?v=6.2.6">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -224,6 +227,7 @@ a:hover { color: #B8105E; }
     </div>
 
     <button class="btn-login" id="btnLogin">ENTRAR</button>
+    <button class="btn-install" type="button" data-pwa-install>INSTALAR NO CELULAR</button>
 
     <div class="forgot">
       Esqueceu a senha?
@@ -237,9 +241,10 @@ a:hover { color: #B8105E; }
   </div>
 </div>
 
-<script src="./js/config.js"></script>
-<script src="./js/api.js"></script>
-<script src="./js/password-toggle.js"></script>
-<script src="./js/login.js"></script>
+<script src="./js/config.js?v=6.2.6"></script>
+<script src="./js/api.js?v=6.2.6"></script>
+<script src="./js/password-toggle.js?v=6.2.6"></script>
+<script src="./js/pwa-install.js?v=6.2.6"></script>
+<script src="./js/login.js?v=6.2.6"></script>
 </body>
 </html>
