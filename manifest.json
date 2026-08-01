@@ -1,8 +1,8 @@
 {
-  "name": "1K Beats — Orçamentos",
-  "short_name": "1K Orçamentos",
+  "name": "1K Beats — Gestão de eventos",
+  "short_name": "1K Beats",
   "id": "./",
-  "description": "Emissão rápida de orçamentos da 1K Beats",
+  "description": "Orçamentos e gestão operacional de eventos da 1K Beats",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

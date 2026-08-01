@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
-  <title>1K Beats — Orçamentos</title>
+  <title>1K Beats — Gestão de eventos</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#D91A72">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.2.6">
-  <link rel="stylesheet" href="./css/secure.css?v=6.2.6">
+  <link rel="stylesheet" href="./css/styles.css?v=6.2.7">
+  <link rel="stylesheet" href="./css/secure.css?v=6.2.7">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
-<div class="app-loading" id="appLoading" role="status">CARREGANDO AMBIENTE SEGURO…</div>
+<div class="app-loading" id="appLoading" role="status">CARREGANDO O AMBIENTE SEGURO…</div>
 
 <div class="app-shell">
 
@@ -53,7 +53,7 @@
 
       <div class="nav-item pro-item" id="navProducoes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M8 14h3M8 17h6"/></svg>
-        <span>Produções/Eventos</span>
+        <span>Produções e eventos</span>
       </div>
       <div class="nav-section">Cadastros</div>
       <div class="nav-item" id="navClientes">
@@ -69,7 +69,7 @@
       <div class="nav-section pro-section" id="navSectionFinanceiro"></div>
       <div class="nav-item pro-item" id="navGastos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span>Gastos</span>
+        <span>Gastos diários</span>
         <span class="badge-pro" id="badgeGastos" style="display:none">PRO</span>
       </div>
 
@@ -77,18 +77,18 @@
       <div class="nav-section pro-section" id="navSectionOperacoes"></div>
       <div class="nav-item pro-item" id="navEquipe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Equipe/Freelancers</span>
+        <span>Equipe e freelancers</span>
         <span class="badge-pro" id="badgeEquipe" style="display:none">PRO</span>
       </div>
       <div class="nav-item pro-item" id="navFornecedores">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        <span>Fornecedores</span>
+        <span>Fornecedores externos</span>
         <span class="badge-pro" id="badgeFornecedores" style="display:none">PRO</span>
       </div>
       <div class="nav-item pro-item" id="navOrdemServico" style="display:none;opacity:0.4">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
         <span>Ordem de serviço</span>
-        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(128,128,128,0.2);color:#888;margin-left:auto;flex-shrink:0">FUTURO</span>
+        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(128,128,128,0.2);color:#888;margin-left:auto;flex-shrink:0">EM BREVE</span>
       </div>
 
       <!-- ADMINISTRAÇÃO — só admin -->
@@ -179,7 +179,7 @@
               <span id="btnDashViewAll" role="button" tabindex="0" style="font-size:12px;color:#D91A72;cursor:pointer">Ver todos →</span>
             </div>
             <div id="dashUltimos">
-              <div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Carregando...</div>
+              <div style="padding:1.5rem;text-align:center;color:#AAA;font-size:13px">Carregando…</div>
             </div>
           </div>
 
@@ -230,7 +230,7 @@
         <div class="quotes-toolbar"><label class="quotes-select-all"><input id="checkTodosOrcamentos" type="checkbox"><span></span> Selecionar todos</label><span id="quoteSelectionLabel">Selecione orçamentos para excluir em grupo</span><button id="btnExcluirSelecionados" type="button" class="quotes-delete" disabled>Excluir selecionados</button></div>
         <div class="quotes-table">
           <div class="quote-table-head"><span></span><span>Nº</span><span>Cliente e referência</span><span>Enviado em</span><span>Valor</span><span>Status</span><span></span></div>
-          <div id="listaOrcamentos"><div class="empty-state">Carregando...</div></div>
+          <div id="listaOrcamentos"><div class="empty-state">Carregando…</div></div>
         </div>
       </div>
     </div>
@@ -404,7 +404,7 @@
           <div style="display:flex;gap:8px"><button class="btn-cancel" id="btnExportarClientes" type="button">Exportar CSV</button><button class="btn-novo" id="btnNovoCliente" type="button">+ Novo cliente</button></div>
         </div>
         <div class="card" id="listaClientes">
-          <div style="color:#999;padding:2rem;text-align:center">Carregando...</div>
+          <div style="color:#999;padding:2rem;text-align:center">Carregando…</div>
         </div>
       </div>
     </div>
@@ -446,7 +446,7 @@
 
           <!-- Lista -->
           <div id="listaCatalogo">
-            <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando...</div>
+            <div style="color:#AAA;padding:2rem;text-align:center;font-size:13px">Carregando…</div>
           </div>
 
         </div>
@@ -624,24 +624,24 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.2.6"></script>
-<script src="./js/password-toggle.js?v=6.2.6"></script>
-<script src="./js/api.js?v=6.2.6"></script>
-<script src="./js/utils.js?v=6.2.6"></script>
-<script src="./js/auth.js?v=6.2.6"></script>
-<script src="./js/nav.js?v=6.2.6"></script>
-<script src="./js/nav-events.js?v=6.2.6"></script>
-<script src="./js/clientes.js?v=6.2.6"></script>
-<script src="./js/financeiro.js?v=6.2.6"></script>
-<script src="./js/operacoes.js?v=6.2.6"></script>
-<script src="./js/producoes.js?v=6.2.6"></script>
-<script src="./js/usuarios.js?v=6.2.6"></script>
-<script src="./js/catalogo.js?v=6.2.6"></script>
-<script src="./js/orcamentos.js?v=6.2.6"></script>
-<script src="./js/secure-overrides.js?v=6.2.6"></script>
-<script src="./js/pwa-install.js?v=6.2.6"></script>
+<script src="./js/config.js?v=6.2.7"></script>
+<script src="./js/password-toggle.js?v=6.2.7"></script>
+<script src="./js/api.js?v=6.2.7"></script>
+<script src="./js/utils.js?v=6.2.7"></script>
+<script src="./js/auth.js?v=6.2.7"></script>
+<script src="./js/nav.js?v=6.2.7"></script>
+<script src="./js/nav-events.js?v=6.2.7"></script>
+<script src="./js/clientes.js?v=6.2.7"></script>
+<script src="./js/financeiro.js?v=6.2.7"></script>
+<script src="./js/operacoes.js?v=6.2.7"></script>
+<script src="./js/producoes.js?v=6.2.7"></script>
+<script src="./js/usuarios.js?v=6.2.7"></script>
+<script src="./js/catalogo.js?v=6.2.7"></script>
+<script src="./js/orcamentos.js?v=6.2.7"></script>
+<script src="./js/secure-overrides.js?v=6.2.7"></script>
+<script src="./js/pwa-install.js?v=6.2.7"></script>
 
-<script src="./js/app.js?v=6.2.6"></script>
+<script src="./js/app.js?v=6.2.7"></script>
 
 </body>
 </html>

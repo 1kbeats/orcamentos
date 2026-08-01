@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Entrar — 1K Beats Orçamentos</title>
+<title>Entrar — 1K Beats Gestão</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#D91A72">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/secure.css?v=6.2.6">
+<link rel="stylesheet" href="./css/secure.css?v=6.2.7">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -163,6 +163,12 @@ a:hover { color: #B8105E; }
   font-family: 'Space Mono', monospace; line-height: 1.8;
 }
 .footer strong { color: #9090B0; }
+@media (max-width: 600px) {
+  body { align-items: flex-start; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
+  .logo-area { margin-bottom: 20px; }
+  .card { padding: 26px 20px; }
+  .field input { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -209,42 +215,44 @@ a:hover { color: #B8105E; }
   <div class="card">
     <div class="rec-badge">
       <div class="rec-dot"></div>
-      <span>ACESSO SEGURO · v6.0</span>
+      <span>ACESSO SEGURO · v6.2.7</span>
     </div>
 
-    <div class="card-title">Bem-vindo</div>
-    <div class="card-sub">ACESSE SUA CONTA PARA CONTINUAR</div>
+    <div class="card-title">Acesse sua conta</div>
+    <div class="card-sub">GESTÃO DE ORÇAMENTOS E EVENTOS</div>
 
-    <div class="error" id="errMsg">Usuário ou senha incorretos.</div>
+    <div class="error" id="errMsg" role="alert" aria-live="polite">E-mail ou senha incorretos.</div>
 
+    <form id="loginForm" novalidate>
     <div class="field">
       <label for="usuario">E-mail</label>
-      <input type="email" id="usuario" placeholder="seu@email.com" autocomplete="username" autocapitalize="none">
+      <input type="email" id="usuario" placeholder="seu@email.com" autocomplete="username" autocapitalize="none" spellcheck="false" inputmode="email" required>
     </div>
     <div class="field">
       <label for="senha">Senha</label>
-      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password" required>
     </div>
 
-    <button class="btn-login" id="btnLogin">ENTRAR</button>
+    <button class="btn-login" id="btnLogin" type="submit">ENTRAR</button>
     <button class="btn-install" type="button" data-pwa-install>INSTALAR NO CELULAR</button>
 
     <div class="forgot">
       Esqueceu a senha?
       <a href="#" id="forgotLink">Recuperar por e-mail</a>
     </div>
+    </form>
   </div>
 
   <div class="footer">
     Desenvolvido por <strong>Alessandro Lima</strong><br>
-    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v6.0</span> · ambiente seguro
+    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v6.2.7</span> · ambiente seguro
   </div>
 </div>
 
-<script src="./js/config.js?v=6.2.6"></script>
-<script src="./js/api.js?v=6.2.6"></script>
-<script src="./js/password-toggle.js?v=6.2.6"></script>
-<script src="./js/pwa-install.js?v=6.2.6"></script>
-<script src="./js/login.js?v=6.2.6"></script>
+<script src="./js/config.js?v=6.2.7"></script>
+<script src="./js/api.js?v=6.2.7"></script>
+<script src="./js/password-toggle.js?v=6.2.7"></script>
+<script src="./js/pwa-install.js?v=6.2.7"></script>
+<script src="./js/login.js?v=6.2.7"></script>
 </body>
 </html>

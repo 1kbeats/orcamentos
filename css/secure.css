@@ -163,3 +163,20 @@ body:has(.modal-bg.open),body:has(.modal-overlay.open),body:has(.modal-edit-bg.o
 .pwa-install-dialog-actions{display:flex;justify-content:flex-end;padding:14px 22px 20px;border-top:1px solid #ececf2}
 .pwa-install-ok{min-height:42px;padding:0 18px;border:0;border-radius:8px;background:#D91A72;color:#fff;font-weight:700;cursor:pointer}
 @media(max-width:600px){.pwa-install-overlay{align-items:end;padding:0}.pwa-install-dialog{width:100%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom)}}
+/* Acabamento responsivo v6.2.7 */
+.nav-item span,.ops-head>div,.production-detail-head>div,.production-line>div{min-width:0}
+.ops-head h1,.production-card h3,.production-detail-head h1,.production-detail-head p,.ops-note,.ops-card-title,.production-line strong{overflow-wrap:anywhere}
+@media(max-width:600px){
+  .ops-field input,.ops-field select,.ops-field textarea,
+  .modal-field input,.modal-field select,
+  .cfg-fld input{font-size:16px}
+  .production-detail-head{flex-direction:column}
+  .production-info{grid-template-columns:1fr}
+  .production-actions .ops-btn{flex:1 1 100%;min-height:44px}
+  .ops-card-title{display:flex;flex-direction:column;gap:5px}
+  .ops-card-title span{float:none}
+  .admin-header{align-items:flex-start;flex-wrap:wrap;gap:12px}
+  .modal-box{max-height:calc(100dvh - 24px);margin:12px;overflow:auto}
+  .update-banner{width:calc(100% - 24px);max-width:480px;white-space:normal;text-align:center;justify-content:center}
+  .toast{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;text-align:center}
+}
