@@ -1,6 +1,7 @@
 {
   "name": "1K Beats — Orçamentos",
   "short_name": "1K Orçamentos",
+  "id": "./",
   "description": "Emissão rápida de orçamentos da 1K Beats",
   "start_url": "./index.html",
   "scope": "./",
