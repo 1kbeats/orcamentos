@@ -49,11 +49,11 @@ const Catalogo = {
           '<span class="catalog-category">' + Utils.escapeHTML(item.categoria || 'Outros') + '</span>' +
           '<span class="catalog-price">' + Utils.escapeHTML(Utils.fmt(item.valor)) + '</span>' +
           '<div class="catalog-actions">' +
-            '<button class="btn-edit-cat" type="button" title="Editar" aria-label="Editar item">✎</button>' +
-            '<button class="btn-del-cat" type="button" title="Excluir" aria-label="Excluir item">✕</button>' +
+            (CONFIG.canEditCommercial ? '<button class="btn-edit-cat" type="button" title="Editar" aria-label="Editar item">✎</button>' : '') +
+            (CONFIG.isAdmin ? '<button class="btn-del-cat" type="button" title="Excluir" aria-label="Excluir item">✕</button>' : '') +
           '</div>';
-        row.querySelector('.btn-edit-cat').addEventListener('click', () => this.abrirEditar(item));
-        row.querySelector('.btn-del-cat').addEventListener('click', () => this.excluir(item.id));
+        row.querySelector('.btn-edit-cat')?.addEventListener('click', () => this.abrirEditar(item));
+        row.querySelector('.btn-del-cat')?.addEventListener('click', () => this.excluir(item.id));
         container.appendChild(row);
       });
     });

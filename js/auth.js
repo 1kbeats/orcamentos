@@ -82,7 +82,8 @@ const Auth = {
   },
 
   configurarPerfil(user) {
-    Nav.configurarMenu(CONFIG.isAdmin, CONFIG.plan);
+    document.body.dataset.role = CONFIG.role;
+    Nav.configurarMenu();
     const name = user.user_metadata?.name || user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário';
     const nameElement = document.getElementById('userNome');
     const avatar = document.querySelector('.sidebar-avatar');
@@ -90,6 +91,14 @@ const Auth = {
     if (avatar) avatar.textContent = name.charAt(0).toUpperCase();
     const company = document.getElementById('activeCompanyName');
     if (company) company.textContent = CONFIG.context.organization?.name || '';
+    const roleElement = document.getElementById('activeRoleName');
+    const roleLabels = {
+      owner: 'Administrador principal',
+      admin: 'Gestor operacional',
+      member: 'Comercial',
+      viewer: 'Somente visualização'
+    };
+    if (roleElement) roleElement.textContent = roleLabels[CONFIG.role] || 'Usuário';
   },
 
   redirectToLogin() {

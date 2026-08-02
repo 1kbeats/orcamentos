@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.2.7">
-  <link rel="stylesheet" href="./css/secure.css?v=6.2.7">
+  <link rel="stylesheet" href="./css/styles.css?v=6.2.8">
+  <link rel="stylesheet" href="./css/secure.css?v=6.2.8">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -37,7 +37,7 @@
     <div class="sidebar-user">
       <div class="sidebar-avatar">U</div>
       <div>
-        <div class="sidebar-username" id="userNome">—</div><div id="activeCompanyName" style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px"></div>
+        <div class="sidebar-username" id="userNome">—</div><div id="activeCompanyName" style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px"></div><div id="activeRoleName" class="sidebar-role"></div>
       </div>
     </div>
     <nav class="sidebar-nav">
@@ -590,7 +590,8 @@
   <div class="modal-box">
     <div class="modal-title">Novo usuário</div>
     <div class="modal-field"><label for="novoUsuarioNome">Nome</label><input type="text" id="novoUsuarioNome" autocomplete="name" placeholder="Ex.: João"></div>
-    <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="email"></div><div class="modal-field"><label for="novoUsuarioRole">Perfil</label><select id="novoUsuarioRole"><option value="member">Colaborador</option><option value="admin">Administrador</option></select></div>
+    <div class="modal-field"><label for="novoUsuarioEmail">E-mail</label><input type="email" id="novoUsuarioEmail" placeholder="usuario@empresa.com.br" autocomplete="email"></div>
+    <div class="modal-field"><label for="novoUsuarioRole">Perfil de acesso</label><select id="novoUsuarioRole"><option value="admin">Gestor operacional</option><option value="member">Comercial</option><option value="viewer">Somente visualização</option></select><small class="access-help">O perfil pode ser alterado depois.</small></div>
     <div class="modal-field"><label for="novoUsuarioSenha">Senha</label><input type="password" id="novoUsuarioSenha" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="btnCancelarNovoUsuario" type="button">Cancelar</button>
@@ -599,6 +600,29 @@
   </div>
 </div>
 
+<!-- MODAL: EDITAR ACESSO DO USUÁRIO -->
+<div class="modal-edit-bg" id="modalEditAcesso">
+  <div class="modal-box">
+    <div class="modal-title">Editar acesso — <span id="editAcessoNome"></span></div>
+    <div class="modal-field">
+      <label for="editAcessoRole">Perfil de acesso</label>
+      <select id="editAcessoRole">
+        <option value="admin">Gestor operacional</option>
+        <option value="member">Comercial</option>
+        <option value="viewer">Somente visualização</option>
+      </select>
+      <div class="access-profile-guide">
+        <p><strong>Gestor operacional:</strong> orçamentos, produções, gastos, equipe e fornecedores.</p>
+        <p><strong>Comercial:</strong> clientes, catálogo e orçamentos.</p>
+        <p><strong>Somente visualização:</strong> consulta os dados sem alterar ou excluir.</p>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="btnCancelarAcesso" type="button">Cancelar</button>
+      <button class="btn-save" id="btnSalvarAcesso" type="button">Salvar acesso</button>
+    </div>
+  </div>
+</div>
 <!-- ══ MODAL: EDITAR SENHA DO USUÁRIO ══ -->
 <div class="modal-edit-bg" id="modalEditSenha">
   <div class="modal-box">
@@ -624,24 +648,24 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.2.7"></script>
-<script src="./js/password-toggle.js?v=6.2.7"></script>
-<script src="./js/api.js?v=6.2.7"></script>
-<script src="./js/utils.js?v=6.2.7"></script>
-<script src="./js/auth.js?v=6.2.7"></script>
-<script src="./js/nav.js?v=6.2.7"></script>
-<script src="./js/nav-events.js?v=6.2.7"></script>
-<script src="./js/clientes.js?v=6.2.7"></script>
-<script src="./js/financeiro.js?v=6.2.7"></script>
-<script src="./js/operacoes.js?v=6.2.7"></script>
-<script src="./js/producoes.js?v=6.2.7"></script>
-<script src="./js/usuarios.js?v=6.2.7"></script>
-<script src="./js/catalogo.js?v=6.2.7"></script>
-<script src="./js/orcamentos.js?v=6.2.7"></script>
-<script src="./js/secure-overrides.js?v=6.2.7"></script>
-<script src="./js/pwa-install.js?v=6.2.7"></script>
+<script src="./js/config.js?v=6.2.8"></script>
+<script src="./js/password-toggle.js?v=6.2.8"></script>
+<script src="./js/api.js?v=6.2.8"></script>
+<script src="./js/utils.js?v=6.2.8"></script>
+<script src="./js/auth.js?v=6.2.8"></script>
+<script src="./js/nav.js?v=6.2.8"></script>
+<script src="./js/nav-events.js?v=6.2.8"></script>
+<script src="./js/clientes.js?v=6.2.8"></script>
+<script src="./js/financeiro.js?v=6.2.8"></script>
+<script src="./js/operacoes.js?v=6.2.8"></script>
+<script src="./js/producoes.js?v=6.2.8"></script>
+<script src="./js/usuarios.js?v=6.2.8"></script>
+<script src="./js/catalogo.js?v=6.2.8"></script>
+<script src="./js/orcamentos.js?v=6.2.8"></script>
+<script src="./js/secure-overrides.js?v=6.2.8"></script>
+<script src="./js/pwa-install.js?v=6.2.8"></script>
 
-<script src="./js/app.js?v=6.2.7"></script>
+<script src="./js/app.js?v=6.2.8"></script>
 
 </body>
 </html>

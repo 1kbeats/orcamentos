@@ -8,61 +8,35 @@ const Nav = {
   _plano: 'basico', // 'basico', 'professional', 'admin'
 
   // Configura o menu de acordo com o perfil
-  configurarMenu(isAdmin, plano) {
-    this._plano = isAdmin ? 'admin' : (plano || 'basico');
-    const isPro = this._plano === 'professional' || this._plano === 'admin';
+  configurarMenu() {
+    const canViewOperations = CONFIG.canViewOperations;
+    const canManageUsers = CONFIG.canManageUsers;
 
-    // Seções PRO sempre visíveis
-    document.querySelectorAll('.pro-section').forEach(el => {
-      el.style.display = 'block';
+    document.querySelectorAll('.pro-section').forEach(element => {
+      element.style.display = canViewOperations ? 'block' : 'none';
+    });
+    ['navProducoes', 'navGastos', 'navEquipe', 'navFornecedores'].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.style.display = canViewOperations ? 'flex' : 'none';
     });
 
-    // Labels das seções
-    const secFin = document.getElementById('navSectionFinanceiro');
-    if (secFin) secFin.textContent = isPro ? 'Financeiro' : 'Upgrade disponível';
+    const financeSection = document.getElementById('navSectionFinanceiro');
+    if (financeSection) financeSection.textContent = canViewOperations ? 'Financeiro' : '';
+    const operationsSection = document.getElementById('navSectionOperacoes');
+    if (operationsSection) operationsSection.textContent = canViewOperations ? 'Operações' : '';
 
-    const secOp = document.getElementById('navSectionOperacoes');
-    if (secOp) secOp.textContent = isPro ? 'Operações' : '';
+    ['badgeGastos', 'badgeEquipe', 'badgeFornecedores'].forEach(id => {
+      const badge = document.getElementById(id);
+      if (badge) badge.style.display = 'none';
+    });
 
-    // Badges por perfil
-    const badgeGastos = document.getElementById('badgeGastos');
-    const badgeEquipe = document.getElementById('badgeEquipe');
-    const badgeFornecedores = document.getElementById('badgeFornecedores');
+    const serviceOrder = document.getElementById('navOrdemServico');
+    if (serviceOrder) serviceOrder.style.display = canViewOperations ? 'flex' : 'none';
 
-    if (isAdmin) {
-      // Admin vê badges BUILD
-      if (badgeGastos) badgeGastos.style.display = 'none';
-      if (badgeEquipe) badgeEquipe.style.display = 'none';
-      if (badgeFornecedores) badgeFornecedores.style.display = 'none';
-      // Admin também vê Ordem de serviço FUTURO
-      const itemOS = document.getElementById('navOrdemServico');
-      if (itemOS) itemOS.style.display = 'flex';
-    } else if (isPro) {
-      // PRO — sem badges
-      if (badgeGastos) badgeGastos.style.display = 'none';
-      if (badgeEquipe) badgeEquipe.style.display = 'none';
-      if (badgeFornecedores) badgeFornecedores.style.display = 'none';
-      const itemOS = document.getElementById('navOrdemServico');
-      if (itemOS) itemOS.style.display = 'none';
-    } else {
-      // Básico — badges PRO
-      if (badgeGastos) { badgeGastos.style.display = 'inline'; badgeGastos.textContent = 'PRO'; badgeGastos.style.background = 'rgba(217,26,114,0.2)'; badgeGastos.style.color = '#D91A72'; }
-      if (badgeEquipe) { badgeEquipe.style.display = 'inline'; badgeEquipe.textContent = 'PRO'; badgeEquipe.style.background = 'rgba(217,26,114,0.2)'; badgeEquipe.style.color = '#D91A72'; }
-      if (badgeFornecedores) { badgeFornecedores.style.display = 'inline'; badgeFornecedores.textContent = 'PRO'; badgeFornecedores.style.background = 'rgba(217,26,114,0.2)'; badgeFornecedores.style.color = '#D91A72'; }
-      ['navGastos','navEquipe','navFornecedores'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('pro-bloqueado');
-      });
-      const itemOS = document.getElementById('navOrdemServico');
-      if (itemOS) itemOS.style.display = 'none';
-    }
-
-    // Admin — mostrar Administração
-    document.querySelectorAll('.admin-only').forEach(el => {
-      el.style.display = isAdmin ? '' : 'none';
+    document.querySelectorAll('.admin-only').forEach(element => {
+      element.style.display = canManageUsers ? '' : 'none';
     });
   },
-
   // Mostra painel e atualiza nav ativo
   showPanel(panel) {
     this.painelAtual = panel;
@@ -89,15 +63,12 @@ const Nav = {
 
   // Mostra painel PRO ou teaser
   showPanelPro(panel) {
-    const isPro = this._plano === 'professional' || this._plano === 'admin';
-    if (isPro) {
+    if (CONFIG.canViewOperations) {
       this.showPanel(panel);
     } else {
-      // Admin e básico veem o teaser (admin vê por ser módulo em construção)
       this.showPanelBloqueado(panel);
     }
   },
-
   // Tela de teaser por módulo
   _teasers: {
     gastos: {
