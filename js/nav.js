@@ -15,7 +15,7 @@ const Nav = {
     document.querySelectorAll('.pro-section').forEach(element => {
       element.style.display = canViewOperations ? 'block' : 'none';
     });
-    ['navProducoes', 'navGastos', 'navEquipe', 'navFornecedores'].forEach(id => {
+    ['navProducoes', 'navGastos', 'navEquipe', 'navFornecedores', 'navOrdemServico'].forEach(id => {
       const element = document.getElementById(id);
       if (element) element.style.display = canViewOperations ? 'flex' : 'none';
     });
@@ -58,6 +58,7 @@ const Nav = {
     if (panel === 'catalogo')  Catalogo.renderLista();
     if (panel === 'admin')     Usuarios.carregar();
     if (panel === 'producoes') Producoes.carregar();
+    if (panel === 'ordemServico') OrdensServico.carregar();
     if (['gastos', 'equipe', 'fornecedores'].includes(panel)) Operacoes.carregar();
   },
 

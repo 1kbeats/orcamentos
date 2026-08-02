@@ -59,7 +59,7 @@
     setButtonsVisible(!isStandalone());
     if (!('serviceWorker' in navigator)) return;
     try {
-      await navigator.serviceWorker.register('./sw.js?v=6.2.9', { scope: './', updateViaCache: 'none' });
+      await navigator.serviceWorker.register('./sw.js?v=6.3.0', { scope: './', updateViaCache: 'none' });
     } catch (_) {}
   };
 
