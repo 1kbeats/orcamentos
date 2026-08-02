@@ -86,4 +86,47 @@
     root.querySelectorAll('[data-confirm-os]').forEach(button => button.addEventListener('click', () => this.confirmar(this._data.ordens.find(order => order.id === button.dataset.confirmOs))));
     bindPagination(root, this);
   };
-})();
+
+  Operacoes._equipePage = 1;
+  Operacoes._historicoPage = 1;
+  Operacoes._equipeSelecionada = '';
+
+  Operacoes.renderEquipe = function renderEquipeCompacta() {
+    const root = document.getElementById('equipeContent');
+    if (!root) return;
+    if (typeof this._filters.equipeStatus === 'undefined') this._filters.equipeStatus = 'ativos';
+    const term = String(this._filters.equipeBusca || '').toLocaleLowerCase('pt-BR');
+    const filteredPeople = this._data.equipe.filter(person => {
+      const matchesSearch = !term || [person.nome, person.funcao, person.telefone].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(term));
+      const matchesStatus = !this._filters.equipeStatus || (this._filters.equipeStatus === 'ativos' && person.ativo) || (this._filters.equipeStatus === 'arquivados' && !person.ativo);
+      return matchesSearch && matchesStatus;
+    });
+    const peopleData = pageData(filteredPeople, this._equipePage); this._equipePage = peopleData.current;
+    const peopleRows = peopleData.items.map(person => {
+      const history = this._data.diarias.filter(item => item.equipe_id === person.id);
+      const total = history.reduce((sum, item) => sum + (Number(item.valor_diaria) || 0), 0);
+      const secondary = CONFIG.canManageOperations ? '<button type="button" data-edit="equipe" data-id="' + Utils.safeId(person.id) + '">Editar</button><button type="button" class="' + (person.ativo ? 'danger' : '') + '" data-archive="equipe" data-id="' + Utils.safeId(person.id) + '">' + (person.ativo ? 'Arquivar' : 'Reativar') + '</button>' : '';
+      return '<article class="compact-row team-compact-row' + (person.ativo ? '' : ' archived') + '"><div class="compact-main team-person"><div class="ops-avatar">' + this.escape(person.nome.charAt(0).toUpperCase()) + '</div><div><h3>' + this.escape(person.nome) + '</h3><p>' + this.escape(person.funcao || 'Freelancer') + '</p></div></div><div class="compact-contact"><small>CONTATO</small><strong>' + this.escape(person.telefone || 'Sem telefone') + '</strong></div><div class="compact-money"><small>DIÁRIA PADRÃO</small><strong>' + this.money(person.valor_diaria) + '</strong></div><div class="compact-count"><small>EVENTOS</small><strong>' + history.length + '</strong></div><div class="compact-money compact-team-total"><small>TOTAL RECEBIDO</small><strong>' + this.money(total) + '</strong></div><div class="compact-status"><small>SITUAÇÃO</small><span class="ops-tag ' + (person.ativo ? 'status-confirmado' : 'status-cancelado') + '">' + (person.ativo ? 'Ativo' : 'Arquivado') + '</span></div><div class="compact-actions"><button type="button" class="ops-btn secondary" data-team-history="' + Utils.safeId(person.id) + '">' + (this._equipeSelecionada === person.id ? 'Exibindo' : 'Ver histórico') + '</button>' + (secondary ? moreMenu(secondary) : '') + '</div></article>';
+    }).join('');
+    const selected = this._data.equipe.find(person => person.id === this._equipeSelecionada);
+    const filteredDiaries = this._data.diarias.filter(item => (!selected || item.equipe_id === selected.id) && (!this._filters.diariasEvento || item.orcamento_id === this._filters.diariasEvento));
+    const historyData = pageData(filteredDiaries, this._historicoPage); this._historicoPage = historyData.current;
+    const historyRows = historyData.items.map(item => '<tr><td>' + this.escape(Utils.fmtDate(item.data)) + '</td><td><strong>' + this.escape(item.equipe?.nome) + '</strong><small>' + this.escape(item.funcao_evento || '') + '</small></td><td>' + this.escape(this.quoteLabel(item.orcamentos)) + '</td><td>' + this.escape(item.horario_inicio || '—') + '</td><td class="ops-money">' + this.money(item.valor_diaria) + '</td><td>' + this.actionButtons('equipe_diarias', item.id) + '</td></tr>').join('');
+    const statusOptions = '<option value="">Todos</option>' + this.option('ativos', 'Ativos', this._filters.equipeStatus) + this.option('arquivados', 'Arquivados', this._filters.equipeStatus);
+    const filters = '<div class="ops-filters team-filters">' + this.filterField('Buscar profissional', 'opsEquipeBusca', 'search', this._filters.equipeBusca) + this.filterField('Situação', 'opsEquipeStatus', 'select', '', statusOptions) + this.filterField('Evento das diárias', 'opsDiariasEvento', 'select', '', this.filterQuoteOptions(this._filters.diariasEvento)) + '<button type="button" class="ops-filter-clear" id="opsEquipeLimpar">Limpar filtros</button></div>';
+    const historyTitle = selected ? 'Histórico de ' + this.escape(selected.nome) : 'Histórico de trabalho';
+    const clearSelected = selected ? '<button type="button" class="ops-btn secondary history-all" id="opsHistoricoTodos">Ver todos</button>' : '';
+    root.innerHTML = '<div class="ops-page">' + this.titulo('Equipe e freelancers', 'Técnicos de áudio, luz, vídeo e apoio, com diárias por evento.', 'Cadastrar profissional', 'opsNovaEquipe') + '<div class="ops-actions">' + (CONFIG.canManageOperations ? '<button class="ops-btn secondary" id="opsNovaDiaria">+ Registrar diária</button>' : '') + '<span>Arquivar mantém o histórico e retira o profissional dos novos lançamentos.</span></div>' + filters + '<div class="compact-list-head team-compact-head"><span>Profissional</span><span>Contato</span><span>Diária</span><span>Eventos</span><span>Total</span><span>Situação</span><span>Ações</span></div><div class="compact-list">' + (peopleRows || '<div class="ops-empty">Nenhum profissional encontrado.</div>') + '</div>' + pagination(peopleData, 'profissionais').replaceAll('data-page=', 'data-team-page=') + '<div class="ops-card team-history-card"><div class="ops-card-title"><div>' + historyTitle + ' <span>' + filteredDiaries.length + ' registro(s)</span></div>' + clearSelected + '</div><div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Data</th><th>Profissional</th><th>Evento</th><th>Início</th><th>Diária</th><th>Ações</th></tr></thead><tbody>' + (historyRows || '<tr><td colspan="6" class="ops-empty">Nenhuma diária encontrada.</td></tr>') + '</tbody></table></div>' + pagination(historyData, 'diárias').replaceAll('data-page=', 'data-history-page=') + '</div></div>';
+    root.querySelector('#opsNovaEquipe')?.addEventListener('click', () => this.modalEquipe());
+    root.querySelector('#opsNovaDiaria')?.addEventListener('click', () => this.modalDiaria());
+    root.querySelectorAll('[data-team-history]').forEach(button => button.addEventListener('click', () => { this._equipeSelecionada = button.dataset.teamHistory; this._historicoPage = 1; this.renderEquipe(); }));
+    root.querySelector('#opsHistoricoTodos')?.addEventListener('click', () => { this._equipeSelecionada = ''; this._historicoPage = 1; this.renderEquipe(); });
+    root.querySelectorAll('[data-team-page]').forEach(button => button.addEventListener('click', () => { this._equipePage = Number(button.dataset.teamPage) || 1; this.renderEquipe(); }));
+    root.querySelectorAll('[data-history-page]').forEach(button => button.addEventListener('click', () => { this._historicoPage = Number(button.dataset.historyPage) || 1; this.renderEquipe(); }));
+    const resetPeople = () => { this._equipePage = 1; this.renderEquipe(); };
+    root.querySelector('#opsEquipeBusca')?.addEventListener('input', event => { this._filters.equipeBusca = event.target.value; clearTimeout(this._professionalFilterTimer); this._professionalFilterTimer = setTimeout(resetPeople, 280); });
+    root.querySelector('#opsEquipeStatus')?.addEventListener('change', event => { this._filters.equipeStatus = event.target.value; resetPeople(); });
+    root.querySelector('#opsDiariasEvento')?.addEventListener('change', event => { this._filters.diariasEvento = event.target.value; this._historicoPage = 1; this.renderEquipe(); });
+    root.querySelector('#opsEquipeLimpar')?.addEventListener('click', () => { this._filters.equipeBusca = ''; this._filters.equipeStatus = 'ativos'; this._filters.diariasEvento = ''; this._equipeSelecionada = ''; this._equipePage = 1; this._historicoPage = 1; this.renderEquipe(); });
+    this.bindProfessionalActions(root);
+  };})();

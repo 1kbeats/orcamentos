@@ -1,4 +1,4 @@
-const CACHE_NAME = '1kbeats-v6-secure-21';
+const CACHE_NAME = '1kbeats-v6-secure-22';
 const APP_SHELL = [
   './',
   './index.html',
