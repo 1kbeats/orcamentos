@@ -1,4 +1,4 @@
-# Validação da versão v6.3.1
+# Validação da versão v6.3.2
 
 Data da revisão: 01/08/2026
 

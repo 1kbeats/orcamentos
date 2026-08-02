@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=6.3.1', { scope: './', updateViaCache: 'none' });
+      const registration = await navigator.serviceWorker.register('./sw.js?v=6.3.2', { scope: './', updateViaCache: 'none' });
       registration.addEventListener('updatefound', () => {
         registration.installing?.addEventListener('statechange', event => {
           if (event.target.state === 'installed' && navigator.serviceWorker.controller) {
