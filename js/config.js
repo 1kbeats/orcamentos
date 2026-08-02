@@ -1,7 +1,7 @@
 // Configuração pública do frontend. Nunca adicione service_role ou outros segredos aqui.
 const CONFIG = {
   APP_NAME: '1K Beats — Gestão de eventos',
-  APP_VERSION: 'v6.2.7',
+  APP_VERSION: 'v6.2.8',
   SUPABASE_URL: 'https://hcjbfdspmqlyzkgypacb.supabase.co',
   SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_muX8-m3AXYd3lOHGGsd23w_iRsXUq7X',
   STORAGE_PREFIX: '1kbeats_v6_',
@@ -78,6 +78,26 @@ const CONFIG = {
 
   get isAdmin() {
     return this.role === 'owner' || this.role === 'admin';
+  },
+
+  get canManageUsers() {
+    return this.role === 'owner';
+  },
+
+  get canManageOperations() {
+    return this.role === 'owner' || this.role === 'admin';
+  },
+
+  get canViewOperations() {
+    return this.role === 'owner' || this.role === 'admin' || this.role === 'viewer';
+  },
+
+  get canEditCommercial() {
+    return this.role === 'owner' || this.role === 'admin' || this.role === 'member';
+  },
+
+  get isReadOnly() {
+    return this.role === 'viewer';
   },
 
   publicQuoteUrl(token) {

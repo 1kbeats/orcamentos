@@ -63,7 +63,7 @@ async function requireCaller(authorization: string) {
   return error ? null : data.user
 }
 
-async function requireAdmin(userId: string, organizationId: string) {
+async function requireOwner(userId: string, organizationId: string) {
   const { data, error } = await supabaseAdmin
     .from('organization_members')
     .select('role')
@@ -71,10 +71,7 @@ async function requireAdmin(userId: string, organizationId: string) {
     .eq('user_id', userId)
     .maybeSingle()
 
-  if (error || !data || !['owner', 'admin'].includes(data.role)) {
-    throw new Error('forbidden')
-  }
-  return data.role as 'owner' | 'admin'
+  if (error || data?.role !== 'owner') throw new Error('forbidden')
 }
 
 async function organizationMembers(organizationId: string) {
@@ -97,15 +94,9 @@ Deno.serve(async request => {
       headers: access.headers
     })
   }
-  if (!access.allowed) {
-    return json(403, { error: 'origin_not_allowed' }, access.headers)
-  }
-  if (request.method !== 'POST') {
-    return json(405, { error: 'method_not_allowed' }, access.headers)
-  }
-  if (!SUPABASE_URL || !ADMIN_KEY) {
-    return json(500, { error: 'server_not_configured' }, access.headers)
-  }
+  if (!access.allowed) return json(403, { error: 'origin_not_allowed' }, access.headers)
+  if (request.method !== 'POST') return json(405, { error: 'method_not_allowed' }, access.headers)
+  if (!SUPABASE_URL || !ADMIN_KEY) return json(500, { error: 'server_not_configured' }, access.headers)
 
   try {
     const caller = await requireCaller(request.headers.get('authorization') ?? '')
@@ -117,17 +108,12 @@ Deno.serve(async request => {
       return json(400, { error: 'invalid_organization' }, access.headers)
     }
 
-    const callerRole = await requireAdmin(caller.id, organizationId)
+    await requireOwner(caller.id, organizationId)
     const members = await organizationMembers(organizationId)
-    const memberById = new Map(
-      members.map(member => [member.user_id, member] as const)
-    )
+    const memberById = new Map(members.map(member => [member.user_id, member] as const))
 
     if (body.action === 'list') {
-      const { data, error } = await supabaseAdmin.auth.admin.listUsers({
-        page: 1,
-        perPage: 1000
-      })
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
       if (error) throw error
 
       const users = data.users
@@ -147,19 +133,18 @@ Deno.serve(async request => {
       const email = String(body.email || '').trim().toLowerCase()
       const password = String(body.password || '')
       const name = String(body.name || '').trim().slice(0, 100)
-      const role = ['admin', 'member'].includes(body.role) ? body.role : 'member'
+      const role = ['admin', 'member', 'viewer'].includes(body.role) ? body.role : 'member'
 
       if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8) {
         return json(400, { error: 'invalid_user_data' }, access.headers)
       }
 
-      const { data: created, error: createError } =
-        await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true,
-          user_metadata: { name }
-        })
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { name }
+      })
       if (createError || !created.user) throw createError || new Error('create_failed')
 
       const { error: membershipError } = await supabaseAdmin
@@ -179,24 +164,27 @@ Deno.serve(async request => {
 
     const targetId = String(body.user_id || '')
     const target = memberById.get(targetId)
-    if (!target) {
-      return json(404, { error: 'user_not_in_organization' }, access.headers)
-    }
-    if (target.role === 'owner') {
-      return json(403, { error: 'owner_protected' }, access.headers)
-    }
-    if (target.role === 'admin' && callerRole !== 'owner' && targetId !== caller.id) {
-      return json(403, { error: 'owner_required' }, access.headers)
+    if (!target) return json(404, { error: 'user_not_in_organization' }, access.headers)
+    if (target.role === 'owner') return json(403, { error: 'owner_protected' }, access.headers)
+
+    if (body.action === 'update_role') {
+      const role = String(body.role || '')
+      if (!['admin', 'member', 'viewer'].includes(role)) {
+        return json(400, { error: 'invalid_role' }, access.headers)
+      }
+      const { error } = await supabaseAdmin
+        .from('organization_members')
+        .update({ role })
+        .eq('organization_id', organizationId)
+        .eq('user_id', targetId)
+      if (error) throw error
+      return json(200, { ok: true }, access.headers)
     }
 
     if (body.action === 'update_password') {
       const password = String(body.password || '')
-      if (password.length < 8) {
-        return json(400, { error: 'weak_password' }, access.headers)
-      }
-      const { error } = await supabaseAdmin.auth.admin.updateUserById(targetId, {
-        password
-      })
+      if (password.length < 8) return json(400, { error: 'weak_password' }, access.headers)
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(targetId, { password })
       if (error) throw error
       return json(200, { ok: true }, access.headers)
     }

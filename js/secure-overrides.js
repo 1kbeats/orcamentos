@@ -231,6 +231,9 @@
       container.innerHTML = '';
       quotes.forEach(quote => {
         const status = Object.hasOwn(labels, quote.status) ? quote.status : 'pendente';
+        const statusControl = CONFIG.canEditCommercial
+          ? '<div class="quote-status-control"><button type="button" class="quote-status status-' + Utils.safeId(status) + '" aria-expanded="false">' + Utils.escapeHTML(labels[status]) + '<span>⌄</span></button><div class="quote-status-menu" hidden>' + Object.entries(labels).map(([value, label]) => '<button type="button" data-status="' + value + '">' + Utils.escapeHTML(label) + '</button>').join('') + '</div></div>'
+          : '<div class="quote-status-readonly"><span class="quote-status status-' + Utils.safeId(status) + '">' + Utils.escapeHTML(labels[status]) + '</span></div>';
         const row = document.createElement('div'); row.className = 'quote-list-row';
         row.innerHTML =
           (CONFIG.isAdmin ? '<label class="quote-check"><input type="checkbox" value="' + Utils.safeId(quote.id) + '" aria-label="Selecionar orçamento"><span></span></label>' : '') +
@@ -238,13 +241,13 @@
           '<div class="quote-client"><strong>' + Utils.escapeHTML(quote.cliente_nome || '—') + '</strong>' + (quote.referencia ? '<small>' + Utils.escapeHTML(quote.referencia) + '</small>' : '') + '</div>' +
           '<span class="quote-date">' + Utils.escapeHTML(Utils.fmtDate(quote.created_at)) + '</span>' +
           '<span class="quote-total">' + Utils.escapeHTML(Utils.fmt(quote.total)) + '</span>' +
-          '<div class="quote-status-control"><button type="button" class="quote-status status-' + Utils.safeId(status) + '" aria-expanded="false">' + Utils.escapeHTML(labels[status]) + '<span>⌄</span></button><div class="quote-status-menu" hidden>' + Object.entries(labels).map(([value, label]) => '<button type="button" data-status="' + value + '">' + Utils.escapeHTML(label) + '</button>').join('') + '</div></div>' +
+          statusControl +
           '<div class="quote-actions"><a class="quote-view" target="_blank" rel="noopener" href="' + Utils.escapeHTML('ver.html?t=' + encodeURIComponent(quote.public_token)) + '" title="Visualizar orçamento">↗</a>' + (CONFIG.isAdmin ? '<button class="quote-more" type="button" title="Selecionar para exclusão" aria-label="Selecionar para exclusão">•••</button>' : '') + '</div>';
         const checkbox = row.querySelector('.quote-check input');
         checkbox?.addEventListener('change', event => { if (event.target.checked) this._selecionados.add(quote.id); else this._selecionados.delete(quote.id); this.atualizarAcoesLote(); });
-        const statusButton = row.querySelector('.quote-status'); const statusMenu = row.querySelector('.quote-status-menu');
-        statusButton.addEventListener('click', () => { document.querySelectorAll('.quote-status-menu').forEach(menu => { if (menu !== statusMenu) menu.hidden = true; }); statusMenu.hidden = !statusMenu.hidden; statusButton.setAttribute('aria-expanded', String(!statusMenu.hidden)); });
-        statusMenu.querySelectorAll('[data-status]').forEach(button => button.addEventListener('click', async event => {
+        const statusButton = row.querySelector('.quote-status-control .quote-status'); const statusMenu = row.querySelector('.quote-status-menu');
+        statusButton?.addEventListener('click', () => { document.querySelectorAll('.quote-status-menu').forEach(menu => { if (menu !== statusMenu) menu.hidden = true; }); statusMenu.hidden = !statusMenu.hidden; statusButton.setAttribute('aria-expanded', String(!statusMenu.hidden)); });
+        statusMenu?.querySelectorAll('[data-status]').forEach(button => button.addEventListener('click', async event => {
           const next = event.currentTarget.dataset.status;
           try { await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(quote.id)), { method: 'PATCH', body: JSON.stringify({ status: next }) }); quote.status = next; statusButton.className = 'quote-status status-' + Utils.safeId(next); statusButton.innerHTML = Utils.escapeHTML(labels[next]) + '<span>⌄</span>'; statusMenu.hidden = true; Utils.toast('Status atualizado.'); }
           catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); }

@@ -163,7 +163,7 @@ body:has(.modal-bg.open),body:has(.modal-overlay.open),body:has(.modal-edit-bg.o
 .pwa-install-dialog-actions{display:flex;justify-content:flex-end;padding:14px 22px 20px;border-top:1px solid #ececf2}
 .pwa-install-ok{min-height:42px;padding:0 18px;border:0;border-radius:8px;background:#D91A72;color:#fff;font-weight:700;cursor:pointer}
 @media(max-width:600px){.pwa-install-overlay{align-items:end;padding:0}.pwa-install-dialog{width:100%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom)}}
-/* Acabamento responsivo v6.2.7 */
+/* Acabamento responsivo v6.2.8 */
 .nav-item span,.ops-head>div,.production-detail-head>div,.production-line>div{min-width:0}
 .ops-head h1,.production-card h3,.production-detail-head h1,.production-detail-head p,.ops-note,.ops-card-title,.production-line strong{overflow-wrap:anywhere}
 @media(max-width:600px){
@@ -180,3 +180,35 @@ body:has(.modal-bg.open),body:has(.modal-overlay.open),body:has(.modal-edit-bg.o
   .update-banner{width:calc(100% - 24px);max-width:480px;white-space:normal;text-align:center;justify-content:center}
   .toast{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;text-align:center}
 }
+
+/* Perfis de acesso v6.2.8 */
+.sidebar-role{margin-top:3px;color:#d91a72;font:700 8px/1.25 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.btn-edit-access{background:#fff7fb;border:1px solid rgba(217,26,114,.3);border-radius:4px;padding:4px 10px;color:#b71361;font-size:11px;font-weight:700;cursor:pointer}
+.btn-edit-access:hover{background:#d91a72;border-color:#d91a72;color:#fff}
+.access-help{display:block;margin-top:6px;color:#858596;font-size:11px}
+.access-profile-guide{margin-top:12px;padding:12px 14px;border:1px solid #e4e4ed;border-radius:8px;background:#fafafd;color:#5f5f70;font-size:12px;line-height:1.5}
+.access-profile-guide p{margin:0}
+.access-profile-guide p+p{margin-top:7px}
+.quote-status-readonly{display:flex;justify-content:flex-start}
+.quote-status-readonly .quote-status{cursor:default}
+body:not([data-role="owner"]):not([data-role="admin"]) .quotes-toolbar{display:none}
+body[data-role="member"] #btnConfig{display:none!important}
+body[data-role="viewer"] #btnDashNewQuote,
+body[data-role="viewer"] #btnQuickQuote,
+body[data-role="viewer"] #btnQuickClient,
+body[data-role="viewer"] #btnQuickCatalog,
+body[data-role="viewer"] #btnNovoOrcamento,
+body[data-role="viewer"] #btnNovoCliente,
+body[data-role="viewer"] #btnNovoCatalogo,
+body[data-role="viewer"] #btnConfig,
+body[data-role="viewer"] .actions-strip,
+body[data-role="viewer"] [data-delete],
+body[data-role="viewer"] #opsNovoGasto,
+body[data-role="viewer"] #opsNovaEquipe,
+body[data-role="viewer"] #opsNovaDiaria,
+body[data-role="viewer"] #opsNovoFornecedor,
+body[data-role="viewer"] #opsNovoFornecedorEvento,
+body[data-role="viewer"] #btnNovaProducao,
+body[data-role="viewer"] .production-actions{display:none!important}
+body[data-role="viewer"] .ops-head::after{content:"SOMENTE VISUALIZAÇÃO";padding:6px 10px;border:1px solid #dedee8;border-radius:999px;color:#737386;background:#fff;font:700 9px var(--mono);letter-spacing:.08em}
+@media(max-width:600px){.user-card{align-items:flex-start;gap:12px}.user-actions{flex-wrap:wrap;justify-content:flex-end}.access-profile-guide{font-size:11px}}

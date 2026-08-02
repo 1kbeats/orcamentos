@@ -35,11 +35,11 @@ const Clientes = {
             (client.email ? '<div class="cli-doc">' + Utils.escapeHTML(client.email) + '</div>' : '') +
           '</div>' +
           '<div class="cli-actions">' +
-            '<button class="btn-edit-cli" type="button">Editar</button>' +
-            '<button class="btn-del-cli" type="button">Excluir</button>' +
+            (CONFIG.canEditCommercial ? '<button class="btn-edit-cli" type="button">Editar</button>' : '') +
+            (CONFIG.isAdmin ? '<button class="btn-del-cli" type="button">Excluir</button>' : '') +
           '</div>';
-        card.querySelector('.btn-edit-cli').addEventListener('click', () => this.abrirEditar(client));
-        card.querySelector('.btn-del-cli').addEventListener('click', () => this.excluir(client.id));
+        card.querySelector('.btn-edit-cli')?.addEventListener('click', () => this.abrirEditar(client));
+        card.querySelector('.btn-del-cli')?.addEventListener('click', () => this.excluir(client.id));
         container.appendChild(card);
       });
     });
