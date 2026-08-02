@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.2.9">
-  <link rel="stylesheet" href="./css/secure.css?v=6.2.9">
+  <link rel="stylesheet" href="./css/styles.css?v=6.3.0">
+  <link rel="stylesheet" href="./css/secure.css?v=6.3.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -85,10 +85,9 @@
         <span>Fornecedores externos</span>
         <span class="badge-pro" id="badgeFornecedores" style="display:none">PRO</span>
       </div>
-      <div class="nav-item pro-item" id="navOrdemServico" style="display:none;opacity:0.4">
+      <div class="nav-item pro-item" id="navOrdemServico" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        <span>Ordem de serviço</span>
-        <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(128,128,128,0.2);color:#888;margin-left:auto;flex-shrink:0">EM BREVE</span>
+        <span>Ordens de serviço</span>
       </div>
 
       <!-- ADMINISTRAÇÃO — só admin -->
@@ -472,6 +471,11 @@
       <div id="fornecedoresContent"></div>
     </div>
 
+    <!-- PAINEL: ORDENS DE SERVIÇO -->
+    <div class="panel" id="panelOrdemServico">
+      <div id="ordemServicoContent"></div>
+    </div>
+
     <!-- ══ PAINEL: ADMIN ══ -->
     <div class="panel" id="panelAdmin">
       <div class="admin-wrap">
@@ -648,26 +652,27 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.2.9"></script>
-<script src="./js/password-toggle.js?v=6.2.9"></script>
-<script src="./js/api.js?v=6.2.9"></script>
-<script src="./js/utils.js?v=6.2.9"></script>
-<script src="./js/auth.js?v=6.2.9"></script>
-<script src="./js/nav.js?v=6.2.9"></script>
-<script src="./js/nav-events.js?v=6.2.9"></script>
-<script src="./js/clientes.js?v=6.2.9"></script>
-<script src="./js/financeiro.js?v=6.2.9"></script>
-<script src="./js/operacoes.js?v=6.2.9"></script>
-<script src="./js/operacoes-profissional.js?v=6.2.9"></script>
-<script src="./js/producoes.js?v=6.2.9"></script>
-<script src="./js/producoes-profissional.js?v=6.2.9"></script>
-<script src="./js/usuarios.js?v=6.2.9"></script>
-<script src="./js/catalogo.js?v=6.2.9"></script>
-<script src="./js/orcamentos.js?v=6.2.9"></script>
-<script src="./js/secure-overrides.js?v=6.2.9"></script>
-<script src="./js/pwa-install.js?v=6.2.9"></script>
+<script src="./js/config.js?v=6.3.0"></script>
+<script src="./js/password-toggle.js?v=6.3.0"></script>
+<script src="./js/api.js?v=6.3.0"></script>
+<script src="./js/utils.js?v=6.3.0"></script>
+<script src="./js/auth.js?v=6.3.0"></script>
+<script src="./js/nav.js?v=6.3.0"></script>
+<script src="./js/nav-events.js?v=6.3.0"></script>
+<script src="./js/clientes.js?v=6.3.0"></script>
+<script src="./js/financeiro.js?v=6.3.0"></script>
+<script src="./js/operacoes.js?v=6.3.0"></script>
+<script src="./js/operacoes-profissional.js?v=6.3.0"></script>
+<script src="./js/producoes.js?v=6.3.0"></script>
+<script src="./js/producoes-profissional.js?v=6.3.0"></script>
+<script src="./js/ordens-servico.js?v=6.3.0"></script>
+<script src="./js/usuarios.js?v=6.3.0"></script>
+<script src="./js/catalogo.js?v=6.3.0"></script>
+<script src="./js/orcamentos.js?v=6.3.0"></script>
+<script src="./js/secure-overrides.js?v=6.3.0"></script>
+<script src="./js/pwa-install.js?v=6.3.0"></script>
 
-<script src="./js/app.js?v=6.2.9"></script>
+<script src="./js/app.js?v=6.3.0"></script>
 
 </body>
 </html>
