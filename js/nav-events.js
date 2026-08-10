@@ -8,6 +8,7 @@ Nav.bindEvents = function bindEvents() {
   on('navGastos', () => this.showPanelPro('gastos'));
   on('navEquipe', () => this.showPanelPro('equipe'));
   on('navFornecedores', () => this.showPanelPro('fornecedores'));
+  on('navEstoque', () => this.showPanelPro('estoque'));
   on('navOrdemServico', () => this.showPanelPro('ordemServico'));
   on('navAdmin', () => this.showPanel('admin'));
   on('btnSidebarPassword', () => Usuarios.abrirAlterarSenha());
