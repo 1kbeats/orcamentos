@@ -1,21 +1,26 @@
-# Validação da versão v6.3.2
+# Validação da versão v6.4.0
 
-Data da revisão: 01/08/2026
+Data da revisão: 10/08/2026
 
 ## Verificações concluídas
 
-- sintaxe validada nos 17 arquivos JavaScript;
+- sintaxe validada nos 25 arquivos JavaScript;
 - `manifest.json` e `deno.json` validados como JSON;
 - nenhum manipulador de evento inline (`onclick` e similares);
 - nenhum bloco JavaScript inline;
 - nenhum ID HTML duplicado;
-- todos os 26 recursos do service worker existem;
+- todos os 35 recursos do service worker existem;
 - nenhuma chave `service_role` ou Secret key está presente no frontend;
 - a única chave JWT no frontend tem papel `anon`;
 - acesso anônimo a `index.html` redireciona para o login;
 - formulário de login vazio exibe validação;
 - `ver.html?n=1` não revela orçamento nem dados da Intereventos;
-- tela de recuperação sem token recusa a alteração de senha.
+- tela de recuperação sem token recusa a alteração de senha;
+- Estoque validado com 24 equipamentos e 52 movimentações simuladas;
+- paginação de equipamentos e histórico limitada a 10 registros por página;
+- busca, filtro por categoria e formulário de movimentação verificados;
+- layout do Estoque validado em desktop e celular, sem rolagem horizontal;
+- migração `202608100001_inventory.sql` aceita pelo Supabase em modo `dry-run`, sem alterar o banco remoto.
 
 ## Validações que dependem da implantação
 
