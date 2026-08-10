@@ -267,11 +267,34 @@
 
   ListaOrcamentos.excluirSelecionados = async function excluirSelecionados() {
     const ids = [...(this._selecionados || [])]; if (!ids.length) return;
-    if (!confirm('Excluir definitivamente ' + ids.length + (ids.length === 1 ? ' orçamento?' : ' orçamentos?') + ' Esta ação não pode ser desfeita.')) return;
-    try { await Promise.all(ids.map(id => Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(id)), { method: 'DELETE' }))); Utils.toast(ids.length + (ids.length === 1 ? ' orçamento excluído.' : ' orçamentos excluídos.')); this.carregar(); }
-    catch (error) { Utils.toast(Api.friendlyError(error, 'Não foi possível excluir todos os itens selecionados.'), 'erro'); }
-  };
-  ListaOrcamentos.exportar = function exportarOrcamentos() {
+    try {
+      const inFilter = ids.map(id => Utils.safeId(id)).join(',');
+      const [productions, orders] = await Promise.all([
+        Api.request(Api.orgFilter('/rest/v1/producoes?select=id&orcamento_id=in.(' + inFilter + ')')),
+        Api.request(Api.orgFilter('/rest/v1/ordens_servico?select=id&orcamento_id=in.(' + inFilter + ')'))
+      ]);
+      const productionCount = productions?.length || 0;
+      const orderCount = orders?.length || 0;
+      let confirmed = false;
+      if (productionCount || orderCount) {
+        const impact = ids.length + (ids.length === 1 ? ' orçamento' : ' orçamentos') + ', ' +
+          productionCount + (productionCount === 1 ? ' produção' : ' produções') + ' e ' +
+          orderCount + (orderCount === 1 ? ' ordem de serviço' : ' ordens de serviço');
+        confirmed = prompt('Exclusão administrativa definitiva\n\nSerão apagados: ' + impact + '.\n\nDigite EXCLUIR para confirmar:') === 'EXCLUIR';
+      } else {
+        confirmed = confirm('Excluir definitivamente ' + ids.length + (ids.length === 1 ? ' orçamento?' : ' orçamentos?') + ' Esta ação não pode ser desfeita.');
+      }
+      if (!confirmed) return;
+      const result = await Api.request('/rest/v1/rpc/excluir_orcamentos_com_vinculos', {
+        method: 'POST',
+        body: JSON.stringify({ p_ids: ids, p_confirmacao: 'EXCLUIR' })
+      });
+      this._selecionados = new Set();
+      const removed = Number(result?.orcamentos || ids.length);
+      Utils.toast(removed + (removed === 1 ? ' orçamento excluído com segurança.' : ' orçamentos excluídos com segurança.'));
+      await this.carregar();
+    } catch (error) { Utils.toast(Api.friendlyError(error, 'Não foi possível excluir os itens selecionados.'), 'erro'); }
+  };  ListaOrcamentos.exportar = function exportarOrcamentos() {
     Utils.downloadCSV('orcamentos.csv', (this._dados || []).map(quote => ({
       Número: quote.numero,
       Cliente: quote.cliente_nome,
