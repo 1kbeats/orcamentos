@@ -48,7 +48,9 @@ const Api = {
     if (!error) return fallback;
     if (error.status === 401) return 'Sua sessão expirou. Entre novamente.';
     if (error.status === 403) return 'Você não tem permissão para esta operação.';
-    if (error.status === 409) return 'Já existe um registro com esses dados.';
+    if (error.status === 409 && error.data?.code === '23503') return 'Este registro possui dados vinculados e não pode ser excluído diretamente.';
+    if (error.status === 409 && error.data?.code === '23505') return 'Já existe um registro com esses dados.';
+    if (error.status === 409) return error.message || fallback;
     return error.message || fallback;
   }
 };
