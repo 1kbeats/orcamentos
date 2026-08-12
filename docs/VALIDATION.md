@@ -1,15 +1,15 @@
-# Validação da versão v6.4.1
+# Validação da versão v6.5.0
 
-Data da revisão: 10/08/2026
+Data da revisão: 12/08/2026
 
 ## Verificações concluídas
 
-- sintaxe validada nos 25 arquivos JavaScript;
+- sintaxe validada nos 27 arquivos JavaScript;
 - `manifest.json` e `deno.json` validados como JSON;
 - nenhum manipulador de evento inline (`onclick` e similares);
 - nenhum bloco JavaScript inline;
 - nenhum ID HTML duplicado;
-- todos os 35 recursos do service worker existem;
+- todos os 36 recursos do service worker existem;
 - nenhuma chave `service_role` ou Secret key está presente no frontend;
 - a única chave JWT no frontend tem papel `anon`;
 - acesso anônimo a `index.html` redireciona para o login;
@@ -21,6 +21,10 @@ Data da revisão: 10/08/2026
 - busca, filtro por categoria e formulário de movimentação verificados;
 - layout do Estoque validado em desktop e celular, sem rolagem horizontal;
 - migração `202608100001_inventory.sql` aceita pelo Supabase em modo `dry-run`, sem alterar o banco remoto.
+- migração `202608120001_operational_agenda.sql` aceita pelo Supabase em modo `dry-run`, sem alterar o banco remoto.
+- agenda semanal validada com 16 eventos simulados, exibindo somente 10 inicialmente;
+- busca, filtros por produtor e status, detalhes e prévia editável do WhatsApp verificados;
+- agenda validada em desktop e celular, sem rolagem horizontal;
 
 ## Validações que dependem da implantação
 

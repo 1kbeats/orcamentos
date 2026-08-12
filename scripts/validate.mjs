@@ -8,7 +8,7 @@ const failures = []
 async function filesUnder(directory) {
   const output = []
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === '.temp' || entry.name === 'node_modules') continue
+    if (['.git', '.temp', 'node_modules', 'output', 'tmp'].includes(entry.name)) continue
     const path = join(directory, entry.name)
     if (entry.isDirectory()) output.push(...await filesUnder(path))
     else output.push(path)
