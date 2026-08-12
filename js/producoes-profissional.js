@@ -13,6 +13,7 @@
       '<div class="ops-form-grid">' +
       '<label class="ops-field full"><span>Orçamento vinculado</span><input type="text" value="' + Utils.escapeHTML(this.quoteLabel(producao.orcamentos)) + '" disabled></label>' +
       Operacoes.editField('Nome do evento / serviço', 'nome', 'text', true, producao.nome) +
+      Operacoes.editField('Produtor responsável', 'produtor_responsavel', 'text', false, producao.produtor_responsavel) +
       Operacoes.editField('Data do evento', 'data_evento', 'date', false, producao.data_evento) +
       Operacoes.editField('Horário de montagem', 'hora_montagem', 'time', false, producao.hora_montagem) +
       Operacoes.editField('Horário de início', 'hora_evento', 'time', false, producao.hora_evento) +
@@ -24,6 +25,7 @@
       async form => {
         const payload = {
           nome: this.value(form, 'nome', 180),
+          produtor_responsavel: this.value(form, 'produtor_responsavel', 120),
           data_evento: this.value(form, 'data_evento', 10),
           hora_montagem: this.time(form, 'hora_montagem'),
           hora_evento: this.time(form, 'hora_evento'),
