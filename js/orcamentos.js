@@ -9,6 +9,9 @@ const Orcamentos = {
   _dropCache: [],
   _clienteSelecionado: null,
   _whatsappPadrao: '',
+  _registroAtual: null,
+  _salvando: false,
+  _alteracoesPendentes: false,
 
   // ── Inicialização ─────────────────────────────────────────
   init() {
@@ -20,6 +23,7 @@ const Orcamentos = {
     const hoje = _h.getFullYear() + '-' + String(_h.getMonth()+1).padStart(2,'0') + '-' + String(_h.getDate()).padStart(2,'0');
     document.getElementById('validade').value = hoje;
     this.updateMeta();
+    this.atualizarEstadoSalvamento();
   },
 
   bindEvents() {
@@ -34,8 +38,19 @@ const Orcamentos = {
       document.getElementById('configPanel').classList.toggle('open');
     });
     document.getElementById('btnSaveConfig').addEventListener('click', () => this.salvarConfig());
+    document.getElementById('btnSalvarOrcamento')?.addEventListener('click', () => this.salvarOrcamento());
     document.getElementById('btnWpp').addEventListener('click', () => this.gerarWhatsApp());
     document.getElementById('btnPdf').addEventListener('click', () => this.gerarPDF());
+
+    const form = document.getElementById('panelOrcamentos');
+    form?.addEventListener('input', event => {
+      if (event.target.closest('#configPanel')) return;
+      this.marcarAlterado();
+    });
+    form?.addEventListener('change', event => {
+      if (event.target.closest('#configPanel')) return;
+      this.marcarAlterado();
+    });
 
     // Dropdown de clientes
     const clienteInput = document.getElementById('nomeCliente');
@@ -302,6 +317,139 @@ const Orcamentos = {
     };
   },
 
+  _dadosParaBanco(d) {
+    const cfg = this._cfg;
+    return {
+      cliente_nome: d.cliente || null,
+      cnpj_cli: d.cnpjCli || null,
+      referencia: d.ref || null,
+      valido_ate: d.val || null,
+      desconto_tipo: d.tipo,
+      desconto_valor: d.discVal || 0,
+      itens: d.itens,
+      observacoes: d.obs || null,
+      empresa: cfg.nome || null,
+      cnpj_emp: cfg.cnpj || null,
+      tel_emp: cfg.tel || null,
+      email_emp: cfg.email || null,
+      solicitante: d.solicitante || null,
+      total: d.total,
+      status: this._registroAtual?.status || 'pendente'
+    };
+  },
+
+  _validarAntesDeSalvar(d) {
+    if (!d.cliente || d.cliente === 'Cliente') {
+      Utils.toast('Informe o cliente antes de salvar.');
+      document.getElementById('nomeCliente')?.focus();
+      return false;
+    }
+    if (!d.itens.length) {
+      Utils.toast('Adicione pelo menos um item ao orçamento.');
+      document.querySelector('#itemsContainer .item-row input')?.focus();
+      return false;
+    }
+    return true;
+  },
+
+  marcarAlterado() {
+    this._alteracoesPendentes = true;
+    this.atualizarEstadoSalvamento();
+  },
+
+  atualizarEstadoSalvamento() {
+    const btn = document.getElementById('btnSalvarOrcamento');
+    const status = document.getElementById('orcamentoSaveStatus');
+    if (btn) btn.textContent = this._registroAtual ? 'Salvar alterações' : 'Salvar orçamento';
+    if (!status) return;
+    if (this._salvando) {
+      status.textContent = 'Salvando...';
+      status.className = 'orc-save-status saving';
+    } else if (this._registroAtual && !this._alteracoesPendentes) {
+      status.textContent = 'Orçamento salvo';
+      status.className = 'orc-save-status saved';
+    } else if (this._alteracoesPendentes) {
+      status.textContent = 'Alterações não salvas';
+      status.className = 'orc-save-status pending';
+    } else {
+      status.textContent = 'Ainda não salvo';
+      status.className = 'orc-save-status';
+    }
+  },
+
+  async _salvarRegistro(options = {}) {
+    if (this._salvando) return this._registroAtual;
+    const d = this._coletarDados();
+    if (!this._validarAntesDeSalvar(d)) return null;
+
+    this._salvando = true;
+    this.atualizarEstadoSalvamento();
+    try {
+      const headers = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
+      const editando = Boolean(this._registroAtual?.id);
+      const url = CONFIG.SUPABASE_URL + '/rest/v1/orcamentos' +
+        (editando ? '?id=eq.' + encodeURIComponent(this._registroAtual.id) : '');
+      const response = await fetch(url, {
+        method: editando ? 'PATCH' : 'POST',
+        headers,
+        body: JSON.stringify(this._dadosParaBanco(d))
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Não foi possível salvar.');
+      }
+      const rows = await response.json();
+      const salvo = rows?.[0] || this._registroAtual;
+      if (!salvo?.id) throw new Error('O banco não retornou o orçamento salvo.');
+      this._registroAtual = salvo;
+      this._alteracoesPendentes = false;
+
+      if (salvo.numero) {
+        document.getElementById('metaNumero').textContent = String(salvo.numero).padStart(4, '0');
+        document.getElementById('metaNumeroRow').style.display = '';
+      }
+      if (!options.silent) Utils.toast(editando ? 'Alterações salvas.' : 'Orçamento salvo e incluído na lista.');
+      return salvo;
+    } catch (error) {
+      Utils.toast('Erro ao salvar orçamento: ' + error.message);
+      return null;
+    } finally {
+      this._salvando = false;
+      this.atualizarEstadoSalvamento();
+    }
+  },
+
+  async salvarOrcamento() {
+    const btn = document.getElementById('btnSalvarOrcamento');
+    if (btn) btn.disabled = true;
+    await this._salvarRegistro();
+    if (btn) btn.disabled = false;
+  },
+
+  novoOrcamento() {
+    this._registroAtual = null;
+    this._clienteSelecionado = null;
+    this._alteracoesPendentes = false;
+    this._cnt = 0;
+    ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs'].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.value = '';
+    });
+    document.getElementById('desconto').value = '';
+    document.getElementById('descontoTipo').value = 'pct';
+    const hoje = new Date();
+    document.getElementById('validade').value = hoje.getFullYear() + '-' +
+      String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+    document.getElementById('itemsContainer').innerHTML = '';
+    document.getElementById('metaNumero').textContent = '—';
+    document.getElementById('metaNumeroRow').style.display = 'none';
+    this.addItem();
+    this.setDiscTipo('pct');
+    this.calcTotals();
+    this.updateMeta();
+    this.atualizarEstadoSalvamento();
+  },
+
   // ── WhatsApp ──────────────────────────────────────────────
   abrirModalWhatsApp(mensagem) {
     const modal = document.getElementById('modalWhatsApp');
@@ -369,39 +517,11 @@ const Orcamentos = {
     if (btnEl) { btnEl.textContent = 'Salvando...'; btnEl.disabled = true; }
 
     try {
-      // 1. Salvar primeiro para obter o ID e número
-      const dadosOrc = {
-        cliente_nome: d.cliente || null,
-        cnpj_cli:     d.cnpjCli || null,
-        referencia:   d.ref || null,
-        valido_ate:   d.val || null,
-        desconto_tipo:  d.tipo,
-        desconto_valor: d.discVal || 0,
-        itens:        d.itens,
-        observacoes:  d.obs || null,
-        empresa:      cfg.nome || null,
-        cnpj_emp:     cfg.cnpj || null,
-        tel_emp:      cfg.tel || null,
-        email_emp:    cfg.email || null,
-        solicitante:  d.solicitante || null,
-        total:        d.total,
-        status:       'pendente'
-      };
-      const hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
-      const res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
-        method: 'POST', headers: hdrs, body: JSON.stringify(dadosOrc)
-      });
-      const rows = await res.json();
-      const id = rows && rows[0] && rows[0].id;
-      const numero = rows && rows[0] && rows[0].numero;
-
-      // Mostrar número no masthead
-      if (numero) {
-        const nEl = document.getElementById('metaNumero');
-        if (nEl) nEl.textContent = String(numero).padStart(4, '0');
-        const nRow = document.getElementById('metaNumeroRow');
-        if (nRow) nRow.style.display = '';
-      }
+      // Salva ou atualiza o mesmo registro antes de compartilhar.
+      const salvo = await this._salvarRegistro({ silent: true });
+      if (!salvo) return;
+      const id = salvo.id;
+      const numero = salvo.numero;
 
       // 2. Montar mensagem completa com link
       let msg = Utils.saudacao() + ',' + nl + nl;
@@ -424,7 +544,7 @@ const Orcamentos = {
         // Usar número curto se disponível, senão usar UUID
         const linkId = numero ? numero : id;
         const paramName = numero ? 'n' : 'id';
-        if (rows[0].public_token) msg += CONFIG.publicQuoteUrl(rows[0].public_token);
+        if (salvo.public_token) msg += CONFIG.publicQuoteUrl(salvo.public_token);
       }
 
       // 3. Permitir revisar o destinatário e a mensagem antes do envio
@@ -442,44 +562,9 @@ const Orcamentos = {
     if (!window.jspdf) { alert('Aguarde o app carregar completamente e tente novamente.'); return; }
     document.getElementById('configPanel').classList.remove('open');
 
-    // Salvar no banco antes de gerar o PDF (igual ao WhatsApp)
-    const _nElAtual = document.getElementById('metaNumero');
-    const _jaTemNumero = _nElAtual && _nElAtual.textContent && _nElAtual.textContent !== '—';
-    if (!_jaTemNumero) {
-      try {
-        const _d = this._coletarDados();
-        const _cfg = this._cfg;
-        const _dadosOrc = {
-          cliente_nome: _d.cliente || null,
-          cnpj_cli:     _d.cnpjCli || null,
-          referencia:   _d.ref || null,
-          valido_ate:   _d.val || null,
-          desconto_tipo:  _d.tipo,
-          desconto_valor: _d.discVal || 0,
-          itens:        _d.itens,
-          observacoes:  _d.obs || null,
-          empresa:      _cfg.nome || null,
-          cnpj_emp:     _cfg.cnpj || null,
-          tel_emp:      _cfg.tel || null,
-          email_emp:    _cfg.email || null,
-          solicitante:  _d.solicitante || null,
-          total:        _d.total,
-          status:       'pendente'
-        };
-        const _hdrs = { ...CONFIG.headers(), 'Prefer': 'return=representation' };
-        const _res = await fetch(CONFIG.SUPABASE_URL + '/rest/v1/orcamentos', {
-          method: 'POST', headers: _hdrs, body: JSON.stringify(_dadosOrc)
-        });
-        const _rows = await _res.json();
-        const _numero = _rows && _rows[0] && _rows[0].numero;
-        if (_numero) {
-          const nEl = document.getElementById('metaNumero');
-          if (nEl) nEl.textContent = String(_numero).padStart(4, '0');
-          const nRow = document.getElementById('metaNumeroRow');
-          if (nRow) nRow.style.display = '';
-        }
-      } catch(e) { /* continua mesmo sem número */ }
-    }
+    // Salva ou atualiza o mesmo registro antes de gerar o PDF.
+    const salvo = await this._salvarRegistro({ silent: true });
+    if (!salvo) return;
 
     const d   = this._coletarDados();
     const cfg = this._cfg;
@@ -709,7 +794,10 @@ const ListaOrcamentos = {
 
   bindEvents() {
     const btnNovo = document.getElementById('btnNovoOrcamento');
-    if (btnNovo) btnNovo.addEventListener('click', () => Nav.showPanel('orcamentos'));
+    if (btnNovo) btnNovo.addEventListener('click', () => {
+      Orcamentos.novoOrcamento();
+      Nav.showPanel('orcamentos');
+    });
   }
 };
 
