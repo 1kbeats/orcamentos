@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.5.0">
-  <link rel="stylesheet" href="./css/secure.css?v=6.5.0">
+  <link rel="stylesheet" href="./css/styles.css?v=6.6.0">
+  <link rel="stylesheet" href="./css/secure.css?v=6.6.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -51,10 +51,6 @@
         Orçamentos
       </div>
 
-      <div class="nav-item pro-item" id="navProducoes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M8 14h3M8 17h6"/></svg>
-        <span>Produções e eventos</span>
-      </div>
       <div class="nav-item pro-item" id="navAgenda">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="M7 14h4M7 17h7"/></svg>
         <span>Agenda de eventos</span>
@@ -247,12 +243,13 @@
 
         <!-- Masthead -->
         <div class="masthead no-print">
-          <div class="masthead-logo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" width="200" height="48">
-              <text x="0" y="40" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="40" fill="white" letter-spacing="-1">1K</text>
-              <text x="58" y="40" font-family="'Space Grotesk',sans-serif" font-weight="400" font-size="28" fill="rgba(255,255,255,0.4)">beats</text>
-              <text x="162" y="38" font-family="'Space Grotesk',sans-serif" font-weight="700" font-size="26" fill="#D91A72">))</text>
-            </svg>
+          <div class="masthead-brand">
+            <div class="masthead-logo" aria-label="1K Beats"><span class="masthead-1k">1K</span><span class="masthead-beats">beats</span><span class="masthead-wave">))</span></div>
+            <div class="masthead-company">
+              <div class="masthead-company-label">Emitido por</div>
+              <div class="masthead-company-name" id="mastheadEmpresa">1000 Beats Áudio, Vídeo e Iluminação Ltda.</div>
+              <div class="masthead-company-doc" id="mastheadCnpj">CNPJ 62.496.834/0001-97</div>
+            </div>
           </div>
           <div class="masthead-right">
             <div class="masthead-doc-label">Documento comercial</div>
@@ -262,7 +259,7 @@
               <div class="meta-row"><span class="meta-k">Validade</span><span class="meta-v" id="metaValidade">—</span></div>
               <div class="meta-row" id="metaNumeroRow" style="display:none"><span class="meta-k">Nº</span><span class="meta-v" id="metaNumero" style="color:#D91A72;font-weight:700">—</span></div>
             </div>
-            <div class="masthead-ref" id="metaRefRow" style="display:none;margin-top:8px;text-align:right">
+            <div class="masthead-ref" id="metaRefRow" style="display:none">
               <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.35)">Ref. </span>
               <span style="font-size:11px;font-family:monospace;color:rgba(255,255,255,0.75);letter-spacing:.02em" id="metaRef">—</span>
             </div>
@@ -460,7 +457,7 @@
       </div>
     </div>
 
-    <!-- PAINEL: PRODUÇÕES / EVENTOS -->
+    <!-- PAINEL INTERNO: DADOS OPERACIONAIS DOS EVENTOS (mantido para compatibilidade) -->
     <div class="panel" id="panelProducoes">
       <div id="producoesContent"></div>
     </div>
@@ -668,30 +665,30 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.5.0"></script>
-<script src="./js/password-toggle.js?v=6.5.0"></script>
-<script src="./js/api.js?v=6.5.0"></script>
-<script src="./js/utils.js?v=6.5.0"></script>
-<script src="./js/auth.js?v=6.5.0"></script>
-<script src="./js/nav.js?v=6.5.0"></script>
-<script src="./js/nav-events.js?v=6.5.0"></script>
-<script src="./js/clientes.js?v=6.5.0"></script>
-<script src="./js/financeiro.js?v=6.5.0"></script>
-<script src="./js/operacoes.js?v=6.5.0"></script>
-<script src="./js/operacoes-profissional.js?v=6.5.0"></script>
-<script src="./js/producoes.js?v=6.5.0"></script>
-<script src="./js/producoes-profissional.js?v=6.5.0"></script>
-<script src="./js/agenda.js?v=6.5.0"></script>
-<script src="./js/ordens-servico.js?v=6.5.0"></script>
-<script src="./js/compact-lists.js?v=6.5.0"></script>
-<script src="./js/estoque.js?v=6.5.0"></script>
-<script src="./js/usuarios.js?v=6.5.0"></script>
-<script src="./js/catalogo.js?v=6.5.0"></script>
-<script src="./js/orcamentos.js?v=6.5.0"></script>
-<script src="./js/secure-overrides.js?v=6.5.0"></script>
-<script src="./js/pwa-install.js?v=6.5.0"></script>
+<script src="./js/config.js?v=6.6.0"></script>
+<script src="./js/password-toggle.js?v=6.6.0"></script>
+<script src="./js/api.js?v=6.6.0"></script>
+<script src="./js/utils.js?v=6.6.0"></script>
+<script src="./js/auth.js?v=6.6.0"></script>
+<script src="./js/nav.js?v=6.6.0"></script>
+<script src="./js/nav-events.js?v=6.6.0"></script>
+<script src="./js/clientes.js?v=6.6.0"></script>
+<script src="./js/financeiro.js?v=6.6.0"></script>
+<script src="./js/operacoes.js?v=6.6.0"></script>
+<script src="./js/operacoes-profissional.js?v=6.6.0"></script>
+<script src="./js/producoes.js?v=6.6.0"></script>
+<script src="./js/producoes-profissional.js?v=6.6.0"></script>
+<script src="./js/agenda.js?v=6.6.0"></script>
+<script src="./js/ordens-servico.js?v=6.6.0"></script>
+<script src="./js/compact-lists.js?v=6.6.0"></script>
+<script src="./js/estoque.js?v=6.6.0"></script>
+<script src="./js/usuarios.js?v=6.6.0"></script>
+<script src="./js/catalogo.js?v=6.6.0"></script>
+<script src="./js/orcamentos.js?v=6.6.0"></script>
+<script src="./js/secure-overrides.js?v=6.6.0"></script>
+<script src="./js/pwa-install.js?v=6.6.0"></script>
 
-<script src="./js/app.js?v=6.5.0"></script>
+<script src="./js/app.js?v=6.6.0"></script>
 
 </body>
 </html>

@@ -45,9 +45,11 @@
       : '';
     card.innerHTML =
       '<div class="hdr">' +
-        '<div class="brand" aria-label="1K Beats — Áudio, vídeo e produção de eventos">' +
+        '<div class="brand" aria-label="1K Beats">' +
           '<div class="brand-name"><span class="brand-1k">1K</span><span class="brand-beats">beats</span><span class="brand-wave">))</span></div>' +
-          '<div class="brand-tagline">ÁUDIO &nbsp;·&nbsp; VÍDEO &nbsp;·&nbsp; PRODUÇÃO DE EVENTOS</div>' +
+          '<div class="brand-company"><div class="brand-company-label">Emitido por</div><div class="brand-company-name">' +
+            Utils.escapeHTML(quote.empresa || '1000 Beats Áudio, Vídeo e Iluminação Ltda.') + '</div>' +
+            '<div class="brand-company-doc">' + (quote.cnpj_emp ? 'CNPJ ' + Utils.escapeHTML(quote.cnpj_emp) : 'CNPJ não informado') + '</div></div>' +
         '</div>' +
         '<div class="hdr-right"><div class="meta">' +
           '<div class="doc-label">Documento comercial</div><div class="doc-title">Orçamento</div>' +

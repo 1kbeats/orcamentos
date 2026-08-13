@@ -2,7 +2,6 @@ Nav.bindEvents = function bindEvents() {
   const on = (id, action) => document.getElementById(id)?.addEventListener('click', action);
   on('navDashboard', () => this.showPanel('dashboard'));
   on('navOrcamentos', () => this.showPanel('listaOrcamentos'));
-  on('navProducoes', () => this.showPanelPro('producoes'));
   on('navAgenda', () => this.showPanelPro('agenda'));
   on('navClientes', () => this.showPanel('clientes'));
   on('navCatalogo', () => this.showPanel('catalogo'));

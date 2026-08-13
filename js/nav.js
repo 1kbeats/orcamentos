@@ -15,7 +15,7 @@ const Nav = {
     document.querySelectorAll('.pro-section').forEach(element => {
       element.style.display = canViewOperations ? 'block' : 'none';
     });
-    ['navProducoes', 'navAgenda', 'navGastos', 'navEquipe', 'navFornecedores', 'navEstoque', 'navOrdemServico'].forEach(id => {
+    ['navAgenda', 'navGastos', 'navEquipe', 'navFornecedores', 'navEstoque', 'navOrdemServico'].forEach(id => {
       const element = document.getElementById(id);
       if (element) element.style.display = canViewOperations ? 'flex' : 'none';
     });

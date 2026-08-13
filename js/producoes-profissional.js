@@ -7,7 +7,7 @@
     status: ''
   };
 
-  Producoes.modalEditar = function modalEditar(producao) {
+  Producoes.modalEditar = function modalEditar(producao, onComplete) {
     const statuses = [['planejamento', 'Planejamento'], ['confirmado', 'Confirmado'], ['realizado', 'Realizado'], ['cancelado', 'Cancelado']];
     this.modal('Editar produção / evento',
       '<div class="ops-form-grid">' +
@@ -40,7 +40,8 @@
           body: JSON.stringify(payload)
         });
         Object.assign(producao, payload);
-      }
+      },
+      onComplete
     );
   };
 
