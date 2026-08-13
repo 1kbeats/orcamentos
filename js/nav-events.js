@@ -3,6 +3,7 @@ Nav.bindEvents = function bindEvents() {
   on('navDashboard', () => this.showPanel('dashboard'));
   on('navOrcamentos', () => this.showPanel('listaOrcamentos'));
   on('navAgenda', () => this.showPanelPro('agenda'));
+  on('navFinanceiroEventos', () => this.showPanelPro('financeiroEventos'));
   on('navClientes', () => this.showPanel('clientes'));
   on('navCatalogo', () => this.showPanel('catalogo'));
   on('navGastos', () => this.showPanelPro('gastos'));
