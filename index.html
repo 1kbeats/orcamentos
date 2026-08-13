@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/styles.css?v=6.6.3">
   <link rel="stylesheet" href="./css/secure.css?v=6.6.0">
+  <link rel="stylesheet" href="./css/financeiro-eventos.css?v=6.7.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
@@ -67,6 +68,10 @@
 
       <!-- FINANCEIRO — visível para PRO e admin -->
       <div class="nav-section pro-section" id="navSectionFinanceiro"></div>
+      <div class="nav-item pro-item" id="navFinanceiroEventos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-5 3 3 5-7"/></svg>
+        <span>Financeiro de eventos</span>
+      </div>
       <div class="nav-item pro-item" id="navGastos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span>Gastos diários</span>
@@ -471,6 +476,10 @@
     <div class="panel" id="panelAgenda">
       <div id="agendaContent"></div>
     </div>
+    <!-- PAINEL: FINANCEIRO DE EVENTOS -->
+    <div class="panel" id="panelFinanceiroEventos">
+      <div id="financeiroEventosContent"></div>
+    </div>
     <!-- ══ PAINEL: GASTOS ══ -->
     <div class="panel" id="panelGastos">
       <div id="gastosContent"></div>
@@ -671,20 +680,21 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.6.3"></script>
+<script src="./js/config.js?v=6.7.0"></script>
 <script src="./js/password-toggle.js?v=6.6.0"></script>
 <script src="./js/api.js?v=6.6.0"></script>
 <script src="./js/utils.js?v=6.6.0"></script>
 <script src="./js/auth.js?v=6.6.0"></script>
-<script src="./js/nav.js?v=6.6.0"></script>
-<script src="./js/nav-events.js?v=6.6.0"></script>
+<script src="./js/nav.js?v=6.7.0"></script>
+<script src="./js/nav-events.js?v=6.7.0"></script>
 <script src="./js/clientes.js?v=6.6.0"></script>
 <script src="./js/financeiro.js?v=6.6.0"></script>
 <script src="./js/operacoes.js?v=6.6.0"></script>
 <script src="./js/operacoes-profissional.js?v=6.6.0"></script>
-<script src="./js/producoes.js?v=6.6.0"></script>
+<script src="./js/producoes.js?v=6.7.0"></script>
 <script src="./js/producoes-profissional.js?v=6.6.0"></script>
 <script src="./js/agenda.js?v=6.6.3"></script>
+<script src="./js/financeiro-eventos.js?v=6.7.0"></script>
 <script src="./js/ordens-servico.js?v=6.6.0"></script>
 <script src="./js/compact-lists.js?v=6.6.0"></script>
 <script src="./js/estoque.js?v=6.6.0"></script>
@@ -692,9 +702,9 @@
 <script src="./js/catalogo.js?v=6.6.1"></script>
 <script src="./js/orcamentos.js?v=6.6.3"></script>
 <script src="./js/secure-overrides.js?v=6.6.0"></script>
-<script src="./js/pwa-install.js?v=6.6.3"></script>
+<script src="./js/pwa-install.js?v=6.7.0"></script>
 
-<script src="./js/app.js?v=6.6.3"></script>
+<script src="./js/app.js?v=6.7.0"></script>
 
 </body>
 </html>
