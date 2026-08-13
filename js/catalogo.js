@@ -64,7 +64,8 @@ const Catalogo = {
     document.getElementById('catNome').value = '';
     document.getElementById('catValor').value = '';
     document.getElementById('catCategoria').value = 'Sonorização';
-    document.getElementById('catTitulo').textContent = 'Novo item';
+    const title = document.getElementById('modalCatTitulo');
+    if (title) title.textContent = 'Novo item';
     document.getElementById('modalCatalogo')?.classList.add('open');
     document.getElementById('catNome')?.focus();
   },
@@ -74,7 +75,8 @@ const Catalogo = {
     document.getElementById('catNome').value = item.nome || '';
     document.getElementById('catValor').value = item.valor || '';
     document.getElementById('catCategoria').value = item.categoria || 'Outros';
-    document.getElementById('catTitulo').textContent = 'Editar item';
+    const title = document.getElementById('modalCatTitulo');
+    if (title) title.textContent = 'Editar item';
     document.getElementById('modalCatalogo')?.classList.add('open');
   },
 
