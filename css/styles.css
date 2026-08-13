@@ -144,21 +144,28 @@ a:hover { color: var(--accent-hover); }
 
 /* ── MASTHEAD ── */
 .masthead {
-  background: var(--ink);
+  background: linear-gradient(120deg, #111118 0%, #1A1A24 100%);
   border-radius: 12px 12px 0 0;
-  padding: 1.75rem 2rem;
+  padding: 1.65rem 2rem 1.55rem;
   display: flex; align-items: center; justify-content: space-between;
-  gap: 2rem;
+  gap: 2.25rem;
   position: relative; overflow: hidden;
 }
 .masthead::after {
   content: '';
-  position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 32'%3E%3Cpath d='M0,16 Q20,4 40,16 Q60,28 80,16 Q100,4 120,16 Q140,28 160,10 Q180,0 200,16 Q220,28 240,8 Q260,0 280,16 Q300,28 320,14 Q340,4 360,16 Q380,28 400,16' stroke='%23D91A72' fill='none' stroke-width='1.5' opacity='0.25'/%3E%3C/svg%3E");
-  background-size: 400px 32px;
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
   pointer-events: none;
 }
-.masthead-logo { height: 64px; width: auto; display: block; position: relative; z-index: 1; }
+.masthead-brand { min-width: 0; display: flex; align-items: center; gap: 1.35rem; position: relative; z-index: 1; }
+.masthead-logo { display: flex; align-items: baseline; gap: 7px; white-space: nowrap; line-height: 1; }
+.masthead-1k { color: #fff; font-size: 38px; font-weight: 700; letter-spacing: -.06em; }
+.masthead-beats { color: rgba(255,255,255,.67); font-size: 25px; font-weight: 400; }
+.masthead-wave { color: var(--accent); font-size: 25px; font-weight: 700; }
+.masthead-company { min-width: 0; max-width: 320px; }
+.masthead-company-label { color: rgba(255,255,255,.48); font: 700 9px/1.2 var(--mono); letter-spacing: .13em; text-transform: uppercase; margin-bottom: 4px; }
+.masthead-company-name { color: #fff; font-size: 14px; font-weight: 700; line-height: 1.22; overflow-wrap: anywhere; }
+.masthead-company-doc { color: rgba(255,255,255,.45); font-size: 10px; margin-top: 4px; }
 .masthead-right { text-align: right; position: relative; z-index: 1; }
 .masthead-doc-label {
   font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
@@ -169,10 +176,11 @@ a:hover { color: var(--accent-hover); }
   font-size: 32px; font-weight: 700; letter-spacing: -0.03em;
   color: #FFFFFF; line-height: 1; margin-bottom: 10px;
 }
-.masthead-meta { display: flex; gap: 24px; justify-content: flex-end; align-items: flex-start; }
+.masthead-meta { display: flex; gap: 18px; justify-content: flex-end; align-items: flex-start; }
 .meta-row { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .meta-k { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); font-family: var(--mono); }
 .meta-v { font-size: 12px; color: rgba(255,255,255,0.6); font-family: var(--mono); }
+.masthead-ref { margin-top: 8px; text-align: right; max-width: 330px; margin-left: auto; overflow-wrap: anywhere; }
 
 /* ── FORM SURFACE ── */
 .form-surface {
@@ -435,10 +443,17 @@ a:hover { color: var(--accent-hover); }
   .admin-wrap { padding: 1rem 1rem 4rem; }
 }
 @media (max-width: 600px) {
-  .masthead { flex-direction: column; align-items: flex-start; padding: 16px 16px 14px; border-radius: 0; gap: 0; }
-  .masthead-logo { display: none !important; }
+  .masthead { flex-direction: column; align-items: stretch; padding: 16px 16px 14px; border-radius: 0; gap: 16px; }
+  .masthead-brand { align-items: flex-start; gap: 12px; }
+  .masthead-logo { display: flex !important; }
+  .masthead-1k { font-size: 28px; }
+  .masthead-beats, .masthead-wave { font-size: 19px; }
+  .masthead-company-name { font-size: 12px; }
   .masthead-right { text-align: left; flex: 1; width: 100%; }
   .masthead-doc-title { font-size: 28px; margin-bottom: 10px; }
+  .masthead-meta { justify-content: flex-start; flex-wrap: wrap; }
+  .meta-row { align-items: flex-start; }
+  .masthead-ref { text-align: left; margin-left: 0; }
   .client-row { grid-template-columns: 1fr !important; gap: 10px !important; }
   .tbl-head { display: none !important; }
   .item-row { display: flex !important; flex-wrap: wrap !important; gap: 0 6px !important; padding: 12px 0 !important; }

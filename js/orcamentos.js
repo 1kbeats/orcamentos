@@ -171,6 +171,14 @@ const Orcamentos = {
     else rr.style.display = 'none';
   },
 
+  updateMastheadCompany() {
+    const cfg = this._cfg || {};
+    const nameEl = document.getElementById('mastheadEmpresa');
+    const docEl = document.getElementById('mastheadCnpj');
+    if (nameEl) nameEl.textContent = cfg.nome || '1000 Beats Áudio, Vídeo e Iluminação Ltda.';
+    if (docEl) docEl.textContent = cfg.cnpj ? 'CNPJ ' + cfg.cnpj : 'CNPJ não informado';
+  },
+
   // ── Configurações da empresa ──────────────────────────────
   loadCfg() {
     fetch(CONFIG.SUPABASE_URL + '/rest/v1/config?select=*&limit=1', { headers: CONFIG.headers() })
@@ -184,6 +192,7 @@ const Orcamentos = {
           document.getElementById('cfgTelefone').value = this._cfg.tel;
           document.getElementById('cfgEmail').value    = this._cfg.email;
           document.getElementById('cfgEndereco').value = this._cfg.end;
+          this.updateMastheadCompany();
         }
       })
       .catch(() => {
@@ -204,6 +213,7 @@ const Orcamentos = {
       endereco: document.getElementById('cfgEndereco').value.trim() || null
     };
     this._cfg = { nome: dados.nome, cnpj: dados.cnpj || '', tel: dados.tel || '', email: dados.email || '', end: dados.endereco || '' };
+    this.updateMastheadCompany();
     fetch(CONFIG.SUPABASE_URL + '/rest/v1/config?id=eq.1', {
       method: 'PATCH', headers: CONFIG.headers(), body: JSON.stringify(dados)
     }).then(() => {
@@ -480,51 +490,58 @@ const Orcamentos = {
     const doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
 
-    // Cabeçalho
-    doc.setFillColor(26, 26, 34); doc.rect(0, 0, pw, 62, 'F'); doc.setFillColor(20, 20, 28); doc.rect(0, 62, pw, 14, 'F');
+    // Cabeçalho unificado: marca e emitente à esquerda, documento à direita
+    doc.setFillColor(20, 20, 28); doc.rect(0, 0, pw, 55, 'F');
+    doc.setFillColor(217, 26, 114); doc.rect(0, 54, pw, 1, 'F');
+    doc.setFontSize(28); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+    const _w1k = doc.getTextWidth('1K');
+    doc.text('1K', ml, 29);
+    doc.setFontSize(18); doc.setFont('helvetica', 'normal'); doc.setTextColor(185,185,190);
+    const _wBeats = doc.getTextWidth('beats');
+    doc.text('beats', ml + _w1k + 2.5, 29);
+    doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
+    doc.text('))', ml + _w1k + _wBeats + 4, 28.5);
 
-        // Logo 1K Beats — grande e proporcional
-    doc.setFontSize(36); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
-    var _w1k = doc.getTextWidth('1K');
-    doc.text('1K', ml, 36);
-    doc.setFontSize(22); doc.setFont('helvetica', 'normal'); doc.setTextColor(190,190,190);
-    var _wBeats = doc.getTextWidth('beats');
-    doc.text('beats', ml + _w1k + 3, 36);
-    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(217,26,114);
-    doc.text('))', ml + _w1k + _wBeats + 4, 35);
+    const companyX = 53;
+    doc.setFontSize(6.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(135,135,142);
+    doc.text('EMITIDO POR', companyX, 15);
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+    const companyLines = doc.splitTextToSize(nome, 69).slice(0, 2);
+    doc.text(companyLines, companyX, 21, { lineHeightFactor: 1.15 });
+    if (cfg.cnpj) {
+      doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(125,125,132);
+      doc.text('CNPJ ' + cfg.cnpj, companyX, 22 + companyLines.length * 4.1);
+    }
 
-    // Lado direito — título maior e reequilibrado
+    // Documento e datas
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-    doc.text('DOCUMENTO COMERCIAL', pw - mr, 14, { align: 'right' });
-    doc.setFontSize(32); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-    doc.text('Orçamento', pw - mr, 32, { align: 'right' });
+    doc.text('DOCUMENTO COMERCIAL', pw - mr, 10, { align: 'right' });
+    doc.setFontSize(25); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    doc.text('Orçamento', pw - mr, 25, { align: 'right' });
     // Pegar número do masthead se já foi salvo
     const _nEl = document.getElementById('metaNumero');
     const _numStr = _nEl && _nEl.textContent && _nEl.textContent !== '—' ? _nEl.textContent : null;
 
     doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(140, 140, 140);
-    doc.text('EMISSÃO', pw - mr - 30, 42); doc.text('VALIDADE', pw - mr - 30, 49);
-    doc.setTextColor(210, 210, 210); doc.text(hoje, pw - mr, 42, { align: 'right' }); doc.text(valStr, pw - mr, 49, { align: 'right' });
+    doc.text('Nº', pw - mr - 30, 33); doc.text('EMISSÃO', pw - mr - 30, 41); doc.text('VALIDADE', pw - mr - 30, 49);
+    doc.setTextColor(210, 210, 210);
+    doc.text(_numStr || 'A gerar', pw - mr, 33, { align: 'right' });
+    doc.text(hoje, pw - mr, 41, { align: 'right' }); doc.text(valStr, pw - mr, 49, { align: 'right' });
     if (_numStr) {
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-      doc.setTextColor(140, 140, 140); doc.text('Nº', pw - mr - 30, 56);
-      doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
-      doc.text(_numStr, pw - mr, 57, { align: 'right' });
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(217, 26, 114);
+      doc.text(_numStr, pw - mr, 33, { align: 'right' });
     }
-    // Subtítulo abaixo do logo
-    doc.setFontSize(6.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100);
-    doc.text('ÁUDIO  ·  VÍDEO  ·  PRODUÇÃO DE EVENTOS', ml, 44);
     // Faixa da REF
     if (d.ref) {
-      doc.setFillColor(20, 20, 28); doc.rect(0, 63, pw, 13, 'F');
+      doc.setFillColor(17, 17, 24); doc.rect(0, 55, pw, 13, 'F');
       doc.setFontSize(8); doc.setFont('helvetica', 'bold');
-      doc.setTextColor(110, 110, 118); doc.text('REF.', ml, 71);
+      doc.setTextColor(110, 110, 118); doc.text('REF.', ml, 63);
       doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(220, 220, 224);
       const refLines = doc.splitTextToSize(d.ref, 148).slice(0, 2);
-      doc.text(refLines, pw - mr, refLines.length > 1 ? 68.5 : 71, { align: 'right', lineHeightFactor: 1.15 });
+      doc.text(refLines, pw - mr, refLines.length > 1 ? 60.5 : 63, { align: 'right', lineHeightFactor: 1.15 });
     }
 
-    let y = 86;
+    let y = d.ref ? 78 : 68;
     // Dados do cliente
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(150, 150, 150);
     doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('EMITIDO POR', pw - mr, y, { align: 'right' });

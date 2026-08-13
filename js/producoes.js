@@ -67,7 +67,7 @@ const Producoes = {
     root.querySelector('#btnProdFornecedor')?.addEventListener('click', () => this.modalFornecedor(producao));
   },
 
-  modal(title, body, onSave) {
+  modal(title, body, onSave, onComplete) {
     document.getElementById('opsModal')?.remove();
     const wrap = document.createElement('div'); wrap.id = 'opsModal'; wrap.className = 'ops-modal';
     wrap.innerHTML = '<div class="ops-modal-box" role="dialog" aria-modal="true"><div class="ops-modal-head"><h2>' + title + '</h2><button class="ops-icon" type="button" data-close>×</button></div><form id="opsForm">' + body + '<div class="ops-modal-actions"><button type="button" class="ops-btn secondary" data-close>Cancelar</button><button class="ops-btn" type="submit">Salvar</button></div></form></div>';
@@ -76,7 +76,7 @@ const Producoes = {
     wrap.addEventListener('click', event => { if (event.target === wrap) wrap.remove(); });
     wrap.querySelector('#opsForm').addEventListener('submit', async event => {
       event.preventDefault(); const button = event.submitter; button.disabled = true;
-      try { await onSave(new FormData(event.currentTarget)); wrap.remove(); await this.carregar(); Utils.toast('Registro salvo.'); }
+      try { await onSave(new FormData(event.currentTarget)); wrap.remove(); await this.carregar(); if (onComplete) await onComplete(); Utils.toast('Registro salvo.'); }
       catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); button.disabled = false; }
     });
   },
@@ -88,10 +88,39 @@ const Producoes = {
   date(form, name) { return this.value(form, name, 10) || this.dateValue(); },
   time(form, name) { return this.value(form, name, 5); },
 
-  modalNova() {
+  modalNova(onComplete) {
     const available = this._data.orcamentos.filter(q => q.status === 'aprovado' && !this._data.producoes.some(p => p.orcamento_id === q.id));
     const options = '<option value="">Selecione o orçamento aprovado</option>' + available.map(q => '<option value="' + Utils.safeId(q.id) + '">' + this.escape(this.quoteLabel(q)) + '</option>').join('');
-    this.modal('Nova produção / evento', '<div class="ops-form-grid">' + this.select('Orçamento aprovado', 'orcamento_id', options, true) + this.field('Nome do evento / serviço', 'nome', 'text', true) + this.field('Produtor responsável', 'produtor_responsavel') + this.field('Data do evento', 'data_evento', 'date') + this.field('Horário de montagem', 'hora_montagem', 'time') + this.field('Horário de início', 'hora_evento', 'time') + this.field('Local / casa de eventos', 'local_evento') + this.field('Endereço completo', 'endereco') + this.field('Veículo designado', 'veiculo') + this.select('Status', 'status', '<option value="planejamento">Planejamento</option><option value="confirmado">Confirmado</option>') + this.text('Informações operacionais', 'observacoes') + '</div>', async form => Api.request('/rest/v1/producoes', { method: 'POST', body: JSON.stringify(Api.orgPayload({ orcamento_id: this.value(form, 'orcamento_id', 50), nome: this.value(form, 'nome', 180), produtor_responsavel: this.value(form, 'produtor_responsavel', 120), data_evento: this.value(form, 'data_evento', 10), hora_montagem: this.time(form, 'hora_montagem'), hora_evento: this.time(form, 'hora_evento'), local_evento: this.value(form, 'local_evento', 180), endereco: this.value(form, 'endereco', 300), veiculo: this.value(form, 'veiculo', 120), status: form.get('status'), observacoes: this.value(form, 'observacoes', 3000) })) }));
+    const body = '<div class="ops-form-grid">' +
+      this.select('Orçamento aprovado', 'orcamento_id', options, true) +
+      this.field('Nome do evento / serviço', 'nome', 'text', true) +
+      this.field('Produtor responsável', 'produtor_responsavel') +
+      this.field('Data do evento', 'data_evento', 'date') +
+      this.field('Horário de montagem', 'hora_montagem', 'time') +
+      this.field('Horário de início', 'hora_evento', 'time') +
+      this.field('Local / casa de eventos', 'local_evento') +
+      this.field('Endereço completo', 'endereco') +
+      this.field('Veículo designado', 'veiculo') +
+      this.select('Status', 'status', '<option value="planejamento">Planejamento</option><option value="confirmado">Confirmado</option>') +
+      this.text('Informações operacionais', 'observacoes') + '</div>';
+    this.modal('Adicionar evento à agenda', body, async form => {
+      return Api.request('/rest/v1/producoes', {
+        method: 'POST',
+        body: JSON.stringify(Api.orgPayload({
+          orcamento_id: this.value(form, 'orcamento_id', 50),
+          nome: this.value(form, 'nome', 180),
+          produtor_responsavel: this.value(form, 'produtor_responsavel', 120),
+          data_evento: this.value(form, 'data_evento', 10),
+          hora_montagem: this.time(form, 'hora_montagem'),
+          hora_evento: this.time(form, 'hora_evento'),
+          local_evento: this.value(form, 'local_evento', 180),
+          endereco: this.value(form, 'endereco', 300),
+          veiculo: this.value(form, 'veiculo', 120),
+          status: form.get('status'),
+          observacoes: this.value(form, 'observacoes', 3000)
+        }))
+      });
+    }, onComplete);
 
     const modal = document.getElementById('opsModal');
     const quoteSelect = modal?.querySelector('[name="orcamento_id"]');

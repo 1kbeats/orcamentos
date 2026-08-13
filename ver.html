@@ -12,13 +12,16 @@
   .card { max-width: 680px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
 
   /* HEADER */
-  .hdr { background: #1A1A22; padding: 1.7rem 2rem 1.45rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; }
-  .brand { min-width: 0; color: #FFF; }
+  .hdr { position: relative; background: linear-gradient(120deg,#111118 0%,#1A1A24 100%); padding: 1.65rem 2rem 1.55rem; display: flex; justify-content: space-between; align-items: center; gap: 2rem; border-bottom: 3px solid #D91A72; }
+  .brand { min-width: 0; color: #FFF; display: flex; align-items: center; gap: 1.25rem; }
   .brand-name { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; line-height: 1; }
   .brand-1k { font-size: 38px; font-weight: 700; letter-spacing: -0.05em; }
   .brand-beats { font-size: 26px; font-weight: 400; color: #BEBEBE; }
   .brand-wave { font-size: 26px; font-weight: 700; color: #D91A72; }
-  .brand-tagline { margin-top: 13px; font-size: 8px; color: #74747C; letter-spacing: .03em; white-space: nowrap; }
+  .brand-company { min-width: 0; max-width: 270px; }
+  .brand-company-label { font-size: 8px; font-weight: 700; color: #85858C; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 4px; }
+  .brand-company-name { font-size: 13px; font-weight: 700; line-height: 1.22; color: #FFF; overflow-wrap: anywhere; }
+  .brand-company-doc { margin-top: 4px; font-size: 9px; color: #777780; }
   .hdr-right { text-align: right; }
   .doc-label { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #D91A72; margin-bottom: 4px; }
   .doc-title { font-size: 28px; font-weight: 700; color: white; letter-spacing: -0.02em; line-height: 1; margin-bottom: 8px; }
@@ -93,7 +96,9 @@
     .hdr { padding: 1rem; flex-direction: row; }
     .brand-1k { font-size: 30px; }
     .brand-beats, .brand-wave { font-size: 20px; }
-    .brand-tagline { display: none; }
+    .brand { align-items: flex-start; gap: 10px; }
+    .brand-company-name { font-size: 10px; }
+    .brand-company-doc { font-size: 8px; }
     .doc-title { font-size: 20px; }
     .ref-band { padding: 10px 1rem; gap: .75rem; }
     .ref-band-value { font-size: 10px; }
@@ -116,9 +121,9 @@
   </div>
 </div>
 
-<script src="./js/config.js?v=6.5.0"></script>
-<script src="./js/api.js?v=6.5.0"></script>
-<script src="./js/utils.js?v=6.5.0"></script>
-<script src="./js/public-quote.js?v=6.5.0"></script>
+<script src="./js/config.js?v=6.6.0"></script>
+<script src="./js/api.js?v=6.6.0"></script>
+<script src="./js/utils.js?v=6.6.0"></script>
+<script src="./js/public-quote.js?v=6.6.0"></script>
 </body>
 </html>

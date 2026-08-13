@@ -67,13 +67,31 @@ const Agenda = {
     });
   },
   statusLabel(v) { return ({ planejamento:'Planejamento', confirmado:'Confirmado', realizado:'Realizado', cancelado:'Cancelado' })[v] || v; },
+  async carregarBaseOperacional() {
+    Producoes._atual = null;
+    await Producoes.carregar();
+  },
+  async novoEvento() {
+    if (!CONFIG.canManageOperations) return Utils.toast('Seu perfil não permite criar eventos.', 'erro');
+    await this.carregarBaseOperacional();
+    Producoes.modalNova(async () => {
+      this.inicio = this.inicioSemana();
+      await this.carregar();
+    });
+  },
+  async editarEvento(evento) {
+    if (!CONFIG.canManageOperations || !evento) return;
+    await this.carregarBaseOperacional();
+    const atual = Producoes._data.producoes.find(item => item.id === evento.id) || evento;
+    Producoes.modalEditar(atual, async () => this.carregar());
+  },
   diaLabel(iso) {
     const d = new Date(iso + 'T12:00:00');
     return d.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' });
   },
   card(p) {
     const local = p.local_evento || p.endereco || 'Local a definir';
-    return '<article class="agenda-event"><div class="agenda-time"><strong>' + this.escape(p.hora_montagem || p.hora_evento || '--:--') + '</strong><span>' + (p.hora_montagem ? 'montagem' : 'início') + '</span></div><div class="agenda-main"><div><span class="ops-tag status-' + Utils.safeId(p.status) + '">' + this.escape(this.statusLabel(p.status)) + '</span><h3>' + this.escape(p.nome) + '</h3></div><p>' + this.escape(p.orcamentos?.cliente_nome) + '</p><span>' + this.escape(local) + '</span></div><div class="agenda-owner"><small>Produtor</small><strong>' + this.escape(p.produtor_responsavel) + '</strong></div><button class="ops-btn secondary" data-agenda-detail="' + Utils.safeId(p.id) + '">Detalhes</button></article>';
+    return '<article class="agenda-event"><div class="agenda-time"><strong>' + this.escape(p.hora_montagem || p.hora_evento || '--:--') + '</strong><span>' + (p.hora_montagem ? 'montagem' : 'início') + '</span></div><div class="agenda-main"><div><span class="ops-tag status-' + Utils.safeId(p.status) + '">' + this.escape(this.statusLabel(p.status)) + '</span><h3>' + this.escape(p.nome) + '</h3></div><p>' + this.escape(p.orcamentos?.cliente_nome) + (p.orcamentos?.numero ? ' · Orçamento #' + this.escape(Utils.fmtNumero(p.orcamentos.numero)) : '') + '</p><span>' + this.escape(local) + '</span></div><div class="agenda-owner"><small>Produtor</small><strong>' + this.escape(p.produtor_responsavel) + '</strong></div><button class="ops-btn secondary" data-agenda-detail="' + Utils.safeId(p.id) + '">Detalhes</button></article>';
   },
   render() {
     const root = document.getElementById('agendaContent'); if (!root) return;
@@ -82,7 +100,7 @@ const Agenda = {
     const produtores = [...new Set(this.dados.map(p => p.produtor_responsavel).filter(Boolean))].sort();
     const gruposHtml = Object.entries(grupos).map(([dia, eventos]) => '<section class="agenda-day"><header><h2>' + this.escape(this.diaLabel(dia)) + '</h2><span>' + eventos.length + ' evento(s)</span></header>' + eventos.map(p => this.card(p)).join('') + '</section>').join('');
     const periodo = this.inicio.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) + ' — ' + this.fimSemana().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
-    root.innerHTML = '<div class="ops-page agenda-page"><div class="ops-head"><div><div class="ops-kicker">1000 BEATS • OPERAÇÃO</div><h1>Agenda de eventos</h1><p>Visão semanal da operação, equipe e materiais.</p></div><button class="ops-btn agenda-share" id="agendaCompartilhar">Compartilhar semana</button></div><div class="agenda-week"><button id="agendaAnterior" aria-label="Semana anterior">‹</button><button id="agendaHoje">Hoje</button><strong>' + periodo + '</strong><button id="agendaProxima" aria-label="Próxima semana">›</button></div><div class="ops-filters agenda-filters"><label><span>Buscar evento ou local</span><input id="agendaBusca" type="search" value="' + Utils.escapeHTML(this.busca) + '"></label><label><span>Produtor responsável</span><select id="agendaProdutor"><option value="">Todos</option>' + produtores.map(n => '<option' + (n === this.produtor ? ' selected' : '') + '>' + this.escape(n) + '</option>').join('') + '</select></label><label><span>Status</span><select id="agendaStatus"><option value="ativos"' + (this.status==='ativos'?' selected':'') + '>Ativos</option><option value="planejamento"' + (this.status==='planejamento'?' selected':'') + '>Planejamento</option><option value="confirmado"' + (this.status==='confirmado'?' selected':'') + '>Confirmados</option><option value="realizado"' + (this.status==='realizado'?' selected':'') + '>Realizados</option><option value="cancelado"' + (this.status==='cancelado'?' selected':'') + '>Cancelados</option><option value="todos"' + (this.status==='todos'?' selected':'') + '>Todos</option></select></label></div><div class="ops-results-count">' + itens.length + ' evento(s) nesta semana</div>' + (gruposHtml || '<div class="ops-empty">Nenhum evento encontrado nesta semana.</div>') + (itens.length > visiveis.length ? '<button class="agenda-more" id="agendaMais">Mostrar mais ' + Math.min(10,itens.length-visiveis.length) + '</button>' : '') + '</div>';
+    root.innerHTML = '<div class="ops-page agenda-page"><div class="ops-head"><div><div class="ops-kicker">1000 BEATS • OPERAÇÃO</div><h1>Agenda de eventos</h1><p>Do orçamento aprovado à execução do evento, tudo em um só lugar.</p></div><div class="agenda-actions">' + (CONFIG.canManageOperations ? '<button class="ops-btn" id="agendaNovoEvento">+ Adicionar evento</button>' : '') + '<button class="ops-btn agenda-share" id="agendaCompartilhar">Compartilhar semana</button></div></div><div class="production-guide"><strong>Fluxo simples:</strong> aprove o orçamento e adicione o evento à agenda. Complete aqui os dados operacionais conforme forem definidos.</div><div class="agenda-week"><button id="agendaAnterior" aria-label="Semana anterior">‹</button><button id="agendaHoje">Hoje</button><strong>' + periodo + '</strong><button id="agendaProxima" aria-label="Próxima semana">›</button></div><div class="ops-filters agenda-filters"><label><span>Buscar evento ou local</span><input id="agendaBusca" type="search" value="' + Utils.escapeHTML(this.busca) + '"></label><label><span>Produtor responsável</span><select id="agendaProdutor"><option value="">Todos</option>' + produtores.map(n => '<option' + (n === this.produtor ? ' selected' : '') + '>' + this.escape(n) + '</option>').join('') + '</select></label><label><span>Status</span><select id="agendaStatus"><option value="ativos"' + (this.status==='ativos'?' selected':'') + '>Ativos</option><option value="planejamento"' + (this.status==='planejamento'?' selected':'') + '>Planejamento</option><option value="confirmado"' + (this.status==='confirmado'?' selected':'') + '>Confirmados</option><option value="realizado"' + (this.status==='realizado'?' selected':'') + '>Realizados</option><option value="cancelado"' + (this.status==='cancelado'?' selected':'') + '>Cancelados</option><option value="todos"' + (this.status==='todos'?' selected':'') + '>Todos</option></select></label></div><div class="ops-results-count">' + itens.length + ' evento(s) nesta semana</div>' + (gruposHtml || '<div class="ops-empty">Nenhum evento encontrado nesta semana.</div>') + (itens.length > visiveis.length ? '<button class="agenda-more" id="agendaMais">Mostrar mais ' + Math.min(10,itens.length-visiveis.length) + '</button>' : '') + '</div>';
     root.querySelector('#agendaAnterior').onclick = () => this.mudarSemana(-7);
     root.querySelector('#agendaProxima').onclick = () => this.mudarSemana(7);
     root.querySelector('#agendaHoje').onclick = () => { this.inicio=this.inicioSemana(); this.limite=10; this.carregar(); };
@@ -91,6 +109,7 @@ const Agenda = {
     root.querySelector('#agendaStatus').onchange = e => { this.status=e.target.value;this.limite=10;this.render(); };
     root.querySelector('#agendaMais')?.addEventListener('click',()=>{this.limite+=10;this.render();});
     root.querySelector('#agendaCompartilhar').onclick = () => this.compartilhar(itens);
+    root.querySelector('#agendaNovoEvento')?.addEventListener('click', () => this.novoEvento());
     root.querySelectorAll('[data-agenda-detail]').forEach(b => b.onclick=()=>this.detalhes(this.dados.find(p=>p.id===b.dataset.agendaDetail)));
   },
   mudarSemana(dias) { this.inicio=new Date(this.inicio);this.inicio.setDate(this.inicio.getDate()+dias);this.limite=10;this.carregar(); },
@@ -98,9 +117,10 @@ const Agenda = {
     if (!p) return; document.getElementById('opsModal')?.remove();
     const wrap=document.createElement('div');wrap.id='opsModal';wrap.className='ops-modal';
     const lista=(titulo,valores)=>'<section class="agenda-detail-section"><small>'+titulo+'</small><p>'+(valores.length?valores.map(this.escape.bind(this)).join('<br>'):'A definir')+'</p></section>';
-    wrap.innerHTML='<div class="ops-modal-box agenda-detail" role="dialog" aria-modal="true"><div class="ops-modal-head"><div><small>EVENTO</small><h2>'+this.escape(p.nome)+'</h2></div><button class="ops-icon" data-close>×</button></div><div class="agenda-detail-grid"><section><small>Data e montagem</small><p>'+this.escape(Utils.fmtDate(p.data_evento))+' · '+this.escape(p.hora_montagem)+'</p></section><section><small>Produtor responsável</small><p>'+this.escape(p.produtor_responsavel)+'</p></section><section class="full"><small>Local</small><p>'+this.escape(p.local_evento)+'<br>'+this.escape(p.endereco)+'</p></section>'+lista('Equipe técnica',p.equipe)+lista('Materiais e serviços',p.materiais)+'<section class="full"><small>Veículo</small><p>'+this.escape(p.veiculo)+'</p></section></div><div class="ops-modal-actions"><button class="ops-btn secondary" data-close>Fechar</button>'+(p.os?'<button class="ops-btn" id="agendaAbrirOS">Abrir ordem de serviço</button>':'')+'</div></div>';
+    wrap.innerHTML='<div class="ops-modal-box agenda-detail" role="dialog" aria-modal="true"><div class="ops-modal-head"><div><small>EVENTO · ORÇAMENTO '+this.escape(p.orcamentos?.numero ? '#'+Utils.fmtNumero(p.orcamentos.numero) : 'A DEFINIR')+'</small><h2>'+this.escape(p.nome)+'</h2></div><button class="ops-icon" data-close>×</button></div><div class="agenda-detail-grid"><section><small>Data e montagem</small><p>'+this.escape(Utils.fmtDate(p.data_evento))+' · '+this.escape(p.hora_montagem)+'</p></section><section><small>Produtor responsável</small><p>'+this.escape(p.produtor_responsavel)+'</p></section><section class="full"><small>Local</small><p>'+this.escape(p.local_evento)+'<br>'+this.escape(p.endereco)+'</p></section>'+lista('Equipe técnica',p.equipe)+lista('Materiais e serviços',p.materiais)+'<section class="full"><small>Veículo</small><p>'+this.escape(p.veiculo)+'</p></section></div><div class="ops-modal-actions"><button class="ops-btn secondary" data-close>Fechar</button>'+(CONFIG.canManageOperations?'<button class="ops-btn secondary" id="agendaEditarEvento">Editar evento</button>':'')+(p.os?'<button class="ops-btn" id="agendaAbrirOS">Abrir ordem de serviço</button>':'')+'</div></div>';
     document.body.appendChild(wrap);wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());wrap.onclick=e=>{if(e.target===wrap)wrap.remove();};
     wrap.querySelector('#agendaAbrirOS')?.addEventListener('click',async()=>{wrap.remove();Nav.showPanel('ordemServico');await OrdensServico.carregar();OrdensServico.abrirPreview(OrdensServico._data.ordens.find(o=>o.id===p.os.id)||p.os);});
+    wrap.querySelector('#agendaEditarEvento')?.addEventListener('click',()=>{wrap.remove();this.editarEvento(p);});
   },
   mensagem(itens) {
     const linhas=['*AGENDA SEMANAL | 1000 BEATS*','📅 '+this.dataISO(this.inicio).split('-').reverse().join('/')+' a '+this.dataISO(this.fimSemana()).split('-').reverse().join('/'),''];
