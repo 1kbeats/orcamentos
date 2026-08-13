@@ -1,6 +1,7 @@
 const Agenda = {
   inicio: null,
   dados: [],
+  profissionais: [],
   busca: '',
   produtor: '',
   status: 'ativos',
@@ -34,14 +35,17 @@ const Agenda = {
       const producoes = await Api.request(Api.orgFilter('/rest/v1/producoes?select=*,orcamentos(id,numero,referencia,cliente_nome,itens)&data_evento=gte.' + de + '&data_evento=lte.' + ate + '&order=data_evento.asc,hora_montagem.asc.nullslast')) || [];
       const ids = producoes.map(p => p.id), quoteIds = [...new Set(producoes.map(p => p.orcamento_id).filter(Boolean))];
       const inFilter = values => 'in.(' + values.map(encodeURIComponent).join(',') + ')';
-      const [ordens, diarias, movimentos] = await Promise.all([
+      const [ordens, diarias, movimentos, profissionais] = await Promise.all([
         ids.length ? Api.request(Api.orgFilter('/rest/v1/ordens_servico?select=*&producao_id=' + inFilter(ids))) : [],
         quoteIds.length ? Api.request(Api.orgFilter('/rest/v1/equipe_diarias?select=*,equipe(nome,funcao)&orcamento_id=' + inFilter(quoteIds))) : [],
-        ids.length ? Api.request(Api.orgFilter('/rest/v1/estoque_movimentacoes?select=*,estoque_itens(nome)&producao_id=' + inFilter(ids))) : []
+        ids.length ? Api.request(Api.orgFilter('/rest/v1/estoque_movimentacoes?select=*,estoque_itens(nome)&producao_id=' + inFilter(ids))) : [],
+        Api.request(Api.orgFilter('/rest/v1/equipe?select=id,nome,funcao,valor_diaria,ativo&ativo=is.true&order=nome.asc'))
       ]);
+      this.profissionais = profissionais || [];
       this.dados = producoes.map(p => {
         const os = (ordens || []).find(o => o.producao_id === p.id);
-        const equipe = (diarias || []).filter(d => d.orcamento_id === p.orcamento_id).map(d => d.equipe?.nome).filter(Boolean);
+        const equipeDiarias = (diarias || []).filter(d => d.orcamento_id === p.orcamento_id);
+        const equipe = equipeDiarias.map(d => d.equipe?.nome).filter(Boolean);
         const saldos = (movimentos || []).filter(m => m.producao_id === p.id).reduce((acc, m) => {
           const nome = m.estoque_itens?.nome;
           if (nome) acc[nome] = (acc[nome] || 0) + (m.tipo === 'saida_evento' ? m.quantidade : m.tipo === 'devolucao_evento' ? -m.quantidade : 0);
@@ -49,7 +53,7 @@ const Agenda = {
         }, {});
         const estoque = Object.entries(saldos).filter(([, quantidade]) => quantidade > 0).map(([nome, quantidade]) => (quantidade !== 1 ? quantidade + 'x ' : '') + nome);
         const materiais = this.itensTexto(os?.itens?.length ? os.itens : p.orcamentos?.itens);
-        return { ...p, os, equipe: [...new Set(equipe)], materiais: [...new Set([...materiais, ...estoque])] };
+        return { ...p, os, equipe: [...new Set(equipe)], equipeDiarias, materiais: [...new Set([...materiais, ...estoque])] };
       });
       this.render();
     } catch (error) {
@@ -85,6 +89,32 @@ const Agenda = {
     const atual = Producoes._data.producoes.find(item => item.id === evento.id) || evento;
     Producoes.modalEditar(atual, async () => this.carregar());
   },
+  profissionalOptions(selected) {
+    return '<option value="">Selecione o profissional</option>' + this.profissionais.map(item => '<option value="' + Utils.safeId(item.id) + '"' + (item.id === selected ? ' selected' : '') + '>' + this.escape(item.nome + (item.funcao ? ' · ' + item.funcao : '')) + '</option>').join('');
+  },
+  async gerenciarEquipe(evento) {
+    if (!evento || !CONFIG.canManageOperations) return;
+    document.getElementById('opsModal')?.remove();
+    const wrap = document.createElement('div'); wrap.id = 'opsModal'; wrap.className = 'ops-modal';
+    const diarias = evento.equipeDiarias || [];
+    const linhas = diarias.map(item => '<div class="agenda-team-row"><div><strong>' + this.escape(item.equipe?.nome) + '</strong><span>' + this.escape(item.funcao_evento || item.equipe?.funcao || 'Técnico') + ' · ' + Utils.fmt(item.valor_diaria) + '</span></div><span class="ops-tag status-' + Utils.safeId(item.status_pagamento || 'pendente') + '">' + ((item.status_pagamento || 'pendente') === 'pago' ? 'Pago' : 'Pendente') + '</span><button type="button" class="ops-icon" data-remove-daily="' + Utils.safeId(item.id) + '" title="Remover da equipe">×</button></div>').join('');
+    wrap.innerHTML = '<div class="ops-modal-box agenda-team-box" role="dialog" aria-modal="true"><div class="ops-modal-head"><div><small>EQUIPE DO EVENTO</small><h2>' + this.escape(evento.nome) + '</h2></div><button class="ops-icon" data-close>×</button></div><div class="agenda-team-body"><section><h3>Profissionais escalados</h3><div class="agenda-team-list">' + (linhas || '<div class="ops-empty">Nenhum profissional escalado.</div>') + '</div></section><form id="agendaTeamForm"><h3>Adicionar profissional</h3><div class="ops-form-grid"><label class="ops-field full"><span>Profissional</span><select name="equipe_id" required>' + this.profissionalOptions() + '</select></label>' + Operacoes.editField('Função no evento', 'funcao_evento', 'text') + Operacoes.editField('Valor da diária (R$)', 'valor_diaria', 'number', true) + Operacoes.editField('Horário de início', 'horario_inicio', 'time') + Operacoes.editField('Horário de término', 'horario_fim', 'time') + '<label class="ops-field"><span>Pagamento</span><select name="status_pagamento"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></label></div><div class="ops-modal-actions"><button class="ops-btn secondary" type="button" data-close>Fechar</button><button class="ops-btn" type="submit">Adicionar profissional</button></div></form></div></div>';
+    document.body.appendChild(wrap);
+    const close = () => wrap.remove(); wrap.querySelectorAll('[data-close]').forEach(button => button.onclick = close); wrap.onclick = event => { if (event.target === wrap) close(); };
+    const select = wrap.querySelector('[name="equipe_id"]'), daily = wrap.querySelector('[name="valor_diaria"]'), role = wrap.querySelector('[name="funcao_evento"]');
+    select.onchange = () => { const person = this.profissionais.find(item => item.id === select.value); if (person) { daily.value = Number(person.valor_diaria || 0); if (!role.value) role.value = person.funcao || ''; } };
+    wrap.querySelector('#agendaTeamForm').onsubmit = async event => {
+      event.preventDefault(); const form = new FormData(event.currentTarget), button = event.submitter; button.disabled = true;
+      try {
+        await Api.request('/rest/v1/equipe_diarias', { method:'POST', body:JSON.stringify(Api.orgPayload({ equipe_id:form.get('equipe_id'), orcamento_id:evento.orcamento_id, data:evento.data_evento || new Date().toISOString().slice(0,10), funcao_evento:Utils.sanitizeText(form.get('funcao_evento'),120)||null, valor_diaria:Math.max(0,Number(form.get('valor_diaria'))||0), horario_inicio:form.get('horario_inicio')||null, horario_fim:form.get('horario_fim')||null, status_pagamento:form.get('status_pagamento') })) });
+        close(); await this.carregar(); this.detalhes(this.dados.find(item => item.id === evento.id)); Utils.toast('Profissional adicionado ao evento.');
+      } catch (error) { button.disabled = false; Utils.toast(Api.friendlyError(error), 'erro'); }
+    };
+    wrap.querySelectorAll('[data-remove-daily]').forEach(button => button.onclick = async () => {
+      if (!confirm('Remover este profissional do evento?')) return;
+      try { await Api.request(Api.orgFilter('/rest/v1/equipe_diarias?id=eq.' + encodeURIComponent(button.dataset.removeDaily)), { method:'DELETE' }); close(); await this.carregar(); this.detalhes(this.dados.find(item => item.id === evento.id)); Utils.toast('Profissional removido do evento.'); } catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); }
+    });
+  },
   diaLabel(iso) {
     const d = new Date(iso + 'T12:00:00');
     return d.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' });
@@ -117,10 +147,11 @@ const Agenda = {
     if (!p) return; document.getElementById('opsModal')?.remove();
     const wrap=document.createElement('div');wrap.id='opsModal';wrap.className='ops-modal';
     const lista=(titulo,valores)=>'<section class="agenda-detail-section"><small>'+titulo+'</small><p>'+(valores.length?valores.map(this.escape.bind(this)).join('<br>'):'A definir')+'</p></section>';
-    wrap.innerHTML='<div class="ops-modal-box agenda-detail" role="dialog" aria-modal="true"><div class="ops-modal-head"><div><small>EVENTO · ORÇAMENTO '+this.escape(p.orcamentos?.numero ? '#'+Utils.fmtNumero(p.orcamentos.numero) : 'A DEFINIR')+'</small><h2>'+this.escape(p.nome)+'</h2></div><button class="ops-icon" data-close>×</button></div><div class="agenda-detail-grid"><section><small>Data e montagem</small><p>'+this.escape(Utils.fmtDate(p.data_evento))+' · '+this.escape(p.hora_montagem)+'</p></section><section><small>Produtor responsável</small><p>'+this.escape(p.produtor_responsavel)+'</p></section><section class="full"><small>Local</small><p>'+this.escape(p.local_evento)+'<br>'+this.escape(p.endereco)+'</p></section>'+lista('Equipe técnica',p.equipe)+lista('Materiais e serviços',p.materiais)+'<section class="full"><small>Veículo</small><p>'+this.escape(p.veiculo)+'</p></section></div><div class="ops-modal-actions"><button class="ops-btn secondary" data-close>Fechar</button>'+(CONFIG.canManageOperations?'<button class="ops-btn secondary" id="agendaEditarEvento">Editar evento</button>':'')+(p.os?'<button class="ops-btn" id="agendaAbrirOS">Abrir ordem de serviço</button>':'')+'</div></div>';
+    wrap.innerHTML='<div class="ops-modal-box agenda-detail" role="dialog" aria-modal="true"><div class="ops-modal-head"><div><small>EVENTO · ORÇAMENTO '+this.escape(p.orcamentos?.numero ? '#'+Utils.fmtNumero(p.orcamentos.numero) : 'A DEFINIR')+'</small><h2>'+this.escape(p.nome)+'</h2></div><button class="ops-icon" data-close>×</button></div><div class="agenda-detail-grid"><section><small>Data e montagem</small><p>'+this.escape(Utils.fmtDate(p.data_evento))+' · '+this.escape(p.hora_montagem)+'</p></section><section><small>Produtor responsável</small><p>'+this.escape(p.produtor_responsavel)+'</p></section><section class="full"><small>Local</small><p>'+this.escape(p.local_evento)+'<br>'+this.escape(p.endereco)+'</p></section>'+lista('Equipe técnica',p.equipe)+lista('Materiais e serviços',p.materiais)+'<section class="full"><small>Veículo</small><p>'+this.escape(p.veiculo)+'</p></section></div><div class="ops-modal-actions"><button class="ops-btn secondary" data-close>Fechar</button>'+(CONFIG.canManageOperations?'<button class="ops-btn secondary" id="agendaEditarEvento">Editar evento</button><button class="ops-btn" id="agendaGerenciarEquipe">Gerenciar equipe</button>':'')+(p.os?'<button class="ops-btn" id="agendaAbrirOS">Abrir ordem de serviço</button>':'')+'</div></div>';
     document.body.appendChild(wrap);wrap.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>wrap.remove());wrap.onclick=e=>{if(e.target===wrap)wrap.remove();};
     wrap.querySelector('#agendaAbrirOS')?.addEventListener('click',async()=>{wrap.remove();Nav.showPanel('ordemServico');await OrdensServico.carregar();OrdensServico.abrirPreview(OrdensServico._data.ordens.find(o=>o.id===p.os.id)||p.os);});
     wrap.querySelector('#agendaEditarEvento')?.addEventListener('click',()=>{wrap.remove();this.editarEvento(p);});
+    wrap.querySelector('#agendaGerenciarEquipe')?.addEventListener('click',()=>{wrap.remove();this.gerenciarEquipe(p);});
   },
   mensagem(itens) {
     const linhas=['*AGENDA SEMANAL | 1000 BEATS*','📅 '+this.dataISO(this.inicio).split('-').reverse().join('/')+' a '+this.dataISO(this.fimSemana()).split('-').reverse().join('/'),''];
