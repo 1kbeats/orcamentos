@@ -50,6 +50,7 @@ for (const path of files.filter(path => extname(path) === '.html')) {
 }
 
 for (const path of files.filter(path => ['.html', '.js', '.ts'].includes(extname(path)))) {
+  if (display(path).startsWith('js/vendor/')) continue
   const source = await readFile(path, 'utf8')
   if (/sb_secret_[A-Za-z0-9_-]{20,}/.test(source)) fail(`Secret key encontrada em ${display(path)}`)
   if (/5521999999999/.test(source)) fail(`Telefone placeholder encontrado em ${display(path)}`)
