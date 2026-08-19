@@ -163,10 +163,30 @@ const OrdensServico = {
   },
 
   abrirWhatsApp(order) {
-    document.getElementById('serviceOrderWhatsApp')?.remove(); const wrap = document.createElement('div'); wrap.id = 'serviceOrderWhatsApp'; wrap.className = 'modal-overlay open'; const message = this.mensagem(order);
-    wrap.innerHTML = '<div class="whatsapp-share-box service-order-share"><div class="whatsapp-share-head"><div><small>WHATSAPP</small><h2>Compartilhar ordem de serviço</h2></div><button class="whatsapp-share-close" data-close aria-label="Fechar">×</button></div><div class="modal-field"><label>Telefone do técnico</label><input id="osWhatsAppDestino" type="tel" inputmode="tel" value="' + this.safe(order.responsavel_telefone) + '" placeholder="(21) 99999-9999"><small class="whatsapp-share-hint">Se não estiver salvo na agenda, o WhatsApp abrirá diretamente neste número.</small></div><div class="modal-field whatsapp-message-field"><div class="whatsapp-message-label"><label>Prévia da mensagem</label><div class="whatsapp-message-tools"><button type="button" data-restore>Restaurar padrão</button><button type="button" data-copy>Copiar mensagem</button></div></div><textarea id="osWhatsAppMensagem">' + this.safe(message) + '</textarea><small class="whatsapp-share-hint">As alterações feitas aqui valem somente para este envio.</small></div><div class="ops-modal-actions whatsapp-share-actions"><button class="ops-btn secondary" type="button" data-close>Cancelar</button><button class="ops-btn whatsapp-open-btn" type="button" data-open>Abrir WhatsApp</button></div></div>';
-    document.body.appendChild(wrap); const close = () => wrap.remove(); wrap.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', close)); wrap.querySelector('[data-restore]').addEventListener('click', () => { wrap.querySelector('#osWhatsAppMensagem').value = message; }); wrap.querySelector('[data-copy]').addEventListener('click', async () => { try { await navigator.clipboard.writeText(wrap.querySelector('#osWhatsAppMensagem').value); Utils.toast('Mensagem copiada.'); } catch (_) { Utils.toast('Não foi possível copiar a mensagem.', 'erro'); } });
-    wrap.querySelector('[data-open]').addEventListener('click', async () => { const content = wrap.querySelector('#osWhatsAppMensagem').value.trim(); const phone = Orcamentos.normalizarWhatsApp(wrap.querySelector('#osWhatsAppDestino').value); if (!content) return Utils.toast('A mensagem está vazia.', 'erro'); window.open((phone ? 'https://wa.me/' + phone : 'https://wa.me/') + '?text=' + encodeURIComponent(content), '_blank', 'noopener'); close(); if (CONFIG.canManageOperations && order.status === 'rascunho') { try { await Api.request(Api.orgFilter('/rest/v1/ordens_servico?id=eq.' + encodeURIComponent(order.id)), { method: 'PATCH', body: JSON.stringify({ status: 'enviada', enviada_em: new Date().toISOString() }) }); order.status = 'enviada'; await this.carregar(); } catch (_) {} } });
+    document.getElementById('serviceOrderWhatsApp')?.remove(); const trigger = document.activeElement; const wrap = document.createElement('div'); wrap.id = 'serviceOrderWhatsApp'; wrap.className = 'modal-overlay service-order-whatsapp-overlay open'; const message = this.mensagem(order);
+    wrap.innerHTML = '<div class="modal-box whatsapp-share-box service-order-share"><div class="whatsapp-share-head"><div><small class="whatsapp-share-kicker">WHATSAPP</small><h2 class="modal-title">Compartilhar ordem de serviço</h2></div><button class="whatsapp-share-close" data-close aria-label="Fechar">×</button></div><div class="modal-field"><label>Telefone do técnico</label><input id="osWhatsAppDestino" type="tel" inputmode="tel" value="' + this.safe(order.responsavel_telefone) + '" placeholder="(21) 99999-9999"><small class="whatsapp-share-hint">Se não estiver salvo na agenda, o WhatsApp abrirá diretamente neste número.</small></div><div class="modal-field whatsapp-message-field"><div class="whatsapp-message-label"><label>Prévia da mensagem</label><div class="whatsapp-message-tools"><button type="button" data-restore>Restaurar padrão</button><button type="button" data-copy>Copiar mensagem</button></div></div><textarea id="osWhatsAppMensagem">' + this.safe(message) + '</textarea><small class="whatsapp-share-hint">As alterações feitas aqui valem somente para este envio.</small></div><div class="ops-modal-actions whatsapp-share-actions"><button class="ops-btn secondary" type="button" data-close>Cancelar</button><button class="ops-btn whatsapp-open-btn" type="button" data-open>Abrir WhatsApp</button></div></div>';
+    document.body.appendChild(wrap);
+    const onKeyDown = event => { if (event.key === 'Escape') close(); };
+    const close = () => { document.removeEventListener('keydown', onKeyDown); wrap.remove(); if (trigger instanceof HTMLElement && document.contains(trigger)) trigger.focus(); };
+    document.addEventListener('keydown', onKeyDown);
+    wrap.addEventListener('click', event => { if (event.target === wrap) close(); });
+    wrap.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', close));
+    wrap.querySelector('[data-restore]').addEventListener('click', () => { wrap.querySelector('#osWhatsAppMensagem').value = message; });
+    wrap.querySelector('[data-copy]').addEventListener('click', async () => { try { await navigator.clipboard.writeText(wrap.querySelector('#osWhatsAppMensagem').value); Utils.toast('Mensagem copiada.'); } catch (_) { Utils.toast('Não foi possível copiar a mensagem.', 'erro'); } });
+    wrap.querySelector('[data-open]').addEventListener('click', async () => {
+      const content = wrap.querySelector('#osWhatsAppMensagem').value.trim();
+      const rawPhone = wrap.querySelector('#osWhatsAppDestino').value.trim();
+      const phone = Orcamentos.normalizarWhatsApp(rawPhone);
+      if (!content) return Utils.toast('A mensagem está vazia.', 'erro');
+      if (rawPhone && !/^55\d{10,11}$/.test(phone)) return Utils.toast('Informe um telefone com DDD válido.', 'erro');
+      const url = (phone ? 'https://wa.me/' + phone : 'https://wa.me/') + '?text=' + encodeURIComponent(content);
+      const opened = window.open(url, '_blank');
+      if (!opened) return Utils.toast('O navegador bloqueou a abertura. Permita pop-ups para este aplicativo.', 'erro');
+      try { opened.opener = null; } catch (_) {}
+      close();
+      if (CONFIG.canManageOperations && order.status === 'rascunho') { try { await Api.request(Api.orgFilter('/rest/v1/ordens_servico?id=eq.' + encodeURIComponent(order.id)), { method: 'PATCH', body: JSON.stringify({ status: 'enviada', enviada_em: new Date().toISOString() }) }); order.status = 'enviada'; await this.carregar(); } catch (_) {} }
+    });
+    wrap.querySelector('#osWhatsAppDestino')?.focus();
   },
 
   salvarPDF(order) {
