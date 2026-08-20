@@ -15,7 +15,7 @@ const Nav = {
     document.querySelectorAll('.pro-section').forEach(element => {
       element.style.display = canViewOperations ? 'block' : 'none';
     });
-    ['navAgenda', 'navFinanceiroEventos', 'navGastos', 'navEquipe', 'navFornecedores', 'navEstoque', 'navOrdemServico'].forEach(id => {
+    ['navAgenda', 'navFinanceiroEventos', 'navGastos', 'navEquipe', 'navFornecedores', 'navEstoque'].forEach(id => {
       const element = document.getElementById(id);
       if (element) element.style.display = canViewOperations ? 'flex' : 'none';
     });
@@ -23,7 +23,7 @@ const Nav = {
     const financeSection = document.getElementById('navSectionFinanceiro');
     if (financeSection) financeSection.textContent = canViewOperations ? 'Financeiro' : '';
     const operationsSection = document.getElementById('navSectionOperacoes');
-    if (operationsSection) operationsSection.textContent = canViewOperations ? 'Operações' : '';
+    if (operationsSection) operationsSection.textContent = canViewOperations ? 'Cadastros operacionais' : '';
 
     ['badgeGastos', 'badgeEquipe', 'badgeFornecedores'].forEach(id => {
       const badge = document.getElementById(id);
@@ -31,7 +31,7 @@ const Nav = {
     });
 
     const serviceOrder = document.getElementById('navOrdemServico');
-    if (serviceOrder) serviceOrder.style.display = canViewOperations ? 'flex' : 'none';
+    if (serviceOrder) serviceOrder.style.display = 'none';
 
     document.querySelectorAll('.admin-only').forEach(element => {
       element.style.display = canManageUsers ? '' : 'none';
