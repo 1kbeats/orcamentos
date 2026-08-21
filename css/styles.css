@@ -118,6 +118,15 @@ a:hover { color: var(--accent-hover); }
   padding: 0.75rem 1.25rem;
   border-top: 1px solid rgba(255,255,255,0.07);
 }
+.sidebar-technology {
+  padding: .55rem .75rem .1rem;
+  color: rgba(255,255,255,.34);
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: .02em;
+}
+.sidebar-technology strong { color: rgba(255,255,255,.52); font-weight: 600; }
 
 .main-content { margin-left: 220px; flex: 1; min-height: 100vh; }
 

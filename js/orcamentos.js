@@ -389,14 +389,20 @@ const Orcamentos = {
       const editando = Boolean(this._registroAtual?.id);
       const url = CONFIG.SUPABASE_URL + '/rest/v1/orcamentos' +
         (editando ? '?id=eq.' + encodeURIComponent(this._registroAtual.id) : '');
+      const payload = Api.orgPayload(this._dadosParaBanco(d));
       const response = await fetch(url, {
         method: editando ? 'PATCH' : 'POST',
         headers,
-        body: JSON.stringify(this._dadosParaBanco(d))
+        body: JSON.stringify(payload)
       });
       if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Não foi possível salvar.');
+        const errorText = await response.text();
+        let errorMessage = errorText;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData?.message || errorData?.error || errorText;
+        } catch (_) {}
+        throw new Error(errorMessage || 'Não foi possível salvar.');
       }
       const rows = await response.json();
       const salvo = rows?.[0] || this._registroAtual;
