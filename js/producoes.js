@@ -128,15 +128,19 @@ const Producoes = {
     if (!quoteSelect || !nameInput) return;
 
     nameInput.placeholder = 'Ex.: Inauguração da Praça XV';
+    nameInput.autocomplete = 'off';
+    nameInput.setAttribute('data-form-type', 'other');
     let lastSuggestedName = '';
-    quoteSelect.addEventListener('change', () => {
+    const preencherNomeDoEvento = () => {
       const quote = available.find(item => item.id === quoteSelect.value);
-      const suggestedName = quote?.referencia || '';
+      const suggestedName = quote?.referencia || quote?.cliente_nome || '';
       if (!nameInput.value.trim() || nameInput.value === lastSuggestedName) {
         nameInput.value = suggestedName;
       }
       lastSuggestedName = suggestedName;
-    });
+    };
+    quoteSelect.addEventListener('change', preencherNomeDoEvento);
+    preencherNomeDoEvento();
   },
 
   modalGasto(producao, onComplete) { this.modal('Lançar gasto da produção', '<div class="ops-form-grid">' + this.field('Data', 'data', 'date', true, producao.data_evento || this.dateValue()) + this.select('Categoria', 'categoria', '<option value="combustivel">Combustível</option><option value="alimentacao">Alimentação</option><option value="manutencao">Manutenção</option><option value="equipamento">Equipamento</option><option value="logistica">Logística</option><option value="nota_fiscal">Nota fiscal</option><option value="outro">Outro</option>', true) + this.field('Descrição', 'descricao', 'text', true) + this.field('Valor (R$)', 'valor', 'number', true) + this.field('Fornecedor / posto', 'fornecedor') + this.field('Número da NF', 'nota_fiscal') + this.select('Pagamento', 'status_pagamento', '<option value="pago">Pago</option><option value="pendente">Pendente</option>') + this.text('Observações', 'observacoes') + '</div>', async form => Api.request('/rest/v1/gastos', { method: 'POST', body: JSON.stringify(Api.orgPayload({ orcamento_id: producao.orcamento_id, data: this.date(form, 'data'), categoria: form.get('categoria'), descricao: this.value(form, 'descricao'), valor: this.number(form, 'valor'), fornecedor: this.value(form, 'fornecedor'), nota_fiscal: this.value(form, 'nota_fiscal'), status_pagamento: form.get('status_pagamento'), observacoes: this.value(form, 'observacoes', 2000) })) }), onComplete); },
