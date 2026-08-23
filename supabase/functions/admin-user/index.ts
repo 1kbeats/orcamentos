@@ -77,7 +77,7 @@ async function requireOwner(userId: string, organizationId: string) {
 async function organizationMembers(organizationId: string) {
   const { data, error } = await supabaseAdmin
     .from('organization_members')
-    .select('user_id,role')
+    .select('user_id,role,module_permissions')
     .eq('organization_id', organizationId)
 
   if (error) throw error
@@ -123,6 +123,7 @@ Deno.serve(async request => {
           email: user.email ?? '',
           name: user.user_metadata?.name || user.user_metadata?.nome || '',
           role: memberById.get(user.id)?.role || 'member',
+          permissions: memberById.get(user.id)?.module_permissions || {},
           active: !user.banned_until || new Date(user.banned_until) <= new Date()
         }))
 
@@ -175,6 +176,23 @@ Deno.serve(async request => {
       const { error } = await supabaseAdmin
         .from('organization_members')
         .update({ role })
+        .eq('organization_id', organizationId)
+        .eq('user_id', targetId)
+      if (error) throw error
+      return json(200, { ok: true }, access.headers)
+    }
+
+    if (body.action === 'update_permissions') {
+      const allowedModules = ['dashboard','orcamentos','agenda','clientes_catalogo','financeiro','despesas','equipe','fornecedores','estoque']
+      const source = body.permissions && typeof body.permissions === 'object' ? body.permissions : {}
+      const permissions: Record<string,string> = {}
+      for (const module of allowedModules) {
+        const level = String(source[module] || 'none')
+        permissions[module] = ['none','view','edit'].includes(level) ? level : 'none'
+      }
+      const { error } = await supabaseAdmin
+        .from('organization_members')
+        .update({ module_permissions: permissions })
         .eq('organization_id', organizationId)
         .eq('user_id', targetId)
       if (error) throw error

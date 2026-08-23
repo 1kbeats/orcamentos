@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/styles.css?v=6.9.3">
-  <link rel="stylesheet" href="./css/secure.css?v=6.8.1">
+  <link rel="stylesheet" href="./css/secure.css?v=6.9.4">
   <link rel="stylesheet" href="./css/financeiro-eventos.css?v=6.9.3">
   <link rel="stylesheet" href="./css/simplified-experience.css?v=6.9.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -636,24 +636,15 @@
 
 <!-- MODAL: EDITAR ACESSO DO USUÁRIO -->
 <div class="modal-edit-bg" id="modalEditAcesso">
-  <div class="modal-box">
-    <div class="modal-title">Editar acesso — <span id="editAcessoNome"></span></div>
-    <div class="modal-field">
-      <label for="editAcessoRole">Perfil de acesso</label>
-      <select id="editAcessoRole">
-        <option value="admin">Gestor operacional</option>
-        <option value="member">Comercial</option>
-        <option value="viewer">Somente visualização</option>
-      </select>
-      <div class="access-profile-guide">
-        <p><strong>Gestor operacional:</strong> orçamentos, produções, gastos, equipe e fornecedores.</p>
-        <p><strong>Comercial:</strong> clientes, catálogo e orçamentos.</p>
-        <p><strong>Somente visualização:</strong> consulta os dados sem alterar ou excluir.</p>
-      </div>
-    </div>
-    <div class="modal-btns">
+  <div class="modal-box permission-modal-box">
+    <div class="permission-modal-head"><div><small>PERMISSÕES</small><div class="modal-title">Acesso do usuário</div><p>Defina o que <strong id="editAcessoNome"></strong> poderá visualizar e alterar.</p></div></div>
+    <div class="permission-user-summary"><span><strong id="editAcessoNomeResumo"></strong><small id="editAcessoPerfil"></small></span><b>Você controla este acesso</b></div>
+    <div class="permission-presets"><button type="button" data-permission-preset="operational">Acesso operacional completo</button><button type="button" data-permission-preset="view">Somente visualização</button><button type="button" data-permission-preset="none">Remover todos</button></div>
+    <div class="permission-grid" id="modulePermissionsGrid"></div>
+    <div class="permission-security"><strong>Segurança:</strong> as permissões são verificadas também no banco de dados.</div>
+    <div class="modal-btns permission-actions">
       <button class="btn-cancel" id="btnCancelarAcesso" type="button">Cancelar</button>
-      <button class="btn-save" id="btnSalvarAcesso" type="button">Salvar acesso</button>
+      <button class="btn-save" id="btnSalvarAcesso" type="button">Salvar permissões</button>
     </div>
   </div>
 </div>
@@ -682,12 +673,12 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.9.3"></script>
+<script src="./js/config.js?v=6.9.4"></script>
 <script src="./js/password-toggle.js?v=6.6.0"></script>
 <script src="./js/api.js?v=6.6.0"></script>
 <script src="./js/utils.js?v=6.6.0"></script>
-<script src="./js/auth.js?v=6.6.0"></script>
-<script src="./js/nav.js?v=6.7.0"></script>
+<script src="./js/auth.js?v=6.9.4"></script>
+<script src="./js/nav.js?v=6.9.4"></script>
 <script src="./js/nav-events.js?v=6.7.0"></script>
 <script src="./js/clientes.js?v=6.6.0"></script>
 <script src="./js/financeiro.js?v=6.6.0"></script>
@@ -701,14 +692,14 @@
 <script src="./js/ordens-servico.js?v=6.8.1"></script>
 <script src="./js/compact-lists.js?v=6.6.0"></script>
 <script src="./js/estoque.js?v=6.6.0"></script>
-<script src="./js/usuarios.js?v=6.6.0"></script>
+<script src="./js/usuarios.js?v=6.9.4"></script>
 <script src="./js/catalogo.js?v=6.6.1"></script>
 <script src="./js/orcamentos.js?v=6.9.3"></script>
 <script src="./js/secure-overrides.js?v=6.6.0"></script>
 <script src="./js/simplified-experience.js?v=6.9.0"></script>
 <script src="./js/pwa-install.js?v=6.7.0"></script>
 
-<script src="./js/app.js?v=6.7.0"></script>
+<script src="./js/app.js?v=6.9.4"></script>
 
 </body>
 </html>

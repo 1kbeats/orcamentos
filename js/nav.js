@@ -9,17 +9,14 @@ const Nav = {
 
   // Configura o menu de acordo com o perfil
   configurarMenu() {
-    const canViewOperations = CONFIG.canViewOperations;
+    const moduleByNav = {navDashboard:'dashboard',navOrcamentos:'orcamentos',navAgenda:'agenda',navClientes:'clientes_catalogo',navCatalogo:'clientes_catalogo',navFinanceiroEventos:'financeiro',navGastos:'despesas',navEquipe:'equipe',navFornecedores:'fornecedores',navEstoque:'estoque'};
+    Object.entries(moduleByNav).forEach(([id,module]) => { const el=document.getElementById(id); if(el) el.style.display=CONFIG.canViewModule(module)?'flex':'none'; });
+    const canViewOperations = ['agenda','financeiro','despesas','equipe','fornecedores','estoque'].some(module => CONFIG.canViewModule(module));
     const canManageUsers = CONFIG.canManageUsers;
 
     document.querySelectorAll('.pro-section').forEach(element => {
       element.style.display = canViewOperations ? 'block' : 'none';
     });
-    ['navAgenda', 'navFinanceiroEventos', 'navGastos', 'navEquipe', 'navFornecedores', 'navEstoque'].forEach(id => {
-      const element = document.getElementById(id);
-      if (element) element.style.display = canViewOperations ? 'flex' : 'none';
-    });
-
     const financeSection = document.getElementById('navSectionFinanceiro');
     if (financeSection) financeSection.textContent = canViewOperations ? 'Financeiro' : '';
     const operationsSection = document.getElementById('navSectionOperacoes');
@@ -39,6 +36,20 @@ const Nav = {
   },
   // Mostra painel e atualiza nav ativo
   showPanel(panel) {
+    const moduleByPanel = {dashboard:'dashboard',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users'};
+    const activeModule = moduleByPanel[panel] || 'dashboard';
+    const allowed = panel === 'admin' ? CONFIG.canManageUsers : CONFIG.canViewModule(activeModule);
+    if (!allowed) {
+      Utils.toast('Este módulo não está liberado para o seu perfil.', 'erro');
+      const firstAllowed = [
+        ['dashboard','dashboard'], ['listaOrcamentos','orcamentos'], ['agenda','agenda'],
+        ['clientes','clientes_catalogo'], ['financeiroEventos','financeiro'], ['gastos','despesas'],
+        ['equipe','equipe'], ['fornecedores','fornecedores'], ['estoque','estoque']
+      ].find(([, module]) => CONFIG.canViewModule(module));
+      if (firstAllowed && firstAllowed[0] !== panel) return this.showPanel(firstAllowed[0]);
+      return;
+    }
+    CONFIG.activeModule = activeModule;
     this.painelAtual = panel;
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));

@@ -1,7 +1,7 @@
 // Configuração pública do frontend. Nunca adicione service_role ou outros segredos aqui.
 const CONFIG = {
   APP_NAME: '1K Beats — Gestão de eventos',
-  APP_VERSION: 'v6.9.3',
+  APP_VERSION: 'v6.9.4',
   SUPABASE_URL: 'https://hcjbfdspmqlyzkgypacb.supabase.co',
   SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_muX8-m3AXYd3lOHGGsd23w_iRsXUq7X',
   STORAGE_PREFIX: '1kbeats_v6_',
@@ -9,6 +9,7 @@ const CONFIG = {
   PUBLIC_APP_URL: 'https://1kbeats.github.io/orcamentos/',
   SUPPORT_WHATSAPP: '',
   context: null,
+  activeModule: 'dashboard',
 
   assertSafe() {
     const key = this.SUPABASE_PUBLISHABLE_KEY || '';
@@ -80,24 +81,37 @@ const CONFIG = {
     return this.role === 'owner' || this.role === 'admin';
   },
 
+  moduleAccess(module) {
+    if (this.role === 'owner') return 'edit';
+    const explicit = this.context?.permissions?.[module];
+    if (['none', 'view', 'edit'].includes(explicit)) return explicit;
+    if (this.role === 'admin' && module !== 'users') return 'edit';
+    if (this.role === 'member' && ['dashboard','orcamentos','clientes_catalogo'].includes(module)) return 'edit';
+    if (this.role === 'viewer' && module !== 'users') return 'view';
+    return 'none';
+  },
+
+  canViewModule(module) { return ['view','edit'].includes(this.moduleAccess(module)); },
+  canEditModule(module) { return this.moduleAccess(module) === 'edit'; },
+
   get canManageUsers() {
     return this.role === 'owner';
   },
 
   get canManageOperations() {
-    return this.role === 'owner' || this.role === 'admin';
+    return this.canEditModule(this.activeModule);
   },
 
   get canViewOperations() {
-    return this.role === 'owner' || this.role === 'admin' || this.role === 'viewer';
+    return ['agenda','financeiro','despesas','equipe','fornecedores','estoque'].some(module => this.canViewModule(module));
   },
 
   get canEditCommercial() {
-    return this.role === 'owner' || this.role === 'admin' || this.role === 'member';
+    return this.canEditModule(this.activeModule);
   },
 
   get isReadOnly() {
-    return this.role === 'viewer';
+    return this.moduleAccess(this.activeModule) === 'view';
   },
 
   publicQuoteUrl(token) {
