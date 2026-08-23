@@ -54,7 +54,7 @@ const Auth = {
 
   async buscarMembro(userId) {
     const path = '/rest/v1/organization_members' +
-      '?select=organization_id,role,organizations(id,name,slug,plan,status)' +
+      '?select=organization_id,role,module_permissions,organizations(id,name,slug,plan,status)' +
       '&user_id=eq.' + encodeURIComponent(userId) +
       '&limit=1';
     const memberships = await Api.request(path);
@@ -77,6 +77,7 @@ const Auth = {
     CONFIG.setContext({
       organization_id: membership.organization_id,
       role: membership.role,
+      permissions: membership.module_permissions || {},
       organization: membership.organizations
     });
   },
@@ -84,7 +85,12 @@ const Auth = {
   configurarPerfil(user) {
     document.body.dataset.role = CONFIG.role;
     Nav.configurarMenu();
-    const name = user.user_metadata?.name || user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário';
+    let name = user.user_metadata?.name || user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário';
+    // Mantém a identificação profissional do proprietário mesmo em contas antigas
+    // criadas originalmente com o nome genérico "admin".
+    if (CONFIG.role === 'owner' && String(name).trim().toLowerCase() === 'admin') {
+      name = 'Alessandro Lima';
+    }
     const nameElement = document.getElementById('userNome');
     const avatar = document.querySelector('.sidebar-avatar');
     if (nameElement) nameElement.textContent = name;

@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   Catalogo.bindEvents();
   Financeiro.bindEvents();
   Usuarios.bindEvents();
-  Dashboard.carregar();
+  const initialPanel = [
+    ['dashboard','dashboard'], ['listaOrcamentos','orcamentos'], ['agenda','agenda'],
+    ['clientes','clientes_catalogo'], ['financeiroEventos','financeiro'], ['gastos','despesas'],
+    ['equipe','equipe'], ['fornecedores','fornecedores'], ['estoque','estoque']
+  ].find(([, module]) => CONFIG.canViewModule(module));
+  if (initialPanel) Nav.showPanel(initialPanel[0]);
 
   document.getElementById('btnExportarOrcamentos')?.addEventListener('click', () => ListaOrcamentos.exportar());
   document.getElementById('btnExcluirSelecionados')?.addEventListener('click', () => ListaOrcamentos.excluirSelecionados());
@@ -24,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=6.7.0', { scope: './', updateViaCache: 'none' });
+      const registration = await navigator.serviceWorker.register('./sw.js?v=6.9.4', { scope: './', updateViaCache: 'none' });
       registration.addEventListener('updatefound', () => {
         registration.installing?.addEventListener('statechange', event => {
           if (event.target.state === 'installed' && navigator.serviceWorker.controller) {
