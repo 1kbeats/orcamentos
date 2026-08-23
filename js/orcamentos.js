@@ -428,8 +428,9 @@ const Orcamentos = {
   async salvarOrcamento() {
     const btn = document.getElementById('btnSalvarOrcamento');
     if (btn) btn.disabled = true;
-    await this._salvarRegistro();
+    const salvo = await this._salvarRegistro();
     if (btn) btn.disabled = false;
+    if (salvo) Nav.showPanel('listaOrcamentos');
   },
 
   novoOrcamento() {

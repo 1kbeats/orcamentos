@@ -36,7 +36,7 @@ const Nav = {
   },
   // Mostra painel e atualiza nav ativo
   showPanel(panel) {
-    const moduleByPanel = {dashboard:'dashboard',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users'};
+    const moduleByPanel = {dashboard:'dashboard',orcamentos:'orcamentos',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users'};
     const activeModule = moduleByPanel[panel] || 'dashboard';
     const allowed = panel === 'admin' ? CONFIG.canManageUsers : CONFIG.canViewModule(activeModule);
     if (!allowed) {
