@@ -13,14 +13,16 @@
 <link rel="stylesheet" href="./css/secure.css?v=6.6.0">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+html { min-height: 100%; }
 body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   background: #F4F4F8;
   color: #1A1A25;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
+  isolation: isolate;
 }
 a { color: #D91A72; text-decoration: none; }
 a:hover { color: #B8105E; }
@@ -38,7 +40,22 @@ a:hover { color: #B8105E; }
 .wrap {
   width: 100%; max-width: 400px;
   animation: fadeUp .5s ease-out both;
+  position: relative; z-index: 1;
 }
+
+/* ── AMBIENTE SONORO ── */
+.login-ambient {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(217,26,114,.08), transparent 30%),
+    radial-gradient(circle at 12% 48%, rgba(144,144,176,.07), transparent 24%),
+    radial-gradient(circle at 88% 48%, rgba(217,26,114,.055), transparent 24%);
+}
+.login-ambient svg { width: 100%; height: 100%; }
+.ambient-wave-primary { fill: none; stroke: url(#ambientGradient); stroke-width: 2; opacity: .18; }
+.ambient-wave-secondary { fill: none; stroke: #9090B0; stroke-width: 1; opacity: .12; }
+.ambient-dot { fill: #D91A72; opacity: .17; }
+.ambient-bars rect { fill: #D91A72; opacity: .13; rx: 3; }
 
 /* ── LOGO AREA ── */
 .logo-area { text-align: center; margin-bottom: 28px; }
@@ -163,8 +180,40 @@ a:hover { color: #B8105E; }
   font-family: 'Space Mono', monospace; line-height: 1.8;
 }
 .footer strong { color: #9090B0; }
+@media (max-height: 900px) and (min-width: 601px) {
+  body { align-items: flex-start; padding: 12px 24px; }
+  .wrap { max-width: 390px; margin: auto; }
+  .logo-area { margin-bottom: 14px; }
+  .wave-strip { height: 10px; margin-bottom: 8px; }
+  .logo-mark { gap: 11px; margin-bottom: 5px; }
+  .logo-icon { width: 46px; height: 46px; border-radius: 10px; }
+  .logo-icon svg { width: 30px; height: 30px; }
+  .logo-text-main { font-size: 24px; }
+  .logo-text-sub { font-size: 8px; }
+  .eq-bars { height: 12px; margin-top: 3px; }
+  .card { padding: 22px 26px; }
+  .rec-badge { margin-bottom: 10px; }
+  .card-sub { margin-bottom: 15px; }
+  .field { margin-bottom: 10px; }
+  .field label { margin-bottom: 5px; }
+  .field input { height: 42px; }
+  .btn-login { height: 44px; margin-top: 5px; }
+  .btn-install { min-height: 42px; margin-top: 8px; }
+  .forgot { margin-top: 11px; }
+  .footer { margin-top: 11px; font-size: 9px; line-height: 1.5; }
+}
+@media (max-height: 720px) and (min-width: 601px) {
+  .wave-strip { display: none; }
+  .logo-area { margin-bottom: 10px; }
+  .logo-mark { margin-bottom: 0; }
+  .eq-bars { display: flex; height: 10px; margin-top: 4px; overflow: hidden; }
+  .eq-bar { width: 3px; }
+  .card { padding-top: 18px; padding-bottom: 18px; }
+  .footer { margin-top: 8px; }
+}
 @media (max-width: 600px) {
   body { align-items: flex-start; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
+  .login-ambient { display: none; }
   .logo-area { margin-bottom: 20px; }
   .card { padding: 26px 20px; }
   .field input { font-size: 16px; }
@@ -172,6 +221,29 @@ a:hover { color: #B8105E; }
 </style>
 </head>
 <body>
+
+<div class="login-ambient" aria-hidden="true">
+  <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="ambientGradient" x1="0" x2="1">
+        <stop offset="0" stop-color="#D91A72" stop-opacity="0"/>
+        <stop offset=".22" stop-color="#D91A72"/>
+        <stop offset=".5" stop-color="#FF4DA6" stop-opacity=".25"/>
+        <stop offset=".78" stop-color="#D91A72"/>
+        <stop offset="1" stop-color="#D91A72" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path class="ambient-wave-secondary" d="M-80 468 C35 468 35 395 150 395 S265 540 380 540 495 345 610 345 725 505 840 505 955 380 1070 380 1185 525 1300 525 1415 405 1530 405 1645 468 1760 468"/>
+    <path class="ambient-wave-primary" d="M-80 450 C25 450 25 360 130 360 S235 530 340 530 445 315 550 315 655 565 760 565 865 335 970 335 1075 535 1180 535 1285 370 1390 370 1495 450 1600 450"/>
+    <g class="ambient-bars" transform="translate(120 610)">
+      <rect x="0" y="35" width="8" height="28"/><rect x="16" y="18" width="8" height="45"/><rect x="32" y="0" width="8" height="63"/><rect x="48" y="26" width="8" height="37"/><rect x="64" y="10" width="8" height="53"/><rect x="80" y="38" width="8" height="25"/>
+    </g>
+    <g class="ambient-bars" transform="translate(1384 260)">
+      <rect x="0" y="35" width="8" height="28"/><rect x="16" y="18" width="8" height="45"/><rect x="32" y="0" width="8" height="63"/><rect x="48" y="26" width="8" height="37"/><rect x="64" y="10" width="8" height="53"/><rect x="80" y="38" width="8" height="25"/>
+    </g>
+    <circle class="ambient-dot" cx="185" cy="315" r="4"/><circle class="ambient-dot" cx="275" cy="270" r="2"/><circle class="ambient-dot" cx="1360" cy="650" r="4"/><circle class="ambient-dot" cx="1450" cy="590" r="2"/>
+  </svg>
+</div>
 
 <div class="wrap">
 
@@ -215,7 +287,7 @@ a:hover { color: #B8105E; }
   <div class="card">
     <div class="rec-badge">
       <div class="rec-dot"></div>
-      <span>ACESSO SEGURO · v6.9.2</span>
+      <span>ACESSO SEGURO · v6.9.3</span>
     </div>
 
     <div class="card-title">Acesse sua conta</div>
@@ -244,12 +316,13 @@ a:hover { color: #B8105E; }
   </div>
 
   <div class="footer">
-    Tecnologia por <strong>Pryntix</strong><br>
-    © 2026 · Todos os direitos reservados<br><span style="font-size:10px;opacity:0.5">v6.9.2</span> · ambiente seguro
+    Desenvolvido por <strong>Alessandro Lima</strong><br>
+    Tecnologia e licenciamento por <strong>Pryntix</strong><br>
+    <span style="font-size:10px;opacity:0.5">© 2026 · v6.9.3 · Ambiente seguro</span>
   </div>
 </div>
 
-<script src="./js/config.js?v=6.9.2"></script>
+<script src="./js/config.js?v=6.9.3"></script>
 <script src="./js/api.js?v=6.6.0"></script>
 <script src="./js/password-toggle.js?v=6.6.0"></script>
 <script src="./js/pwa-install.js?v=6.7.0"></script>
