@@ -22,18 +22,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('checkTodosOrcamentos')?.addEventListener('change', event => {
     document.querySelectorAll('.quote-check input').forEach(input => { input.checked = event.target.checked; input.dispatchEvent(new Event('change')); });
   });
-  document.getElementById('updateBanner')?.addEventListener('click', () => window.location.reload());
+  const updateBanner = document.getElementById('updateBanner');
+  updateBanner?.addEventListener('click', () => {
+    sessionStorage.setItem('1kbeats_update_reloaded_at', String(Date.now()));
+    updateBanner.classList.remove('show');
+    window.location.reload();
+  });
   document.getElementById('btnDashViewAll')?.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') Nav.showPanel('listaOrcamentos');
   });
 
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=6.9.4', { scope: './', updateViaCache: 'none' });
+      // O endereço do service worker deve permanecer estável. A versão do cache,
+      // definida no próprio sw.js, é quem controla as atualizações.
+      const registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
       registration.addEventListener('updatefound', () => {
         registration.installing?.addEventListener('statechange', event => {
           if (event.target.state === 'installed' && navigator.serviceWorker.controller) {
-            document.getElementById('updateBanner')?.classList.add('show');
+            const lastReload = Number(sessionStorage.getItem('1kbeats_update_reloaded_at') || 0);
+            const justReloaded = Date.now() - lastReload < 120000;
+            if (!justReloaded) updateBanner?.classList.add('show');
           }
         });
       });
