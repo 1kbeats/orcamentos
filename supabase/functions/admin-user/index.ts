@@ -167,7 +167,7 @@ Deno.serve(async request => {
       }
       if (accessStatus !== 'active') {
         const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(created.user.id, {
-          ban_duration: '876000h'
+          ban_duration: 'none'
         })
         if (banError) throw banError
       }
@@ -231,7 +231,7 @@ Deno.serve(async request => {
       if (membershipError) throw membershipError
 
       const { error } = await supabaseAdmin.auth.admin.updateUserById(targetId, {
-        ban_duration: accessStatus === 'active' ? 'none' : '876000h'
+        ban_duration: 'none'
       })
       if (error) throw error
       return json(200, { ok: true }, access.headers)

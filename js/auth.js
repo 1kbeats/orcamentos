@@ -54,7 +54,7 @@ const Auth = {
 
   async buscarMembro(userId) {
     const path = '/rest/v1/organization_members' +
-      '?select=organization_id,role,module_permissions,organizations(id,name,slug,plan,status)' +
+      '?select=organization_id,role,module_permissions,access_status,organizations(id,name,slug,plan,status)' +
       '&user_id=eq.' + encodeURIComponent(userId) +
       '&limit=1';
     const memberships = await Api.request(path);
@@ -71,7 +71,18 @@ const Auth = {
       });
       membership = await this.buscarMembro(user.id);
     }
-    if (!membership?.organization_id || membership.organizations?.status !== 'active') {
+    if (!membership?.organization_id) {
+      throw new Error('Seu usuário ainda não foi vinculado a uma empresa ativa.');
+    }
+    if (membership.role !== 'owner' && membership.access_status !== 'active') {
+      const message = membership.access_status === 'activation_pending'
+        ? 'Ativação em andamento. O acesso à plataforma ainda está sendo finalizado. Entre em contato com o administrador responsável para mais informações.'
+        : 'Acesso temporariamente indisponível. Entre em contato com o administrador responsável para verificar a liberação da plataforma.';
+      const error = new Error(message);
+      error.code = 'access_unavailable';
+      throw error;
+    }
+    if (membership.organizations?.status !== 'active') {
       throw new Error('Seu usuário ainda não foi vinculado a uma empresa ativa.');
     }
     CONFIG.setContext({
