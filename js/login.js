@@ -40,7 +40,12 @@
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
-      if (!response.ok || !data.access_token) throw new Error('E-mail ou senha incorretos.');
+      if (!response.ok || !data.access_token) {
+        const banned = data?.error_code === 'user_banned' || /banned/i.test(String(data?.msg || data?.error_description || ''));
+        throw new Error(banned
+          ? 'Acesso temporariamente indisponível. Entre em contato com o administrador responsável para verificar a liberação da plataforma.'
+          : 'E-mail ou senha incorretos.');
+      }
       CONFIG.setSession({
         access_token: data.access_token,
         refresh_token: data.refresh_token,

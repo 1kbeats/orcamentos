@@ -77,7 +77,7 @@ async function requireOwner(userId: string, organizationId: string) {
 async function organizationMembers(organizationId: string) {
   const { data, error } = await supabaseAdmin
     .from('organization_members')
-    .select('user_id,role,module_permissions')
+    .select('user_id,role,module_permissions,access_status')
     .eq('organization_id', organizationId)
 
   if (error) throw error
@@ -124,7 +124,8 @@ Deno.serve(async request => {
           name: user.user_metadata?.name || user.user_metadata?.nome || '',
           role: memberById.get(user.id)?.role || 'member',
           permissions: memberById.get(user.id)?.module_permissions || {},
-          active: !user.banned_until || new Date(user.banned_until) <= new Date()
+          access_status: memberById.get(user.id)?.access_status || 'active',
+          active: (memberById.get(user.id)?.access_status || 'active') === 'active'
         }))
 
       return json(200, { users }, access.headers)
@@ -135,6 +136,9 @@ Deno.serve(async request => {
       const password = String(body.password || '')
       const name = String(body.name || '').trim().slice(0, 100)
       const role = ['admin', 'member', 'viewer'].includes(body.role) ? body.role : 'member'
+      const accessStatus = ['active', 'activation_pending', 'suspended'].includes(body.access_status)
+        ? body.access_status
+        : 'activation_pending'
 
       if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 8) {
         return json(400, { error: 'invalid_user_data' }, access.headers)
@@ -153,12 +157,19 @@ Deno.serve(async request => {
         .insert({
           organization_id: organizationId,
           user_id: created.user.id,
-          role
+          role,
+          access_status: accessStatus
         })
 
       if (membershipError) {
         await supabaseAdmin.auth.admin.deleteUser(created.user.id)
         throw membershipError
+      }
+      if (accessStatus !== 'active') {
+        const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(created.user.id, {
+          ban_duration: '876000h'
+        })
+        if (banError) throw banError
       }
       return json(201, { id: created.user.id }, access.headers)
     }
@@ -207,9 +218,20 @@ Deno.serve(async request => {
       return json(200, { ok: true }, access.headers)
     }
 
-    if (body.action === 'set_active') {
+    if (body.action === 'set_access_status') {
+      const accessStatus = String(body.access_status || '')
+      if (!['active', 'activation_pending', 'suspended'].includes(accessStatus)) {
+        return json(400, { error: 'invalid_access_status' }, access.headers)
+      }
+      const { error: membershipError } = await supabaseAdmin
+        .from('organization_members')
+        .update({ access_status: accessStatus })
+        .eq('organization_id', organizationId)
+        .eq('user_id', targetId)
+      if (membershipError) throw membershipError
+
       const { error } = await supabaseAdmin.auth.admin.updateUserById(targetId, {
-        ban_duration: body.active ? 'none' : '876000h'
+        ban_duration: accessStatus === 'active' ? 'none' : '876000h'
       })
       if (error) throw error
       return json(200, { ok: true }, access.headers)

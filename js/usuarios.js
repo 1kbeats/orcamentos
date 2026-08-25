@@ -34,6 +34,10 @@ const Usuarios = {
     }[role] || 'Comercial';
   },
 
+  accessLabel(status) {
+    return { active: 'Ativo', activation_pending: 'Ativação pendente', suspended: 'Suspenso' }[status] || 'Ativação pendente';
+  },
+
   async carregar() {
     const container = document.getElementById('listaUsuarios');
     if (!container || !CONFIG.canManageUsers) return;
@@ -56,18 +60,18 @@ const Usuarios = {
           '<div class="user-info">' +
             '<div class="user-nome">' + Utils.escapeHTML(name) + '</div>' +
             '<div class="user-email">' + Utils.escapeHTML(user.email) + '</div>' +
-            '<div class="user-status ' + (user.active ? 'ativo' : 'inativo') + '">' +
-              (user.active ? '● Ativo' : '● Sem acesso') + ' · ' + Utils.escapeHTML(this.roleLabel(user.role)) +
+            '<div class="user-status ' + (user.access_status === 'active' ? 'ativo' : user.access_status === 'suspended' ? 'inativo' : 'pendente') + '">' +
+              '● ' + Utils.escapeHTML(this.accessLabel(user.access_status)) + ' · ' + Utils.escapeHTML(this.roleLabel(user.role)) +
             '</div>' +
           '</div>' +
           '<div class="user-actions">' +
             (!protectedOwner ? '<button class="btn-edit-access" type="button">Acesso</button>' : '') +
             (!protectedOwner ? '<button class="btn-edit-senha" type="button">Senha</button>' : '') +
-            (!protectedOwner ? '<button class="btn-toggle-user" type="button">' + (user.active ? 'Desativar' : 'Ativar') + '</button>' : '') +
+            (!protectedOwner ? '<select class="user-access-select" aria-label="Situação do acesso"><option value="active"'+(user.access_status==='active'?' selected':'')+'>Ativo</option><option value="activation_pending"'+(user.access_status==='activation_pending'?' selected':'')+'>Ativação pendente</option><option value="suspended"'+(user.access_status==='suspended'?' selected':'')+'>Suspenso</option></select>' : '') +
           '</div>';
         card.querySelector('.btn-edit-access')?.addEventListener('click', () => this.abrirEditAcesso(user.id, name, user.role, user.permissions || {}));
         card.querySelector('.btn-edit-senha')?.addEventListener('click', () => this.abrirEditSenha(user.id, name));
-        card.querySelector('.btn-toggle-user')?.addEventListener('click', () => this.toggleUsuario(user.id, user.active));
+        card.querySelector('.user-access-select')?.addEventListener('change', event => this.setAccessStatus(user.id, event.target.value));
         container.appendChild(card);
       });
     } catch (error) {
@@ -83,6 +87,8 @@ const Usuarios = {
     });
     const role = document.getElementById('novoUsuarioRole');
     if (role) role.value = 'admin';
+    const status = document.getElementById('novoUsuarioStatus');
+    if (status) status.value = 'activation_pending';
     document.getElementById('modalNovoUsuario')?.classList.add('open');
     document.getElementById('novoUsuarioNome')?.focus();
   },
@@ -97,6 +103,7 @@ const Usuarios = {
     const email = String(document.getElementById('novoUsuarioEmail')?.value || '').trim().toLowerCase();
     const password = document.getElementById('novoUsuarioSenha')?.value || '';
     const role = document.getElementById('novoUsuarioRole')?.value || 'admin';
+    const access_status = document.getElementById('novoUsuarioStatus')?.value || 'activation_pending';
     if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Utils.toast('Informe nome e e-mail válidos.', 'erro');
       return;
@@ -106,7 +113,7 @@ const Usuarios = {
       return;
     }
     try {
-      await this.callAdmin('create', { name, email, password, role });
+      await this.callAdmin('create', { name, email, password, role, access_status });
       this.fecharModalNovoUsuario();
       await this.carregar();
       Utils.toast('Usuário criado com segurança.');
@@ -183,12 +190,12 @@ const Usuarios = {
     }
   },
 
-  async toggleUsuario(userId, active) {
+  async setAccessStatus(userId, accessStatus) {
     if (!CONFIG.canManageUsers) return;
     try {
-      await this.callAdmin('set_active', { user_id: userId, active: !active });
+      await this.callAdmin('set_access_status', { user_id: userId, access_status: accessStatus });
       await this.carregar();
-      Utils.toast(active ? 'Usuário desativado.' : 'Usuário ativado.');
+      Utils.toast(accessStatus === 'active' ? 'Acesso liberado.' : accessStatus === 'suspended' ? 'Acesso suspenso.' : 'Acesso aguardando ativação.');
     } catch (error) {
       Utils.toast(Api.friendlyError(error), 'erro');
     }
