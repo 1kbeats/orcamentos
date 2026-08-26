@@ -23,8 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.quote-check input').forEach(input => { input.checked = event.target.checked; input.dispatchEvent(new Event('change')); });
   });
   const updateBanner = document.getElementById('updateBanner');
+  const updateStorageKey = '1kbeats_update_acknowledged_version';
+  const currentAppVersion = String(CONFIG.APP_VERSION || '').trim();
+  const updateWasAcknowledged = () => (
+    currentAppVersion && localStorage.getItem(updateStorageKey) === currentAppVersion
+  );
   updateBanner?.addEventListener('click', () => {
-    sessionStorage.setItem('1kbeats_update_reloaded_at', String(Date.now()));
+    if (currentAppVersion) localStorage.setItem(updateStorageKey, currentAppVersion);
     updateBanner.classList.remove('show');
     window.location.reload();
   });
@@ -40,9 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       registration.addEventListener('updatefound', () => {
         registration.installing?.addEventListener('statechange', event => {
           if (event.target.state === 'installed' && navigator.serviceWorker.controller) {
-            const lastReload = Number(sessionStorage.getItem('1kbeats_update_reloaded_at') || 0);
-            const justReloaded = Date.now() - lastReload < 120000;
-            if (!justReloaded) updateBanner?.classList.add('show');
+            if (!updateWasAcknowledged()) updateBanner?.classList.add('show');
           }
         });
       });
