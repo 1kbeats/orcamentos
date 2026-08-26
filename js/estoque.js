@@ -83,7 +83,7 @@ const Estoque = {
     const available = this._data.itens.filter(item => item.ativo).reduce((sum, item) => sum + Number(item.quantidade_disponivel || 0), 0);
     const itemRows = itemData.items.map(item => {
       const state = this.status(item);
-      const secondary = CONFIG.canManageOperations ? '<button type="button" data-edit-stock="' + Utils.safeId(item.id) + '">Editar cadastro</button><button type="button" data-stock-history="' + Utils.safeId(item.id) + '">Ver histórico</button><button type="button" class="' + (item.ativo ? 'danger' : '') + '" data-toggle-stock="' + Utils.safeId(item.id) + '">' + (item.ativo ? 'Arquivar' : 'Reativar') + '</button>' : '';
+      const secondary = CONFIG.canManageOperations ? '<button type="button" data-edit-stock="' + Utils.safeId(item.id) + '">Editar</button><button type="button" data-stock-history="' + Utils.safeId(item.id) + '">Ver histórico</button><button type="button" class="' + (item.ativo ? 'danger' : '') + '" data-toggle-stock="' + Utils.safeId(item.id) + '">' + (item.ativo ? 'Arquivar' : 'Reativar') + '</button><button type="button" class="danger" data-delete-stock="' + Utils.safeId(item.id) + '">Excluir</button>' : '';
       return '<article class="compact-row stock-compact-row' + (item.ativo ? '' : ' archived') + '"><div class="compact-main"><h3>' + Utils.escapeHTML(item.nome) + '</h3><p>' + Utils.escapeHTML(item.marca_modelo || this.categories[item.categoria] || '') + '</p><span>' + Utils.escapeHTML(item.codigo || item.numero_serie || 'Sem código') + '</span></div><div class="stock-category"><small>CATEGORIA</small><strong>' + Utils.escapeHTML(this.categories[item.categoria] || item.categoria) + '</strong></div><div class="stock-location"><small>LOCALIZAÇÃO</small><strong>' + Utils.escapeHTML(item.localizacao || 'Não informada') + '</strong></div><div class="stock-quantity"><small>TOTAL</small><strong>' + Number(item.quantidade_total || 0) + '</strong></div><div class="stock-quantity available"><small>DISPONÍVEL</small><strong>' + Number(item.quantidade_disponivel || 0) + '</strong></div><div class="compact-status"><small>SITUAÇÃO</small><span class="ops-tag stock-status-' + state.key + '">' + state.label + '</span></div><div class="compact-actions">' + (CONFIG.canManageOperations && item.ativo ? '<button type="button" class="ops-btn secondary" data-move-stock="' + Utils.safeId(item.id) + '">Movimentar</button>' : '<button type="button" class="ops-btn secondary" data-stock-history="' + Utils.safeId(item.id) + '">Histórico</button>') + (secondary ? '<details class="compact-more"><summary aria-label="Mais ações" title="Mais ações">•••</summary><div>' + secondary + '</div></details>' : '') + '</div></article>';
     }).join('');
 
@@ -108,6 +108,7 @@ const Estoque = {
     root.querySelectorAll('[data-stock-history]').forEach(button => button.addEventListener('click', () => { this._selectedItem = button.dataset.stockHistory; this._historyPage = 1; this.render(); }));
     root.querySelector('#stockHistoryAll')?.addEventListener('click', () => { this._selectedItem = ''; this._historyPage = 1; this.render(); });
     root.querySelectorAll('[data-toggle-stock]').forEach(button => button.addEventListener('click', () => this.toggleItem(button.dataset.toggleStock)));
+    root.querySelectorAll('[data-delete-stock]').forEach(button => button.addEventListener('click', () => this.deleteItem(button.dataset.deleteStock)));
     root.querySelectorAll('[data-stock-page]').forEach(button => button.addEventListener('click', () => { this._itemPage = Number(button.dataset.stockPage) || 1; this.render(); }));
     root.querySelectorAll('[data-stock-history-page]').forEach(button => button.addEventListener('click', () => { this._historyPage = Number(button.dataset.stockHistoryPage) || 1; this.render(); }));
     const reset = () => { this._itemPage = 1; this.render(); };
@@ -138,13 +139,18 @@ const Estoque = {
   modalItem(item) {
     if (!CONFIG.canManageOperations) return;
     const categories = Object.entries(this.categories).map(entry => this.option(entry[0], entry[1], item?.categoria || 'audio')).join('');
-    const quantity = item ? '<div class="ops-note full">Quantidade atual: <strong>' + item.quantidade_disponivel + ' disponível de ' + item.quantidade_total + '</strong>. Para alterar quantidades, registre uma movimentação.</div>' : this.field('Quantidade inicial', 'quantidade', 'number', 1, true, ' min="0" step="1" inputmode="numeric"');
+    const quantity = this.field(item ? 'Quantidade total' : 'Quantidade inicial', 'quantidade', 'number', item?.quantidade_total ?? 1, true, ' min="0" step="1" inputmode="numeric"') + (item ? '<div class="ops-note full">Disponíveis agora: <strong>' + item.quantidade_disponivel + '</strong>. Ao corrigir o total, o ajuste ficará registrado automaticamente no histórico.</div>' : '');
     const active = item ? this.select('Situação do cadastro', 'ativo', this.option('true','Ativo',String(item.ativo)) + this.option('false','Arquivado',String(item.ativo)), true) : '';
     const body = '<div class="ops-form-grid">' + this.field('Nome do equipamento', 'nome', 'text', item?.nome, true) + this.select('Categoria', 'categoria', categories, true) + this.field('Código interno', 'codigo', 'text', item?.codigo) + this.field('Marca / modelo', 'marca_modelo', 'text', item?.marca_modelo) + this.field('Número de série', 'numero_serie', 'text', item?.numero_serie) + this.field('Localização', 'localizacao', 'text', item?.localizacao) + quantity + this.field('Valor de aquisição (R$)', 'valor_aquisicao', 'number', item?.valor_aquisicao ?? 0, false, ' min="0" step="0.01" inputmode="decimal"') + active + this.textarea('Observações', 'observacoes', item?.observacoes) + '</div>';
-    this.openModal(item ? 'Editar equipamento' : 'Cadastrar equipamento', body, form => {
+    this.openModal(item ? 'Editar equipamento' : 'Cadastrar equipamento', body, async form => {
       const payload = { nome: Utils.sanitizeText(form.get('nome'),180), categoria: form.get('categoria'), codigo: Utils.sanitizeText(form.get('codigo'),80) || null, marca_modelo: Utils.sanitizeText(form.get('marca_modelo'),180) || null, numero_serie: Utils.sanitizeText(form.get('numero_serie'),120) || null, localizacao: Utils.sanitizeText(form.get('localizacao'),180) || null, valor_aquisicao: Math.max(0,Number(String(form.get('valor_aquisicao') || 0).replace(',','.')) || 0), observacoes: Utils.sanitizeText(form.get('observacoes'),2000) || null };
-      if (item) { payload.ativo = form.get('ativo') === 'true'; return Api.request(Api.orgFilter('/rest/v1/estoque_itens?id=eq.' + encodeURIComponent(item.id)), { method:'PATCH', body:JSON.stringify(payload) }); }
       const quantityValue = Math.max(0,Math.floor(Number(form.get('quantidade')) || 0));
+      if (item) {
+        const delta = quantityValue - Number(item.quantidade_total || 0);
+        if (delta) await Api.request('/rest/v1/rpc/registrar_movimentacao_estoque',{method:'POST',body:JSON.stringify({p_item_id:item.id,p_tipo:delta > 0 ? 'ajuste_entrada' : 'ajuste_saida',p_quantidade:Math.abs(delta),p_producao_id:null,p_responsavel:'Correção de cadastro',p_data_movimentacao:new Date().toISOString(),p_observacoes:'Quantidade total corrigida na edição do equipamento.'})});
+        payload.ativo = form.get('ativo') === 'true';
+        return Api.request(Api.orgFilter('/rest/v1/estoque_itens?id=eq.' + encodeURIComponent(item.id)), { method:'PATCH', body:JSON.stringify(payload) });
+      }
       return Api.request('/rest/v1/estoque_itens', { method:'POST', body:JSON.stringify(Api.orgPayload({ ...payload, quantidade_total:quantityValue, quantidade_disponivel:quantityValue })) });
     });
   },
@@ -163,5 +169,16 @@ const Estoque = {
     if (item.ativo && item.quantidade_disponivel !== item.quantidade_total) return Utils.toast('Devolva todas as unidades antes de arquivar.', 'erro');
     try { await Api.request(Api.orgFilter('/rest/v1/estoque_itens?id=eq.' + encodeURIComponent(id)),{method:'PATCH',body:JSON.stringify({ativo:!item.ativo})}); await this.carregar(); Utils.toast(item.ativo?'Equipamento arquivado.':'Equipamento reativado.'); }
     catch(error){ Utils.toast(Api.friendlyError(error),'erro'); }
+  },
+  async deleteItem(id) {
+    if (!CONFIG.canManageOperations) return;
+    const item = this._data.itens.find(row => row.id === id); if (!item) return;
+    if (!confirm('Excluir definitivamente "' + item.nome + '"? Use esta opção somente para cadastros de teste ou feitos por engano.')) return;
+    try {
+      await Api.request('/rest/v1/rpc/excluir_item_estoque_sem_uso',{method:'POST',body:JSON.stringify({p_item_id:id})});
+      if (this._selectedItem === id) this._selectedItem = '';
+      await this.carregar();
+      Utils.toast('Equipamento excluído.');
+    } catch(error){ Utils.toast(Api.friendlyError(error),'erro'); }
   }
 };
