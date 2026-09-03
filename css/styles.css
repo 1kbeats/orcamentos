@@ -540,6 +540,7 @@ select:-webkit-autofill {
 .billing-status { display:inline-block; padding:7px 10px; border-radius:999px; font-size:12px; font-weight:600; }
 .billing-status.paid { color:#08783f; background:#eaf8ef; }.billing-status.soon { color:#8a5b00; background:#fff3d6; }.billing-status.overdue { color:#b42332; background:#ffe8ea; }.billing-status.pending { color:#58586a; background:#eeeef4; }
 .billing-notice-on { color:#08783f !important; font-weight:600; margin-top:8px !important; }
+.billing-draft-ready { color:#08783f !important; font-weight:600; margin-top:6px !important; }
 .billing-actions { display:flex; gap:7px; justify-content:flex-end; align-items:center; white-space:nowrap; }
 .billing-actions button,.billing-copy { padding:9px 12px; border:1px solid var(--border-dim); border-radius:8px; background:#fff; font:600 12px inherit; cursor:pointer; }
 .billing-actions button.primary,.billing-modal-actions .primary { color:#fff; background:var(--accent); border-color:var(--accent); }

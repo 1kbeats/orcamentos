@@ -51,7 +51,7 @@ const Assinatura = {
     const proxima = pendentes.slice().sort((a,b) => a.vencimento.localeCompare(b.vencimento))[0];
     const rows = this.dados.map(item => {
       const s = this.situacao(item);
-      return '<tr><td><strong>'+Utils.escapeHTML(item.competencia)+'</strong><small>'+Utils.escapeHTML(item.tipo === 'implantacao' ? 'Implantação' : 'Mensalidade')+'</small></td><td>'+Utils.fmtDate(item.vencimento)+'</td><td>'+Utils.fmt(item.valor)+'</td><td><span class="billing-status '+s.classe+'">'+s.texto+'</span>'+(item.aviso_visivel&&item.status!=='pago'?'<small class="billing-notice-on">● Aviso visível para Walter</small>':'')+'</td><td class="billing-actions">'+(item.status === 'pago' ? '<button data-receipt="'+item.id+'">Recibo</button>' : '<button class="billing-charge-primary" data-charge="'+item.id+'">Cobrar cliente</button><button class="primary" data-pay="'+item.id+'">Marcar como pago</button><details class="billing-more"><summary aria-label="Mais ações">•••</summary><button data-notice="'+item.id+'">'+(item.aviso_visivel?'Ocultar aviso do Walter':'Exibir aviso para Walter')+'</button></details>')+'</td></tr>';
+      return '<tr><td><strong>'+Utils.escapeHTML(item.competencia)+'</strong><small>'+Utils.escapeHTML(item.tipo === 'implantacao' ? 'Implantação' : 'Mensalidade')+(item.mensagem_envio?'<span class="billing-draft-ready">✓ Cobrança preparada</span>':'')+'</small></td><td>'+Utils.fmtDate(item.vencimento)+'</td><td>'+Utils.fmt(item.valor)+'</td><td><span class="billing-status '+s.classe+'">'+s.texto+'</span>'+(item.aviso_visivel&&item.status!=='pago'?'<small class="billing-notice-on">● Aviso visível para Walter</small>':'')+'</td><td class="billing-actions">'+(item.status === 'pago' ? '<button data-receipt="'+item.id+'">Recibo</button>' : '<button class="billing-charge-primary" data-charge="'+item.id+'">Cobrar cliente</button><button class="primary" data-pay="'+item.id+'">Marcar como pago</button><details class="billing-more"><summary aria-label="Mais ações">•••</summary><button data-notice="'+item.id+'">'+(item.aviso_visivel?'Ocultar aviso do Walter':'Exibir aviso para Walter')+'</button></details>')+'</td></tr>';
     }).join('');
     root.innerHTML = '<div class="billing-page"><div class="billing-head"><div><div class="ops-kicker">PRYNTIX • LICENCIAMENTO</div><h1>Assinatura</h1><p>Controle simples da implantação e das mensalidades da plataforma.</p></div><div class="billing-head-actions"><button class="ops-btn secondary" id="btnConfigPix">Configurar PIX</button><button class="ops-btn" id="btnNovaCobranca">+ Nova cobrança</button></div></div><div class="billing-summary"><article><span>Mensalidade</span><strong>R$ 300,00</strong></article><article><span>Próximo vencimento</span><strong>'+(proxima?Utils.fmtDate(proxima.vencimento):'Tudo em dia')+'</strong></article><article><span>Pagamentos registrados</span><strong>'+pagos+' de '+this.dados.length+'</strong></article></div><section class="billing-card"><div class="billing-card-title">Histórico de cobranças</div><div class="billing-table-wrap"><table class="billing-table"><thead><tr><th>Referência</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="billing-empty">Nenhuma cobrança cadastrada.</td></tr>')+'</tbody></table></div></section></div>' + this.modalHTML();
     root.querySelector('#btnNovaCobranca')?.addEventListener('click',()=>this.abrirNova());
@@ -64,7 +64,7 @@ const Assinatura = {
   },
 
   modalHTML() {
-    return '<div class="billing-modal-bg" id="billingModal"><div class="billing-modal"><div class="billing-modal-head"><h2 id="billingModalTitle">Nova cobrança</h2><button data-close aria-label="Fechar">×</button></div><div id="billingNewFields"><label>Tipo<select id="billingType"><option value="mensalidade">Mensalidade</option><option value="implantacao">Implantação</option></select></label><label>Referência<input id="billingCompetence" placeholder="Ex.: 10/2026 ou Parcela 1/2"></label><label>Vencimento<input id="billingDue" type="date"></label><label>Valor (R$)<input id="billingValue" type="number" min="0.01" step="0.01" value="300"></label></div><div id="billingWhatsFields" hidden><div class="billing-charge-summary"><span id="billingChargeReference"></span><strong id="billingChargeValue"></strong></div><label>WhatsApp do Guto<input id="billingPhone" type="tel" inputmode="tel" placeholder="(21) 99999-9999"></label><label>Mensagem<textarea id="billingMessage" rows="7"></textarea></label><button class="billing-copy" id="billingCopy">Copiar mensagem</button></div><div id="billingConfigPixFields" hidden><label>Chave PIX (CPF)<input id="billingPixKey" inputmode="numeric" placeholder="Digite somente os números"></label><label>Favorecido<input id="billingPixName" value="Alessandro César de Souza Lima"></label><label>Cidade<input id="billingPixCity" value="NITEROI"></label><label>Instituição<input id="billingPixBank" value="Nubank"></label><small class="billing-security">Dados protegidos e visíveis somente no seu perfil.</small></div><div id="billingPixPreview" hidden><div class="billing-pix-document"><div id="billingQr"></div><div><strong id="billingPixAmount"></strong><span id="billingPixReference"></span><small>Pagamento direcionado ao favorecido configurado.</small></div></div><label class="billing-payload-label">PIX Copia e Cola<textarea id="billingPixPayload" rows="3" readonly></textarea></label><div class="billing-pix-tools"><button class="billing-copy" id="billingCopyPix">Copiar PIX</button><button class="billing-copy" id="billingDownloadPix">Baixar PDF</button></div></div><div class="billing-modal-actions"><button data-close>Cancelar</button><button class="primary" id="billingConfirm">Salvar</button></div></div></div>';
+    return '<div class="billing-modal-bg" id="billingModal"><div class="billing-modal"><div class="billing-modal-head"><h2 id="billingModalTitle">Nova cobrança</h2><button data-close aria-label="Fechar">×</button></div><div id="billingNewFields"><label>Tipo<select id="billingType"><option value="mensalidade">Mensalidade</option><option value="implantacao">Implantação</option></select></label><label>Referência<input id="billingCompetence" placeholder="Ex.: 10/2026 ou Parcela 1/2"></label><label>Vencimento<input id="billingDue" type="date"></label><label>Valor (R$)<input id="billingValue" type="number" min="0.01" step="0.01" value="300"></label></div><div id="billingWhatsFields" hidden><div class="billing-charge-summary"><span id="billingChargeReference"></span><strong id="billingChargeValue"></strong></div><label>WhatsApp do Guto<input id="billingPhone" type="tel" inputmode="tel" placeholder="(21) 99999-9999"></label><label>Mensagem<textarea id="billingMessage" rows="7"></textarea></label><button class="billing-copy" id="billingCopy">Copiar mensagem</button></div><div id="billingConfigPixFields" hidden><label>Chave PIX (CPF)<input id="billingPixKey" inputmode="numeric" placeholder="Digite somente os números"></label><label>Favorecido<input id="billingPixName" value="Alessandro César de Souza Lima"></label><label>Cidade<input id="billingPixCity" value="NITEROI"></label><label>Instituição<input id="billingPixBank" value="Nubank"></label><small class="billing-security">Dados protegidos e visíveis somente no seu perfil.</small></div><div id="billingPixPreview" hidden><div class="billing-pix-document"><div id="billingQr"></div><div><strong id="billingPixAmount"></strong><span id="billingPixReference"></span><small>Pagamento direcionado ao favorecido configurado.</small></div></div><label class="billing-payload-label">PIX Copia e Cola<textarea id="billingPixPayload" rows="3" readonly></textarea></label><div class="billing-pix-tools"><button class="billing-copy" id="billingCopyPix">Copiar PIX</button><button class="billing-copy" id="billingDownloadPix">Baixar PDF</button></div></div><div class="billing-modal-actions"><button data-close>Cancelar</button><button id="billingSaveDraft" hidden>Salvar para depois</button><button class="primary" id="billingConfirm">Salvar</button></div></div></div>';
   },
 
   bindModal(root) {
@@ -73,6 +73,7 @@ const Assinatura = {
     root.querySelector('#billingCopy')?.addEventListener('click',async()=>{await navigator.clipboard.writeText(root.querySelector('#billingMessage').value);Utils.toast('Mensagem copiada.');});
     root.querySelector('#billingCopyPix')?.addEventListener('click',async()=>{await navigator.clipboard.writeText(root.querySelector('#billingPixPayload').value);Utils.toast('Código PIX copiado.');});
     root.querySelector('#billingDownloadPix')?.addEventListener('click',()=>this.baixarCobrancaPix());
+    root.querySelector('#billingSaveDraft')?.addEventListener('click',()=>this.salvarParaDepois());
   },
 
   abrirNova() {
@@ -81,6 +82,7 @@ const Assinatura = {
     document.getElementById('billingModalTitle').textContent='Nova cobrança';
     document.getElementById('billingNewFields').hidden=false; document.getElementById('billingWhatsFields').hidden=true; document.getElementById('billingConfigPixFields').hidden=true; document.getElementById('billingPixPreview').hidden=true;
     document.getElementById('billingConfirm').textContent='Salvar';
+    document.getElementById('billingSaveDraft').hidden=true;
     const now=new Date(), next=new Date(now.getFullYear(),now.getMonth()+1,10);
     document.getElementById('billingCompetence').value=String(next.getMonth()+1).padStart(2,'0')+'/'+next.getFullYear();
     document.getElementById('billingDue').value=next.toISOString().slice(0,10);
@@ -94,10 +96,13 @@ const Assinatura = {
     document.getElementById('billingModalTitle').textContent='Cobrar cliente';
     document.getElementById('billingNewFields').hidden=true; document.getElementById('billingWhatsFields').hidden=false; document.getElementById('billingConfigPixFields').hidden=true; document.getElementById('billingPixPreview').hidden=false;
     document.getElementById('billingConfirm').textContent='Enviar com PDF';
+    document.getElementById('billingSaveDraft').hidden=false;
     document.getElementById('billingChargeReference').textContent=(item.tipo==='implantacao'?'Implantação':'Mensalidade')+' '+item.competencia+' · vence em '+Utils.fmtDate(item.vencimento);
     document.getElementById('billingChargeValue').textContent=Utils.fmt(item.valor);
     const pix=this.pixConfig?.pix_chave?this.pixConfig.pix_chave.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):'configure no menu Assinatura';
-    document.getElementById('billingMessage').value='Olá, Guto! Tudo bem?\n\nA '+(item.tipo==='implantacao'?'implantação':'mensalidade')+' da plataforma 1K Beats, referente a '+item.competencia+', está disponível para pagamento.\n\nValor: '+Utils.fmt(item.valor)+'\nVencimento: '+Utils.fmtDate(item.vencimento)+'\nPIX: '+pix+'\n\nObrigado!';
+    const mensagemPadrao='Olá, Guto! Tudo bem?\n\nA '+(item.tipo==='implantacao'?'implantação':'mensalidade')+' da plataforma 1K Beats, referente a '+item.competencia+', está disponível para pagamento.\n\nValor: '+Utils.fmt(item.valor)+'\nVencimento: '+Utils.fmtDate(item.vencimento)+'\nPIX: '+pix+'\n\nObrigado!';
+    document.getElementById('billingPhone').value=item.telefone_envio||'';
+    document.getElementById('billingMessage').value=item.mensagem_envio||mensagemPadrao;
     document.getElementById('billingPixAmount').textContent=Utils.fmt(item.valor); document.getElementById('billingPixReference').textContent='PIX referente a '+item.competencia; document.getElementById('billingPixPayload').value=payload;
     const qr=document.getElementById('billingQr'); qr.innerHTML=''; new QRCode(qr,{text:payload,width:180,height:180,correctLevel:QRCode.CorrectLevel.M});
   },
@@ -124,6 +129,7 @@ const Assinatura = {
     document.getElementById('billingPixCity').value=this.pixConfig?.cidade||'NITEROI';
     document.getElementById('billingPixBank').value=this.pixConfig?.instituicao||'Nubank';
     document.getElementById('billingConfirm').textContent='Salvar PIX';
+    document.getElementById('billingSaveDraft').hidden=true;
   },
 
   semAcentos(value,max) { return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9 ]/g,'').toUpperCase().trim().slice(0,max); },
@@ -176,6 +182,19 @@ const Assinatura = {
     const phone=Utils.normalizePhone(document.getElementById('billingPhone').value);
     Utils.toast('PDF baixado. Anexe o arquivo na conversa do WhatsApp.');
     setTimeout(()=>Utils.openExternal('https://wa.me/'+(phone?('55'+phone.replace(/^55/,'')):'')+'?text='+encodeURIComponent(mensagem)),500);
+  },
+
+  async salvarParaDepois() {
+    const item=this.cobrancaAtual; if(!item)return;
+    const telefone=Utils.normalizePhone(document.getElementById('billingPhone').value);
+    const mensagem=Utils.sanitizeText(document.getElementById('billingMessage').value,2000);
+    if(!mensagem)return Utils.toast('Escreva a mensagem antes de salvar.','erro');
+    try {
+      await Api.request('/rest/v1/cobrancas_sistema?id=eq.'+encodeURIComponent(item.id),{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({telefone_envio:telefone||null,mensagem_envio:mensagem})});
+      document.getElementById('billingModal').classList.remove('open');
+      await this.carregar();
+      Utils.toast('Cobrança salva para enviar depois.');
+    } catch(e) { Utils.toast(Api.friendlyError(e),'erro'); }
   },
 
   async marcarPago(id) {
