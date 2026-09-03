@@ -540,9 +540,14 @@ select:-webkit-autofill {
 .billing-status { display:inline-block; padding:7px 10px; border-radius:999px; font-size:12px; font-weight:600; }
 .billing-status.paid { color:#08783f; background:#eaf8ef; }.billing-status.soon { color:#8a5b00; background:#fff3d6; }.billing-status.overdue { color:#b42332; background:#ffe8ea; }.billing-status.pending { color:#58586a; background:#eeeef4; }
 .billing-notice-on { color:#08783f !important; font-weight:600; margin-top:8px !important; }
-.billing-actions { display:flex; gap:7px; justify-content:flex-end; }
+.billing-actions { display:flex; gap:7px; justify-content:flex-end; align-items:center; white-space:nowrap; }
 .billing-actions button,.billing-copy { padding:9px 12px; border:1px solid var(--border-dim); border-radius:8px; background:#fff; font:600 12px inherit; cursor:pointer; }
 .billing-actions button.primary,.billing-modal-actions .primary { color:#fff; background:var(--accent); border-color:var(--accent); }
+.billing-actions .billing-charge-primary { color:#fff; background:#168754; border-color:#168754; }
+.billing-more { position:relative; }
+.billing-more summary { list-style:none; cursor:pointer; padding:8px 10px; border:1px solid var(--border-dim); border-radius:8px; font-weight:700; letter-spacing:.08em; }
+.billing-more summary::-webkit-details-marker { display:none; }
+.billing-more button { position:absolute; right:0; top:calc(100% + 6px); z-index:5; width:190px; background:#fff; box-shadow:0 10px 30px rgba(20,20,35,.14); }
 .billing-empty { text-align:center; color:var(--dim); padding:40px !important; }
 .billing-modal-bg { display:none; position:fixed; inset:0; z-index:1200; background:rgba(15,15,25,.6); padding:20px; align-items:center; justify-content:center; }
 .billing-modal-bg.open { display:flex; }
@@ -551,7 +556,11 @@ select:-webkit-autofill {
 #billingNewFields { display:grid; grid-template-columns:1fr 1fr; gap:16px; } #billingNewFields label,#billingWhatsFields label{display:flex;flex-direction:column;gap:7px;font:700 11px var(--mono);text-transform:uppercase;color:var(--dim)}
 .billing-modal input,.billing-modal select,.billing-modal textarea { width:100%; box-sizing:border-box; padding:13px; border:1px solid var(--border-dim); border-radius:8px; font:400 14px var(--sans); color:var(--ink); background:#fff; }
 #billingWhatsFields { display:flex; flex-direction:column; gap:14px; }.billing-copy{align-self:flex-start}.billing-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border-dim)}.billing-modal-actions button{padding:11px 17px;border:1px solid var(--border-dim);border-radius:8px;background:#fff;font-weight:700;cursor:pointer}
+.billing-charge-summary { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 16px; border-radius:10px; background:#fcf0f6; }
+.billing-charge-summary span { color:var(--dim); font-size:13px; }
+.billing-charge-summary strong { color:var(--accent); font-size:20px; white-space:nowrap; }
 #billingConfigPixFields { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 #billingConfigPixFields label,.billing-payload-label { display:flex;flex-direction:column;gap:7px;font:700 11px var(--mono);text-transform:uppercase;color:var(--dim); }
 .billing-security { grid-column:1/-1;color:#08783f; }.billing-pix-document{display:grid;grid-template-columns:190px 1fr;gap:22px;align-items:center;padding:18px;background:#fafafd;border:1px solid var(--border-dim);border-radius:10px;margin-bottom:15px}.billing-pix-document strong{display:block;color:var(--accent);font-size:25px}.billing-pix-document span,.billing-pix-document small{display:block;margin-top:8px;color:var(--dim)}#billingQr{width:180px;height:180px;background:#fff}.billing-payload-label{margin-bottom:10px}
+.billing-pix-tools { display:flex; gap:8px; flex-wrap:wrap; }
 @media(max-width:700px){.subscription-alert{margin:12px;align-items:flex-start;flex-direction:column;gap:3px}.billing-page{padding:20px 14px 70px}.billing-head{align-items:stretch;flex-direction:column}.billing-head-actions{flex-direction:column}.billing-summary{grid-template-columns:1fr}.billing-table{min-width:850px}.billing-table-wrap{overflow-x:auto}#billingNewFields,#billingConfigPixFields{grid-template-columns:1fr}.billing-pix-document{grid-template-columns:1fr}.billing-security{grid-column:auto}}

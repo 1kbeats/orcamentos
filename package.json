@@ -1,6 +1,6 @@
 {
   "name": "1kbeats-orcamentos",
-  "version": "6.10.3",
+  "version": "6.10.4",
   "private": true,
   "scripts": {
     "test": "node scripts/validate.mjs"
