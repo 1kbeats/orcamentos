@@ -1,4 +1,4 @@
-const CACHE_NAME = '1kbeats-v6-secure-44';
+const CACHE_NAME = '1kbeats-v6-secure-45';
 const APP_SHELL = [
   './',
   './index.html',
@@ -35,6 +35,7 @@ const APP_SHELL = [
   './js/compact-lists.js',
   './js/estoque.js',
   './js/usuarios.js',
+  './js/assinatura.js',
   './js/catalogo.js',
   './js/orcamentos.js',
   './js/secure-overrides.js',

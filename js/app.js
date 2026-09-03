@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   Catalogo.bindEvents();
   Financeiro.bindEvents();
   Usuarios.bindEvents();
+  await Assinatura.carregar(true);
   const initialPanel = [
     ['dashboard','dashboard'], ['listaOrcamentos','orcamentos'], ['agenda','agenda'],
     ['clientes','clientes_catalogo'], ['financeiroEventos','financeiro'], ['gastos','despesas'],

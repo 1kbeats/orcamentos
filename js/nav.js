@@ -36,9 +36,9 @@ const Nav = {
   },
   // Mostra painel e atualiza nav ativo
   showPanel(panel) {
-    const moduleByPanel = {dashboard:'dashboard',orcamentos:'orcamentos',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users'};
+    const moduleByPanel = {dashboard:'dashboard',orcamentos:'orcamentos',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users',assinatura:'users'};
     const activeModule = moduleByPanel[panel] || 'dashboard';
-    const allowed = panel === 'admin' ? CONFIG.canManageUsers : CONFIG.canViewModule(activeModule);
+    const allowed = ['admin','assinatura'].includes(panel) ? CONFIG.canManageUsers : CONFIG.canViewModule(activeModule);
     if (!allowed) {
       Utils.toast('Este módulo não está liberado para o seu perfil.', 'erro');
       const firstAllowed = [
@@ -68,6 +68,7 @@ const Nav = {
     if (panel === 'clientes')  Clientes.renderLista();
     if (panel === 'catalogo')  Catalogo.renderLista();
     if (panel === 'admin')     Usuarios.carregar();
+    if (panel === 'assinatura') Assinatura.carregar();
     if (panel === 'producoes') Producoes.carregar();
     if (panel === 'agenda') Agenda.carregar();
     if (panel === 'financeiroEventos') FinanceiroEventos.carregar();

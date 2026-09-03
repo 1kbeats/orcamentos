@@ -12,6 +12,7 @@ Nav.bindEvents = function bindEvents() {
   on('navEstoque', () => this.showPanelPro('estoque'));
   on('navOrdemServico', () => this.showPanelPro('ordemServico'));
   on('navAdmin', () => this.showPanel('admin'));
+  on('navAssinatura', () => this.showPanel('assinatura'));
   on('btnSidebarPassword', () => Usuarios.abrirAlterarSenha());
   on('btnLogout', () => Auth.logout());
   on('sidebarOverlay', () => this.closeSidebar());

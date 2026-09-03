@@ -1,7 +1,7 @@
 // Configuração pública do frontend. Nunca adicione service_role ou outros segredos aqui.
 const CONFIG = {
   APP_NAME: '1K Beats — Gestão de eventos',
-  APP_VERSION: 'v6.9.11',
+  APP_VERSION: 'v6.10.0',
   SUPABASE_URL: 'https://hcjbfdspmqlyzkgypacb.supabase.co',
   SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_muX8-m3AXYd3lOHGGsd23w_iRsXUq7X',
   STORAGE_PREFIX: '1kbeats_v6_',
