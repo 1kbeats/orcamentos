@@ -26,16 +26,15 @@ const Assinatura = {
   renderAlerta() {
     document.getElementById('subscriptionAlert')?.remove();
     if (CONFIG.role === 'owner') return;
-    const pendentes = this.dados.filter(x => x.status !== 'pago').sort((a,b) => a.vencimento.localeCompare(b.vencimento));
+    const pendentes = this.dados.filter(x => x.status !== 'pago' && x.aviso_visivel).sort((a,b) => a.vencimento.localeCompare(b.vencimento));
     if (!pendentes.length) return;
     const item = pendentes[0], situacao = this.situacao(item);
-    if (!['soon','overdue'].includes(situacao.classe)) return;
     const banner = document.createElement('div');
     banner.id = 'subscriptionAlert';
     banner.className = 'subscription-alert ' + situacao.classe;
     banner.innerHTML = situacao.classe === 'overdue'
       ? '<strong>Assinatura pendente</strong><span>Entre em contato com o administrador da plataforma para regularização.</span>'
-      : '<strong>Próximo vencimento</strong><span>A assinatura da plataforma vence em ' + Utils.escapeHTML(Utils.fmtDate(item.vencimento)) + '.</span>';
+      : '<strong>Aviso de assinatura</strong><span>A assinatura da plataforma vence em ' + Utils.escapeHTML(Utils.fmtDate(item.vencimento)) + '.</span>';
     document.querySelector('.main-content')?.prepend(banner);
   },
 
@@ -47,12 +46,13 @@ const Assinatura = {
     const proxima = pendentes.slice().sort((a,b) => a.vencimento.localeCompare(b.vencimento))[0];
     const rows = this.dados.map(item => {
       const s = this.situacao(item);
-      return '<tr><td><strong>'+Utils.escapeHTML(item.competencia)+'</strong><small>'+Utils.escapeHTML(item.tipo === 'implantacao' ? 'Implantação' : 'Mensalidade')+'</small></td><td>'+Utils.fmtDate(item.vencimento)+'</td><td>'+Utils.fmt(item.valor)+'</td><td><span class="billing-status '+s.classe+'">'+s.texto+'</span></td><td class="billing-actions">'+(item.status === 'pago' ? '<button data-receipt="'+item.id+'">Recibo</button>' : '<button data-charge="'+item.id+'">WhatsApp</button><button class="primary" data-pay="'+item.id+'">Marcar pago</button>')+'</td></tr>';
+      return '<tr><td><strong>'+Utils.escapeHTML(item.competencia)+'</strong><small>'+Utils.escapeHTML(item.tipo === 'implantacao' ? 'Implantação' : 'Mensalidade')+'</small></td><td>'+Utils.fmtDate(item.vencimento)+'</td><td>'+Utils.fmt(item.valor)+'</td><td><span class="billing-status '+s.classe+'">'+s.texto+'</span>'+(item.aviso_visivel&&item.status!=='pago'?'<small class="billing-notice-on">● Aviso visível para Walter</small>':'')+'</td><td class="billing-actions">'+(item.status === 'pago' ? '<button data-receipt="'+item.id+'">Recibo</button>' : '<button data-charge="'+item.id+'">WhatsApp</button><button data-notice="'+item.id+'">'+(item.aviso_visivel?'Ocultar aviso':'Mostrar aviso')+'</button><button class="primary" data-pay="'+item.id+'">Marcar pago</button>')+'</td></tr>';
     }).join('');
     root.innerHTML = '<div class="billing-page"><div class="billing-head"><div><div class="ops-kicker">PRYNTIX • LICENCIAMENTO</div><h1>Assinatura</h1><p>Controle simples da implantação e das mensalidades da plataforma.</p></div><button class="ops-btn" id="btnNovaCobranca">+ Nova cobrança</button></div><div class="billing-summary"><article><span>Mensalidade</span><strong>R$ 300,00</strong></article><article><span>Próximo vencimento</span><strong>'+(proxima?Utils.fmtDate(proxima.vencimento):'Tudo em dia')+'</strong></article><article><span>Pagamentos registrados</span><strong>'+pagos+' de '+this.dados.length+'</strong></article></div><section class="billing-card"><div class="billing-card-title">Histórico de cobranças</div><div class="billing-table-wrap"><table class="billing-table"><thead><tr><th>Referência</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="billing-empty">Nenhuma cobrança cadastrada.</td></tr>')+'</tbody></table></div></section></div>' + this.modalHTML();
     root.querySelector('#btnNovaCobranca')?.addEventListener('click',()=>this.abrirNova());
     root.querySelectorAll('[data-charge]').forEach(b=>b.addEventListener('click',()=>this.abrirWhats(b.dataset.charge)));
     root.querySelectorAll('[data-pay]').forEach(b=>b.addEventListener('click',()=>this.marcarPago(b.dataset.pay)));
+    root.querySelectorAll('[data-notice]').forEach(b=>b.addEventListener('click',()=>this.alternarAviso(b.dataset.notice)));
     root.querySelectorAll('[data-receipt]').forEach(b=>b.addEventListener('click',()=>this.gerarRecibo(b.dataset.receipt)));
     this.bindModal(root);
   },
@@ -98,7 +98,13 @@ const Assinatura = {
   },
 
   async marcarPago(id) {
-    try { await Api.request('/rest/v1/cobrancas_sistema?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:'pago',pago_em:new Date().toISOString().slice(0,10)})}); await this.carregar(); Utils.toast('Pagamento confirmado. Recibo liberado.'); } catch(e){Utils.toast(Api.friendlyError(e),'erro');}
+    try { await Api.request('/rest/v1/cobrancas_sistema?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:'pago',pago_em:new Date().toISOString().slice(0,10),aviso_visivel:false})}); await this.carregar(); Utils.toast('Pagamento confirmado. Aviso retirado e recibo liberado.'); } catch(e){Utils.toast(Api.friendlyError(e),'erro');}
+  },
+
+  async alternarAviso(id) {
+    const item=this.dados.find(x=>x.id===id); if(!item)return;
+    const visivel=!item.aviso_visivel;
+    try { await Api.request('/rest/v1/cobrancas_sistema?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({aviso_visivel:visivel})}); await this.carregar(); Utils.toast(visivel?'Aviso liberado para Walter.':'Aviso ocultado para Walter.'); } catch(e){Utils.toast(Api.friendlyError(e),'erro');}
   },
 
   gerarRecibo(id) {
