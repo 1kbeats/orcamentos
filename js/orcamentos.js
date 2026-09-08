@@ -388,7 +388,9 @@ const Orcamentos = {
       status.textContent = numero ? 'Orçamento ' + numero + ' salvo' : 'Orçamento salvo';
       status.className = 'orc-save-status saved';
     } else if (this._alteracoesPendentes) {
-      status.textContent = this._registroAtual ? 'Alterações não salvas' : 'Novo orçamento — alterações não salvas';
+      status.textContent = this._registroAtual
+        ? 'Alterações não salvas — salve e reenvie ao cliente'
+        : 'Novo orçamento — alterações não salvas';
       status.className = 'orc-save-status pending';
     } else {
       status.textContent = 'Novo orçamento — ainda não salvo';
@@ -416,6 +418,15 @@ const Orcamentos = {
   sairOrcamento(destino = 'listaOrcamentos') {
     this._destinoAposSaida = destino;
     if (this.deveConfirmarSaida()) {
+      const titulo = document.getElementById('modalSairOrcamentoTitulo');
+      const texto = document.getElementById('modalSairOrcamentoTexto');
+      if (this._registroAtual) {
+        if (titulo) titulo.textContent = 'Descartar as alterações?';
+        if (texto) texto.textContent = 'As mudanças ainda não foram salvas. A versão anterior do orçamento será mantida com o mesmo número.';
+      } else {
+        if (titulo) titulo.textContent = 'Descartar este orçamento?';
+        if (texto) texto.textContent = 'As informações preenchidas ainda não foram salvas. Ao sair, elas serão descartadas e nenhum número será gerado.';
+      }
       document.getElementById('modalSairOrcamento')?.classList.add('open');
       return;
     }
@@ -514,6 +525,7 @@ const Orcamentos = {
 
   novoOrcamento() {
     this._registroAtual = null;
+    this._currentQuote = null;
     this._clienteSelecionado = null;
     this._alteracoesPendentes = false;
     this._cnt = 0;
@@ -533,7 +545,57 @@ const Orcamentos = {
     this.setDiscTipo('pct');
     this.calcTotals();
     this.updateMeta();
+    const hint = document.getElementById('quoteEditorHint');
+    if (hint) hint.textContent = 'O número será gerado somente ao salvar.';
     this.atualizarEstadoSalvamento();
+  },
+
+  editarOrcamento(orcamento) {
+    if (!orcamento?.id) return;
+    this.novoOrcamento();
+    this._registroAtual = orcamento;
+    this._currentQuote = orcamento;
+    this._clienteSelecionado = null;
+
+    const values = {
+      nomeCliente: orcamento.cliente_nome || '',
+      cnpjCliente: orcamento.cnpj_cli || '',
+      solicitante: orcamento.solicitante || '',
+      refEvento: orcamento.referencia || '',
+      validade: orcamento.valido_ate || '',
+      obs: orcamento.observacoes || '',
+      desconto: Number(orcamento.desconto_valor) || ''
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) element.value = value;
+    });
+
+    const itens = Array.isArray(orcamento.itens) ? orcamento.itens : [];
+    const container = document.getElementById('itemsContainer');
+    if (container) container.innerHTML = '';
+    this._cnt = 0;
+    (itens.length ? itens : [{ desc: '', qty: 1, unit: 0 }]).forEach(item => {
+      this.addItem();
+      const row = container?.lastElementChild;
+      const inputs = row?.querySelectorAll('input');
+      if (!inputs?.length) return;
+      inputs[0].value = item.desc || item.descricao || '';
+      inputs[1].value = Number(item.qty ?? item.quantidade) || 1;
+      inputs[2].value = Number(item.unit ?? item.valor_unitario) || 0;
+    });
+
+    this.setDiscTipo(orcamento.desconto_tipo === 'val' ? 'val' : 'pct');
+    document.getElementById('metaNumero').textContent = Utils.fmtNumero(orcamento.numero);
+    document.getElementById('metaNumeroRow').style.display = '';
+    this.calcTotals();
+    this.updateMeta();
+    this._alteracoesPendentes = false;
+    const hint = document.getElementById('quoteEditorHint');
+    if (hint) hint.textContent = 'Editando o orçamento ' + Utils.fmtNumero(orcamento.numero) + '. O número será mantido.';
+    this.atualizarEstadoSalvamento();
+    Nav.showPanel('orcamentos');
+    document.getElementById('pageRoot')?.scrollIntoView({ block: 'start' });
   },
 
   // ── WhatsApp ──────────────────────────────────────────────

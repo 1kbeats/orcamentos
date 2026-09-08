@@ -128,38 +128,22 @@
       email_emp: Utils.sanitizeText(this._cfg.email, 150) || null,
       solicitante: Utils.sanitizeText(data.solicitante, 150) || null,
       total: Math.max(0, Number(data.total) || 0),
-      status: this._currentQuote?.status || 'pendente'
+      status: this._registroAtual?.status || 'pendente'
     };
   };
 
   Orcamentos.salvarAtual = async function salvarAtual() {
-    const payload = this.dadosSeguros();
-    if (this._currentQuote?.id) {
-      const rows = await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(this._currentQuote.id)), {
-        method: 'PATCH',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(payload)
-      });
-      this._currentQuote = rows?.[0] || { ...this._currentQuote, ...payload };
-    } else {
-      const rows = await Api.request('/rest/v1/orcamentos', {
-        method: 'POST',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(Api.orgPayload({ ...payload, created_by: Auth.user?.id || null }))
-      });
-      this._currentQuote = rows?.[0];
-    }
-    if (!this._currentQuote?.id || !this._currentQuote?.public_token) {
-      throw new Error('O servidor não retornou o identificador do orçamento.');
-    }
-    const numberElement = document.getElementById('metaNumero');
-    const numberRow = document.getElementById('metaNumeroRow');
-    if (numberElement) numberElement.textContent = Utils.fmtNumero(this._currentQuote.numero);
-    if (numberRow) numberRow.style.display = '';
-    return this._currentQuote;
+    const quote = await this._salvarRegistro({ silent: true });
+    if (!quote?.id || !quote?.public_token) throw new Error('O servidor não retornou o identificador do orçamento.');
+    this._currentQuote = quote;
+    return quote;
   };
 
-  Orcamentos.gerarWhatsApp = async function gerarWhatsApp() {
+  Orcamentos.gerarWhatsApp = async function gerarWhatsApp(confirmado = false) {
+    if (!this._registroAtual && !confirmado) {
+      this.abrirModalGeracaoNumero('whatsapp');
+      return;
+    }
     const button = document.getElementById('btnWpp');
     const buttonHtml = button?.innerHTML || 'WhatsApp';
     const data = this._coletarDados();
@@ -209,10 +193,9 @@
       }
     }
   };
-  Orcamentos.gerarPDF = async function gerarPDFSeguro() {
+  Orcamentos.gerarPDF = async function gerarPDFSeguro(confirmado = false) {
     try {
-      await this.salvarAtual();
-      await originalPdf();
+      await originalPdf(confirmado);
     } catch (error) {
       Utils.toast(Api.friendlyError(error, 'Erro ao gerar o PDF.'), 'erro');
     }
@@ -223,7 +206,7 @@
     if (!container) return;
     container.innerHTML = '<div class="empty-state">Carregando orçamentos...</div>';
     try {
-      const quotes = await Api.request(Api.orgFilter('/rest/v1/orcamentos?select=id,numero,cliente_nome,referencia,total,status,created_at,public_token&order=created_at.desc&limit=100')) || [];
+      const quotes = await Api.request(Api.orgFilter('/rest/v1/orcamentos?select=*&order=created_at.desc&limit=100')) || [];
       this._dados = quotes;
       this._selecionados = new Set();
       if (!quotes.length) { container.innerHTML = '<div class="empty-state">Nenhum orçamento enviado.</div>'; this.atualizarAcoesLote(); return; }
@@ -239,10 +222,14 @@
           (CONFIG.isAdmin ? '<label class="quote-check"><input type="checkbox" value="' + Utils.safeId(quote.id) + '" aria-label="Selecionar orçamento"><span></span></label>' : '') +
           '<span class="quote-number">' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</span>' +
           '<div class="quote-client"><strong>' + Utils.escapeHTML(quote.cliente_nome || '—') + '</strong>' + (quote.referencia ? '<small>' + Utils.escapeHTML(quote.referencia) + '</small>' : '') + '</div>' +
-          '<span class="quote-date">' + Utils.escapeHTML(Utils.fmtDate(quote.created_at)) + '</span>' +
+          '<span class="quote-date" title="Última alteração">' + Utils.escapeHTML(Utils.fmtDate(quote.updated_at || quote.created_at)) + '</span>' +
           '<span class="quote-total">' + Utils.escapeHTML(Utils.fmt(quote.total)) + '</span>' +
           statusControl +
-          '<div class="quote-actions"><a class="quote-view" target="_blank" rel="noopener" href="' + Utils.escapeHTML('ver.html?t=' + encodeURIComponent(quote.public_token)) + '" title="Visualizar orçamento">↗</a>' + (CONFIG.isAdmin ? '<button class="quote-more" type="button" title="Selecionar para exclusão" aria-label="Selecionar para exclusão">•••</button>' : '') + '</div>';
+          '<div class="quote-actions">' +
+            (CONFIG.canEditCommercial ? '<button class="quote-edit" type="button" title="Editar orçamento" aria-label="Editar orçamento">✎</button>' : '') +
+            '<a class="quote-view" target="_blank" rel="noopener" href="' + Utils.escapeHTML('ver.html?t=' + encodeURIComponent(quote.public_token)) + '" title="Visualizar orçamento">↗</a>' +
+            (CONFIG.isAdmin ? '<button class="quote-more" type="button" title="Selecionar para exclusão" aria-label="Selecionar para exclusão">•••</button>' : '') +
+          '</div>';
         const checkbox = row.querySelector('.quote-check input');
         checkbox?.addEventListener('change', event => { if (event.target.checked) this._selecionados.add(quote.id); else this._selecionados.delete(quote.id); this.atualizarAcoesLote(); });
         const statusButton = row.querySelector('.quote-status-control .quote-status'); const statusMenu = row.querySelector('.quote-status-menu');
@@ -253,6 +240,7 @@
           catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); }
         }));
         row.querySelector('.quote-more')?.addEventListener('click', () => { checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); });
+        row.querySelector('.quote-edit')?.addEventListener('click', () => Orcamentos.editarOrcamento(quote));
         container.appendChild(row);
       });
       this.atualizarAcoesLote();
