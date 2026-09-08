@@ -12,6 +12,8 @@ const Orcamentos = {
   _registroAtual: null,
   _salvando: false,
   _alteracoesPendentes: false,
+  _destinoAposSaida: 'listaOrcamentos',
+  _acaoAposSalvar: null,
 
   // ── Inicialização ─────────────────────────────────────────
   init() {
@@ -41,6 +43,22 @@ const Orcamentos = {
     document.getElementById('btnSalvarOrcamento')?.addEventListener('click', () => this.salvarOrcamento());
     document.getElementById('btnWpp').addEventListener('click', () => this.gerarWhatsApp());
     document.getElementById('btnPdf').addEventListener('click', () => this.gerarPDF());
+    document.getElementById('btnSairOrcamento')?.addEventListener('click', () => this.sairOrcamento());
+    document.getElementById('btnContinuarOrcamento')?.addEventListener('click', () => this.fecharModalSaida());
+    document.getElementById('btnDescartarOrcamento')?.addEventListener('click', () => this.descartarESair());
+    document.getElementById('btnCancelarGeracaoNumero')?.addEventListener('click', () => this.fecharModalGeracaoNumero());
+    document.getElementById('btnConfirmarGeracaoNumero')?.addEventListener('click', () => this.confirmarGeracaoNumero());
+    document.getElementById('modalSairOrcamento')?.addEventListener('click', event => {
+      if (event.target.id === 'modalSairOrcamento') this.fecharModalSaida();
+    });
+    document.getElementById('modalGerarNumero')?.addEventListener('click', event => {
+      if (event.target.id === 'modalGerarNumero') this.fecharModalGeracaoNumero();
+    });
+    window.addEventListener('beforeunload', event => {
+      if (!this.deveConfirmarSaida()) return;
+      event.preventDefault();
+      event.returnValue = '';
+    });
 
     const form = document.getElementById('panelOrcamentos');
     form?.addEventListener('input', event => {
@@ -366,15 +384,76 @@ const Orcamentos = {
       status.textContent = 'Salvando...';
       status.className = 'orc-save-status saving';
     } else if (this._registroAtual && !this._alteracoesPendentes) {
-      status.textContent = 'Orçamento salvo';
+      const numero = this._registroAtual.numero ? String(this._registroAtual.numero).padStart(4, '0') : '';
+      status.textContent = numero ? 'Orçamento ' + numero + ' salvo' : 'Orçamento salvo';
       status.className = 'orc-save-status saved';
     } else if (this._alteracoesPendentes) {
-      status.textContent = 'Alterações não salvas';
+      status.textContent = this._registroAtual ? 'Alterações não salvas' : 'Novo orçamento — alterações não salvas';
       status.className = 'orc-save-status pending';
     } else {
-      status.textContent = 'Ainda não salvo';
+      status.textContent = 'Novo orçamento — ainda não salvo';
       status.className = 'orc-save-status';
     }
+  },
+
+  _formTemConteudo() {
+    const ids = ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs'];
+    if (ids.some(id => document.getElementById(id)?.value.trim())) return true;
+    if ((parseFloat(document.getElementById('desconto')?.value) || 0) !== 0) return true;
+    return Array.from(document.querySelectorAll('#itemsContainer .item-row')).some(row => {
+      const inputs = row.querySelectorAll('input');
+      const descricao = inputs[0]?.value.trim();
+      const quantidade = parseFloat(inputs[1]?.value) || 0;
+      const valor = parseFloat(inputs[2]?.value) || 0;
+      return Boolean(descricao) || valor !== 0 || quantidade !== 1;
+    });
+  },
+
+  deveConfirmarSaida() {
+    return Nav.painelAtual === 'orcamentos' && this._alteracoesPendentes && this._formTemConteudo();
+  },
+
+  sairOrcamento(destino = 'listaOrcamentos') {
+    this._destinoAposSaida = destino;
+    if (this.deveConfirmarSaida()) {
+      document.getElementById('modalSairOrcamento')?.classList.add('open');
+      return;
+    }
+    this.novoOrcamento();
+    Nav.showPanel(destino);
+  },
+
+  fecharModalSaida() {
+    document.getElementById('modalSairOrcamento')?.classList.remove('open');
+  },
+
+  descartarESair() {
+    const destino = this._destinoAposSaida || 'listaOrcamentos';
+    this.fecharModalSaida();
+    this.novoOrcamento();
+    Nav.showPanel(destino);
+  },
+
+  abrirModalGeracaoNumero(acao) {
+    this._acaoAposSalvar = acao;
+    const texto = document.getElementById('modalGerarNumeroTexto');
+    if (texto) texto.textContent = acao === 'pdf'
+      ? 'Para gerar o PDF, o orçamento será salvo e receberá um número.'
+      : 'Para compartilhar pelo WhatsApp, o orçamento será salvo e receberá um número.';
+    document.getElementById('modalGerarNumero')?.classList.add('open');
+  },
+
+  fecharModalGeracaoNumero() {
+    document.getElementById('modalGerarNumero')?.classList.remove('open');
+    this._acaoAposSalvar = null;
+  },
+
+  confirmarGeracaoNumero() {
+    const acao = this._acaoAposSalvar;
+    document.getElementById('modalGerarNumero')?.classList.remove('open');
+    this._acaoAposSalvar = null;
+    if (acao === 'pdf') this.gerarPDF(true);
+    if (acao === 'whatsapp') this.gerarWhatsApp(true);
   },
 
   async _salvarRegistro(options = {}) {
@@ -448,8 +527,8 @@ const Orcamentos = {
     document.getElementById('validade').value = hoje.getFullYear() + '-' +
       String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
     document.getElementById('itemsContainer').innerHTML = '';
-    document.getElementById('metaNumero').textContent = '—';
-    document.getElementById('metaNumeroRow').style.display = 'none';
+    document.getElementById('metaNumero').textContent = 'Gerado ao salvar';
+    document.getElementById('metaNumeroRow').style.display = '';
     this.addItem();
     this.setDiscTipo('pct');
     this.calcTotals();
@@ -513,7 +592,11 @@ const Orcamentos = {
     window.open(url, '_blank', 'noopener');
     this.fecharModalWhatsApp();
   },
-  async gerarWhatsApp() {
+  async gerarWhatsApp(confirmado = false) {
+    if (!this._registroAtual && !confirmado) {
+      this.abrirModalGeracaoNumero('whatsapp');
+      return;
+    }
     const d = this._coletarDados();
     const cfg = this._cfg;
     const nome = cfg.nome || '1K Beats';
@@ -565,8 +648,12 @@ const Orcamentos = {
   },
 
   // ── PDF ───────────────────────────────────────────────────
-  async gerarPDF() {
+  async gerarPDF(confirmado = false) {
     if (!window.jspdf) { alert('Aguarde o app carregar completamente e tente novamente.'); return; }
+    if (!this._registroAtual && !confirmado) {
+      this.abrirModalGeracaoNumero('pdf');
+      return;
+    }
     document.getElementById('configPanel').classList.remove('open');
 
     // Salva ou atualiza o mesmo registro antes de gerar o PDF.

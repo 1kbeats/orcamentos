@@ -36,6 +36,11 @@ const Nav = {
   },
   // Mostra painel e atualiza nav ativo
   showPanel(panel) {
+    if (this.painelAtual === 'orcamentos' && panel !== 'orcamentos' &&
+        typeof Orcamentos !== 'undefined' && Orcamentos.deveConfirmarSaida()) {
+      Orcamentos.sairOrcamento(panel);
+      return;
+    }
     const moduleByPanel = {dashboard:'dashboard',orcamentos:'orcamentos',listaOrcamentos:'orcamentos',clientes:'clientes_catalogo',catalogo:'clientes_catalogo',agenda:'agenda',financeiroEventos:'financeiro',gastos:'despesas',equipe:'equipe',fornecedores:'fornecedores',estoque:'estoque',ordemServico:'agenda',admin:'users',assinatura:'users'};
     const activeModule = moduleByPanel[panel] || 'dashboard';
     const allowed = ['admin','assinatura'].includes(panel) ? CONFIG.canManageUsers : CONFIG.canViewModule(activeModule);

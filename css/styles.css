@@ -319,6 +319,14 @@ a:hover { color: var(--accent-hover); }
 .disc-row select { height: 32px; border: none; border-bottom: 1.5px solid var(--border-dim); background: none; font-size: 13px; color: var(--ink); outline: none; cursor: pointer; padding: 0 4px; }
 
 /* ── ACTIONS ── */
+.quote-editor-toolbar { max-width: 860px; margin: 0 auto 10px; padding: 0 2px; display:flex; align-items:center; justify-content:space-between; gap:16px; color:#777789; font-size:11px; }
+.quote-exit-btn { border:1px solid var(--border-dim); background:#fff; color:var(--ink); border-radius:7px; padding:9px 13px; font:700 11px var(--mono); cursor:pointer; }
+.quote-exit-btn:hover { border-color:var(--accent); color:var(--accent); }
+.meta-numero { color:var(--accent); font-weight:700; max-width:100px; line-height:1.15; }
+.quote-confirm-text { margin:-2px 0 4px; color:var(--mid); font-size:13px; line-height:1.55; }
+.quote-confirm-box { max-width:460px; }
+.modal-btn-danger { background:#fff; color:#c62828; border:1.5px solid #efb6b6; border-radius:6px; height:42px; font-size:13px; font-weight:700; cursor:pointer; }
+.modal-btn-danger:hover { background:#fff3f3; border-color:#c62828; }
 .orc-save-feedback { display:flex; justify-content:flex-end; min-height:22px; margin:0 0 7px; }
 .orc-save-status { font-size:11px; color:#888; }
 .orc-save-status.pending { color:#9A6700; }
@@ -331,6 +339,8 @@ a:hover { color: var(--accent-hover); }
 .btn-act:hover { filter: brightness(1.08); }
 .btn-act:active { transform: scale(.97); }
 @media (max-width: 700px) {
+  .quote-editor-toolbar { align-items:flex-start; padding:0 12px; }
+  .quote-editor-toolbar span { text-align:right; }
   .actions-strip { grid-template-columns:1fr; }
   .orc-save-feedback { justify-content:flex-start; }
 }

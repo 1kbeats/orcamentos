@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/styles.css?v=6.10.5">
+  <link rel="stylesheet" href="./css/styles.css?v=6.10.6">
   <link rel="stylesheet" href="./css/secure.css?v=6.9.4">
   <link rel="stylesheet" href="./css/financeiro-eventos.css?v=6.9.3">
   <link rel="stylesheet" href="./css/simplified-experience.css?v=6.9.0">
@@ -252,6 +252,11 @@
     <div class="panel" id="panelOrcamentos">
       <div class="page" id="pageRoot" style="background:var(--bg);min-height:100vh;">
 
+        <div class="quote-editor-toolbar no-print">
+          <button class="quote-exit-btn" id="btnSairOrcamento" type="button">← Sair do orçamento</button>
+          <span>O número será gerado somente ao salvar.</span>
+        </div>
+
         <!-- Masthead -->
         <div class="masthead no-print">
           <div class="masthead-brand">
@@ -268,7 +273,7 @@
             <div class="masthead-meta">
               <div class="meta-row"><span class="meta-k">Emissão</span><span class="meta-v" id="metaEmissao">—</span></div>
               <div class="meta-row"><span class="meta-k">Validade</span><span class="meta-v" id="metaValidade">—</span></div>
-              <div class="meta-row" id="metaNumeroRow" style="display:none"><span class="meta-k">Nº</span><span class="meta-v" id="metaNumero" style="color:#D91A72;font-weight:700">—</span></div>
+              <div class="meta-row" id="metaNumeroRow"><span class="meta-k">Nº</span><span class="meta-v meta-numero" id="metaNumero">Gerado ao salvar</span></div>
             </div>
             <div class="masthead-ref" id="metaRefRow" style="display:none">
               <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.35)">Ref. </span>
@@ -375,7 +380,7 @@
 
           <!-- ACTIONS -->
           <div class="orc-save-feedback no-print" aria-live="polite">
-            <span class="orc-save-status" id="orcamentoSaveStatus">Ainda não salvo</span>
+            <span class="orc-save-status" id="orcamentoSaveStatus">Novo orçamento — ainda não salvo</span>
           </div>
           <div class="actions-strip no-print">
             <button class="btn-act btn-save-orc" id="btnSalvarOrcamento" type="button">
@@ -533,6 +538,30 @@
   🔄 Nova versão disponível — clique para atualizar
 </div>
 
+<!-- ══ MODAL: SAIR DO ORÇAMENTO ══ -->
+<div class="modal-overlay" id="modalSairOrcamento" role="dialog" aria-modal="true" aria-labelledby="modalSairOrcamentoTitulo">
+  <div class="modal-box quote-confirm-box">
+    <div class="modal-title" id="modalSairOrcamentoTitulo">Descartar este orçamento?</div>
+    <p class="quote-confirm-text">As informações preenchidas ainda não foram salvas. Ao sair, elas serão descartadas e nenhum número será gerado.</p>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" id="btnContinuarOrcamento" type="button">Continuar editando</button>
+      <button class="modal-btn-danger" id="btnDescartarOrcamento" type="button">Descartar e sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: GERAR NÚMERO DO ORÇAMENTO ══ -->
+<div class="modal-overlay" id="modalGerarNumero" role="dialog" aria-modal="true" aria-labelledby="modalGerarNumeroTitulo">
+  <div class="modal-box quote-confirm-box">
+    <div class="modal-title" id="modalGerarNumeroTitulo">Salvar este orçamento?</div>
+    <p class="quote-confirm-text" id="modalGerarNumeroTexto">Para continuar, o orçamento será salvo e receberá um número.</p>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" id="btnCancelarGeracaoNumero" type="button">Voltar</button>
+      <button class="modal-btn-save" id="btnConfirmarGeracaoNumero" type="button">Salvar e continuar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL: CLIENTE RÁPIDO (no formulário de orçamento) ══ -->
 <div class="modal-overlay" id="modalCliente">
   <div class="modal-box">
@@ -679,7 +708,7 @@
 </div>
 
 <!-- ══ SCRIPTS (ordem importa) ══ -->
-<script src="./js/config.js?v=6.10.5"></script>
+<script src="./js/config.js?v=6.10.6"></script>
 <script src="./js/password-toggle.js?v=6.6.0"></script>
 <script src="./js/api.js?v=6.6.0"></script>
 <script src="./js/utils.js?v=6.6.0"></script>
@@ -700,14 +729,14 @@
 <script src="./js/estoque.js?v=6.9.11"></script>
 <script src="./js/usuarios.js?v=6.9.8"></script>
 <script src="./js/vendor/qrcode.min.js?v=1.0.0"></script>
-<script src="./js/assinatura.js?v=6.10.5"></script>
+<script src="./js/assinatura.js?v=6.10.6"></script>
 <script src="./js/catalogo.js?v=6.6.1"></script>
-<script src="./js/orcamentos.js?v=6.9.6"></script>
+<script src="./js/orcamentos.js?v=6.10.6"></script>
 <script src="./js/secure-overrides.js?v=6.6.0"></script>
 <script src="./js/simplified-experience.js?v=6.9.7"></script>
 <script src="./js/pwa-install.js?v=6.7.0"></script>
 
-<script src="./js/app.js?v=6.10.5"></script>
+<script src="./js/app.js?v=6.10.6"></script>
 
 </body>
 </html>
