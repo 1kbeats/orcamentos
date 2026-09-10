@@ -209,7 +209,7 @@
       const quotes = await Api.request(Api.orgFilter('/rest/v1/orcamentos?select=*&order=created_at.desc&limit=100')) || [];
       this._dados = quotes;
       this._selecionados = new Set();
-      if (!quotes.length) { container.innerHTML = '<div class="empty-state">Nenhum orçamento enviado.</div>'; this.atualizarAcoesLote(); return; }
+      if (!quotes.length) { container.innerHTML = '<div class="empty-state">Nenhum orçamento enviado.</div>'; document.getElementById('quotePagination').style.display = 'none'; this.atualizarAcoesLote(); return; }
       const labels = { pendente: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado', cancelado: 'Cancelado' };
       container.innerHTML = '';
       quotes.forEach(quote => {
@@ -218,6 +218,8 @@
           ? '<div class="quote-status-control"><button type="button" class="quote-status status-' + Utils.safeId(status) + '" aria-expanded="false">' + Utils.escapeHTML(labels[status]) + '<span>⌄</span></button><div class="quote-status-menu" hidden>' + Object.entries(labels).map(([value, label]) => '<button type="button" data-status="' + value + '">' + Utils.escapeHTML(label) + '</button>').join('') + '</div></div>'
           : '<div class="quote-status-readonly"><span class="quote-status status-' + Utils.safeId(status) + '">' + Utils.escapeHTML(labels[status]) + '</span></div>';
         const row = document.createElement('div'); row.className = 'quote-list-row';
+        row.dataset.search = [quote.numero, quote.cliente_nome, quote.referencia].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+        row.dataset.status = status;
         row.innerHTML =
           (CONFIG.isAdmin ? '<label class="quote-check"><input type="checkbox" value="' + Utils.safeId(quote.id) + '" aria-label="Selecionar orçamento"><span></span></label>' : '') +
           '<span class="quote-number">' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</span>' +
@@ -236,15 +238,66 @@
         statusButton?.addEventListener('click', () => { document.querySelectorAll('.quote-status-menu').forEach(menu => { if (menu !== statusMenu) menu.hidden = true; }); statusMenu.hidden = !statusMenu.hidden; statusButton.setAttribute('aria-expanded', String(!statusMenu.hidden)); });
         statusMenu?.querySelectorAll('[data-status]').forEach(button => button.addEventListener('click', async event => {
           const next = event.currentTarget.dataset.status;
-          try { await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(quote.id)), { method: 'PATCH', body: JSON.stringify({ status: next }) }); quote.status = next; statusButton.className = 'quote-status status-' + Utils.safeId(next); statusButton.innerHTML = Utils.escapeHTML(labels[next]) + '<span>⌄</span>'; statusMenu.hidden = true; Utils.toast('Status atualizado.'); }
+          try { await Api.request(Api.orgFilter('/rest/v1/orcamentos?id=eq.' + encodeURIComponent(quote.id)), { method: 'PATCH', body: JSON.stringify({ status: next }) }); quote.status = next; row.dataset.status = next; statusButton.className = 'quote-status status-' + Utils.safeId(next); statusButton.innerHTML = Utils.escapeHTML(labels[next]) + '<span>⌄</span>'; statusMenu.hidden = true; this.aplicarFiltros(); Utils.toast('Status atualizado.'); }
           catch (error) { Utils.toast(Api.friendlyError(error), 'erro'); }
         }));
         row.querySelector('.quote-more')?.addEventListener('click', () => { checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change')); });
         row.querySelector('.quote-edit')?.addEventListener('click', () => Orcamentos.editarOrcamento(quote));
         container.appendChild(row);
       });
+      this.configurarFiltros();
       this.atualizarAcoesLote();
     } catch (error) { container.innerHTML = '<div class="empty-state error-state">' + Utils.escapeHTML(Api.friendlyError(error)) + '</div>'; }
+  };
+
+  ListaOrcamentos.configurarFiltros = function configurarFiltros() {
+    this._pagina = 1;
+    this._porPagina = 10;
+    const search = document.getElementById('quoteSearch');
+    const status = document.getElementById('quoteStatusFilter');
+    const clear = document.getElementById('quoteClearFilters');
+    const prev = document.getElementById('quotePrevPage');
+    const next = document.getElementById('quoteNextPage');
+    if (search) search.oninput = () => { this._pagina = 1; this.aplicarFiltros(); };
+    if (status) status.onchange = () => { this._pagina = 1; this.aplicarFiltros(); };
+    if (clear) clear.onclick = () => { if (search) search.value = ''; if (status) status.value = ''; this._pagina = 1; this.aplicarFiltros(); };
+    if (prev) prev.onclick = () => { if (this._pagina > 1) { this._pagina--; this.aplicarFiltros(); } };
+    if (next) next.onclick = () => { this._pagina++; this.aplicarFiltros(); };
+    document.getElementById('quotePagination').style.display = '';
+    this.aplicarFiltros();
+  };
+
+  ListaOrcamentos.aplicarFiltros = function aplicarFiltros() {
+    const container = document.getElementById('listaOrcamentos');
+    if (!container) return;
+    const term = (document.getElementById('quoteSearch')?.value || '').trim().toLocaleLowerCase('pt-BR');
+    const status = document.getElementById('quoteStatusFilter')?.value || '';
+    const rows = Array.from(container.querySelectorAll('.quote-list-row'));
+    const filtered = rows.filter(row => (!term || row.dataset.search.includes(term)) && (!status || row.dataset.status === status));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / this._porPagina));
+    this._pagina = Math.min(Math.max(1, this._pagina || 1), totalPages);
+    const start = (this._pagina - 1) * this._porPagina;
+    rows.forEach(row => { row.style.display = 'none'; });
+    filtered.slice(start, start + this._porPagina).forEach(row => { row.style.display = ''; });
+
+    let empty = document.getElementById('quoteNoResults');
+    if (!empty) {
+      empty = document.createElement('div');
+      empty.id = 'quoteNoResults';
+      empty.className = 'quote-no-results';
+      empty.textContent = 'Nenhum orçamento encontrado com esses filtros.';
+      container.appendChild(empty);
+    }
+    empty.hidden = filtered.length > 0;
+    const visibleEnd = Math.min(start + this._porPagina, filtered.length);
+    const summary = document.getElementById('quotePageSummary');
+    if (summary) summary.textContent = filtered.length ? 'Mostrando ' + (start + 1) + '–' + visibleEnd + ' de ' + filtered.length + ' orçamentos' : 'Nenhum orçamento encontrado';
+    const label = document.getElementById('quotePageLabel');
+    if (label) label.textContent = 'Página ' + this._pagina + ' de ' + totalPages;
+    const prev = document.getElementById('quotePrevPage');
+    const next = document.getElementById('quoteNextPage');
+    if (prev) prev.disabled = this._pagina <= 1;
+    if (next) next.disabled = this._pagina >= totalPages;
   };
 
   ListaOrcamentos.atualizarAcoesLote = function atualizarAcoesLote() {
