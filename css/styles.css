@@ -202,7 +202,7 @@ a:hover { color: var(--accent-hover); }
 }
 
 /* ── CLIENT ROW ── */
-.client-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1.35fr) minmax(0,1fr) minmax(0,1.1fr); gap: 1rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
+.client-row { display: grid; grid-template-columns: minmax(0,2.5fr) minmax(0,1fr) 150px; gap: 1.25rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
 .cf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cf label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); font-family: var(--mono); }
 .cf input {
@@ -247,6 +247,9 @@ a:hover { color: var(--accent-hover); }
 .sec-label::after { content:''; flex:1; height:1px; background: var(--border-dim); }
 
 .ref-row { margin-bottom: 1.75rem; }
+.quote-details-row { display: grid; grid-template-columns: minmax(0,1fr) 190px; gap: 1.5rem; align-items: end; margin-bottom: 1.75rem; }
+.quote-details-row .ref-row { margin-bottom: 0; }
+.event-date-field { align-self: end; }
 .ref-input {
   font-size: 13.5px; padding: 6px 0; border: none;
   border-bottom: 1.5px solid var(--border-dim);
@@ -487,6 +490,7 @@ a:hover { color: var(--accent-hover); }
   .meta-row { align-items: flex-start; }
   .masthead-ref { text-align: left; margin-left: 0; }
   .client-row { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .quote-details-row { grid-template-columns: 1fr; gap: 16px; }
   .tbl-head { display: none !important; }
   .item-row { display: flex !important; flex-wrap: wrap !important; gap: 0 6px !important; padding: 12px 0 !important; }
   .item-row > input:nth-child(1) { flex: 1 1 calc(100% - 120px) !important; font-size: 14px !important; font-weight: 600 !important; order: 1 !important; }
