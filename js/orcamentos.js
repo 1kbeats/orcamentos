@@ -861,7 +861,23 @@ const Orcamentos = {
       .replace(/[.\s]+$/g, '')
       .trim()
       .slice(0, 150) || 'Orçamento';
-    doc.save(nomeBasePDF + '.pdf');
+    const nomeArquivoPDF = nomeBasePDF + '.pdf';
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        const arquivo = await window.showSaveFilePicker({
+          suggestedName: nomeArquivoPDF,
+          types: [{ description: 'Documento PDF', accept: { 'application/pdf': ['.pdf'] } }]
+        });
+        const gravacao = await arquivo.createWritable();
+        await gravacao.write(doc.output('blob'));
+        await gravacao.close();
+        Utils.toast('PDF salvo em ' + arquivo.name + '.');
+        return;
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+      }
+    }
+    doc.save(nomeArquivoPDF);
   }
 };
 
