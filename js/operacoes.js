@@ -9,7 +9,7 @@ const Operacoes = {
       ['diarias', '/rest/v1/equipe_diarias?select=*,equipe(nome),orcamentos(numero,referencia,cliente_nome)&order=data.desc,created_at.desc'],
       ['fornecedores', '/rest/v1/fornecedores?select=*&order=ativo.desc,nome.asc'],
       ['eventos', '/rest/v1/fornecedor_eventos?select=*,fornecedores(nome,tipo),orcamentos(numero,referencia,cliente_nome)&order=data.desc,created_at.desc'],
-      ['orcamentos', '/rest/v1/orcamentos?select=id,numero,referencia,cliente_nome,total,status&order=created_at.desc&limit=100']
+      ['orcamentos', '/rest/v1/orcamentos?select=id,numero,referencia,cliente_nome,total,status,data_evento&order=created_at.desc&limit=100']
     ];
     try {
       const results = await Promise.all(requests.map(async ([key, path]) => [key, await Api.request(Api.orgFilter(path)) || []]));

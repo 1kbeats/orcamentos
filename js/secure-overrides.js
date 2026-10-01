@@ -224,7 +224,7 @@
           (CONFIG.isAdmin ? '<label class="quote-check"><input type="checkbox" value="' + Utils.safeId(quote.id) + '" aria-label="Selecionar orçamento"><span></span></label>' : '') +
           '<span class="quote-number">' + Utils.escapeHTML(Utils.fmtNumero(quote.numero)) + '</span>' +
           '<div class="quote-client"><strong>' + Utils.escapeHTML(quote.cliente_nome || '—') + '</strong>' + (quote.referencia ? '<small>' + Utils.escapeHTML(quote.referencia) + '</small>' : '') + '</div>' +
-          '<span class="quote-date" title="Última alteração">' + Utils.escapeHTML(Utils.fmtDate(quote.updated_at || quote.created_at)) + '</span>' +
+          '<span class="quote-date" title="Data do evento">' + Utils.escapeHTML(Utils.fmtDate(quote.data_evento) || 'A definir') + '</span>' +
           '<span class="quote-total">' + Utils.escapeHTML(Utils.fmt(quote.total)) + '</span>' +
           statusControl +
           '<div class="quote-actions">' +
@@ -340,6 +340,7 @@
       Número: quote.numero,
       Cliente: quote.cliente_nome,
       Referência: quote.referencia,
+      'Data do evento': Utils.fmtDate(quote.data_evento),
       Total: Number(quote.total || 0).toFixed(2),
       Status: quote.status,
       Data: Utils.fmtDate(quote.created_at)

@@ -65,8 +65,8 @@
             (quote.solicitante ? '<br><small>Solicitante: ' + Utils.escapeHTML(quote.solicitante) + '</small>' : '') +
           '</div></div>' +
           '<div><div class="cf-label">CNPJ / CPF</div><div class="cf-val">' + Utils.escapeHTML(quote.cnpj_cli || '—') + '</div></div>' +
-          '<div class="issuer"><div class="cf-label">Emitido por</div><div class="cf-val">' +
-            Utils.escapeHTML(quote.empresa || '—') + '</div></div>' +
+          '<div class="issuer"><div class="cf-label">Data do evento</div><div class="cf-val">' +
+            Utils.escapeHTML(Utils.fmtDate(quote.data_evento) || 'A definir') + '</div></div>' +
         '</div>' +
 
         '<div class="sec-label">Itens do orçamento</div>' +

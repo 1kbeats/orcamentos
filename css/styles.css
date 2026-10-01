@@ -202,7 +202,7 @@ a:hover { color: var(--accent-hover); }
 }
 
 /* ── CLIENT ROW ── */
-.client-row { display: grid; grid-template-columns: 2.5fr 1fr 130px; gap: 1.5rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
+.client-row { display: grid; grid-template-columns: minmax(260px,2.2fr) minmax(160px,1fr) 140px 150px; gap: 1.25rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
 .cf { display: flex; flex-direction: column; gap: 6px; }
 .cf label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); font-family: var(--mono); }
 .cf input {

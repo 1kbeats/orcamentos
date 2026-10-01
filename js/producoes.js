@@ -7,7 +7,7 @@ const Producoes = {
     try {
       const requests = [
         ['producoes', '/rest/v1/producoes?select=*,orcamentos(id,numero,referencia,cliente_nome,total,status)&order=data_evento.asc.nullslast,created_at.desc'],
-        ['orcamentos', '/rest/v1/orcamentos?select=id,numero,referencia,cliente_nome,total,status&order=created_at.desc&limit=100'],
+        ['orcamentos', '/rest/v1/orcamentos?select=id,numero,referencia,cliente_nome,total,status,data_evento&order=created_at.desc&limit=100'],
         ['gastos', '/rest/v1/gastos?select=*&order=data.desc'],
         ['diarias', '/rest/v1/equipe_diarias?select=*,equipe(nome)&order=data.desc'],
         ['fornecedoresEvento', '/rest/v1/fornecedor_eventos?select=*,fornecedores(nome,tipo)&order=data.desc'],
@@ -125,6 +125,7 @@ const Producoes = {
     const modal = document.getElementById('opsModal');
     const quoteSelect = modal?.querySelector('[name="orcamento_id"]');
     const nameInput = modal?.querySelector('[name="nome"]');
+    const dateInput = modal?.querySelector('[name="data_evento"]');
     if (!quoteSelect || !nameInput) return;
 
     nameInput.placeholder = 'Ex.: Inauguração da Praça XV';
@@ -137,6 +138,7 @@ const Producoes = {
       if (!nameInput.value.trim() || nameInput.value === lastSuggestedName) {
         nameInput.value = suggestedName;
       }
+      if (dateInput && quote?.data_evento && !dateInput.value) dateInput.value = quote.data_evento;
       lastSuggestedName = suggestedName;
     };
     quoteSelect.addEventListener('change', preencherNomeDoEvento);

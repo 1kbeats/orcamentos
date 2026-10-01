@@ -329,6 +329,7 @@ const Orcamentos = {
       cnpjCli:    document.getElementById('cnpjCliente').value.trim(),
       ref:        document.getElementById('refEvento').value.trim(),
       val:        document.getElementById('validade').value,
+      dataEvento: document.getElementById('dataEventoOrcamento').value,
       obs:        document.getElementById('obs').value.trim(),
       solicitante: (document.getElementById('solicitante') || {}).value || '',
       itens, sub, discVal, tipo, discReais, total
@@ -342,6 +343,7 @@ const Orcamentos = {
       cnpj_cli: d.cnpjCli || null,
       referencia: d.ref || null,
       valido_ate: d.val || null,
+      data_evento: d.dataEvento || null,
       desconto_tipo: d.tipo,
       desconto_valor: d.discVal || 0,
       itens: d.itens,
@@ -365,6 +367,11 @@ const Orcamentos = {
     if (!d.itens.length) {
       Utils.toast('Adicione pelo menos um item ao orçamento.');
       document.querySelector('#itemsContainer .item-row input')?.focus();
+      return false;
+    }
+    if (!d.dataEvento) {
+      Utils.toast('Informe a data do evento antes de salvar.');
+      document.getElementById('dataEventoOrcamento')?.focus();
       return false;
     }
     return true;
@@ -399,7 +406,7 @@ const Orcamentos = {
   },
 
   _formTemConteudo() {
-    const ids = ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs'];
+    const ids = ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs', 'dataEventoOrcamento'];
     if (ids.some(id => document.getElementById(id)?.value.trim())) return true;
     if ((parseFloat(document.getElementById('desconto')?.value) || 0) !== 0) return true;
     return Array.from(document.querySelectorAll('#itemsContainer .item-row')).some(row => {
@@ -529,7 +536,7 @@ const Orcamentos = {
     this._clienteSelecionado = null;
     this._alteracoesPendentes = false;
     this._cnt = 0;
-    ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs'].forEach(id => {
+    ['nomeCliente', 'cnpjCliente', 'solicitante', 'refEvento', 'obs', 'dataEventoOrcamento'].forEach(id => {
       const element = document.getElementById(id);
       if (element) element.value = '';
     });
@@ -563,6 +570,7 @@ const Orcamentos = {
       solicitante: orcamento.solicitante || '',
       refEvento: orcamento.referencia || '',
       validade: orcamento.valido_ate || '',
+      dataEventoOrcamento: orcamento.data_evento || '',
       obs: orcamento.observacoes || '',
       desconto: Number(orcamento.desconto_valor) || ''
     };
@@ -681,6 +689,7 @@ const Orcamentos = {
       if (d.ref) msg += 'Ref.: *' + d.ref + '*' + nl;
       if (d.cliente) msg += 'Empresa: *' + d.cliente + '*' + nl;
       if (d.solicitante) msg += 'Solicitante: *' + d.solicitante + '*' + nl;
+      if (d.dataEvento) msg += 'Data do evento: *' + Utils.fmtDate(d.dataEvento) + '*' + nl;
       msg += 'Válido até: ' + Utils.fmtDate(d.val) + nl;
       msg += nl + '*Itens:*' + nl;
       d.itens.forEach(it => { msg += '- ' + it.desc + ' · Qtd: ' + it.qty + ' · Total: ' + Utils.fmt(it.tot) + nl; });
@@ -727,6 +736,7 @@ const Orcamentos = {
     const nome    = cfg.nome || '1K Beats';
     const hoje    = new Date().toLocaleDateString('pt-BR');
     const valStr  = d.val ? Utils.fmtDate(d.val) : '—';
+    const eventDateStr = d.dataEvento ? Utils.fmtDate(d.dataEvento) : '—';
 
     const doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pw = 210, ph = 297, ml = 15, mr = 15, cw = 180;
@@ -785,17 +795,15 @@ const Orcamentos = {
     let y = d.ref ? 78 : 68;
     // Dados do cliente
     doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(150, 150, 150);
-    doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('EMITIDO POR', pw - mr, y, { align: 'right' });
+    doc.text('CLIENTE', ml, y); doc.text('CNPJ / CPF', ml + cw * 0.42, y); doc.text('DATA DO EVENTO', pw - mr, y, { align: 'right' });
     y += 5;
     doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(42, 42, 53);
     const clientLines = doc.splitTextToSize(d.cliente || '—', 67).slice(0, 2);
     doc.text(clientLines, ml, y, { lineHeightFactor: 1.15 });
     doc.setFontSize(10); doc.setFont('helvetica', 'normal');
     doc.text(d.cnpjCli || '—', ml + cw * 0.42, y);
-    doc.setFontSize(8); doc.setFont('helvetica', 'bold');
-    const issuerLines = doc.splitTextToSize(nome, 62).slice(0, 2);
-    doc.text(issuerLines, pw - mr, y, { align: 'right', lineHeightFactor: 1.15 });
-    if (cfg.cnpj) { doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text(cfg.cnpj, pw - mr, y + (issuerLines.length * 4.2), { align: 'right' }); }
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+    doc.text(eventDateStr, pw - mr, y, { align: 'right' });
     if (d.solicitante) { doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(130, 130, 130); doc.text('Solicitante: ' + d.solicitante, ml, y + (clientLines.length * 4.5)); }
 
     y += 14; doc.setDrawColor(210, 210, 210); doc.setLineWidth(0.3); doc.line(ml, y, pw - mr, y); y += 8;
