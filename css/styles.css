@@ -202,13 +202,13 @@ a:hover { color: var(--accent-hover); }
 }
 
 /* ── CLIENT ROW ── */
-.client-row { display: grid; grid-template-columns: minmax(260px,2.2fr) minmax(160px,1fr) 140px 150px; gap: 1.25rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
-.cf { display: flex; flex-direction: column; gap: 6px; }
+.client-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1.35fr) minmax(0,1fr) minmax(0,1.1fr); gap: 1rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border-dim); margin-bottom: 1.75rem; }
+.cf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cf label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); font-family: var(--mono); }
 .cf input {
   background: none; border: none; border-bottom: 1.5px solid var(--border-dim);
   border-radius: 0; padding: 6px 0; font-size: 14px; font-weight: 500;
-  color: var(--ink); outline: none; width: 100%; transition: border-color .15s;
+  color: var(--ink); outline: none; width: 100%; min-width: 0; box-sizing: border-box; transition: border-color .15s;
 }
 .cf input::placeholder { color: #C0C0D0; font-weight: 400; }
 .cf input:focus { border-color: var(--accent); }
