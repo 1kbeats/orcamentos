@@ -856,7 +856,12 @@ const Orcamentos = {
     doc.text(f1, ml, ph - 12);
     if (f2) doc.text(f2, pw - mr, ph - 12, { align: 'right' });
 
-    doc.save((nome || 'Orcamento').replace(/[^a-zA-Z0-9_-]+/g, '-') + '-Orcamento.pdf');
+    const nomeBasePDF = String(d.ref || (_numStr ? 'Orçamento ' + _numStr : 'Orçamento'))
+      .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-')
+      .replace(/[.\s]+$/g, '')
+      .trim()
+      .slice(0, 150) || 'Orçamento';
+    doc.save(nomeBasePDF + '.pdf');
   }
 };
 
