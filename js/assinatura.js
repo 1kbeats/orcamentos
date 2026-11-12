@@ -2,6 +2,14 @@ const Assinatura = {
   dados: [],
   cobrancaAtual: null,
   pixConfig: null,
+  usuariosCliente: [],
+
+  async callAdmin(action, payload = {}) {
+    return Api.request('/functions/v1/admin-user', {
+      method: 'POST',
+      body: JSON.stringify({ action, organization_id: CONFIG.organizationId, ...payload })
+    });
+  },
 
   async carregar(silencioso = false) {
     try {
@@ -10,6 +18,8 @@ const Assinatura = {
       if (CONFIG.role === 'owner') {
         const configPath = Api.orgFilter('/rest/v1/config_cobranca_sistema?select=*&limit=1');
         this.pixConfig = (await Api.request(configPath) || [])[0] || null;
+        const userData = await this.callAdmin('list');
+        this.usuariosCliente = (userData.users || []).filter(user => user.role !== 'owner');
       }
       this.renderAlerta();
       if (!silencioso && CONFIG.role === 'owner') this.render();
@@ -53,14 +63,40 @@ const Assinatura = {
       const s = this.situacao(item);
       return '<tr><td><strong>'+Utils.escapeHTML(item.competencia)+'</strong><small>'+Utils.escapeHTML(item.tipo === 'implantacao' ? 'Implantação' : 'Mensalidade')+(item.mensagem_envio?'<span class="billing-draft-ready">✓ Cobrança preparada</span>':'')+'</small></td><td>'+Utils.fmtDate(item.vencimento)+'</td><td>'+Utils.fmt(item.valor)+'</td><td><span class="billing-status '+s.classe+'">'+s.texto+'</span>'+(item.aviso_visivel&&item.status!=='pago'?'<small class="billing-notice-on">● Aviso visível para Walter</small>':'')+'</td><td class="billing-actions">'+(item.status === 'pago' ? '<button data-receipt="'+item.id+'">Recibo</button>' : '<button class="billing-charge-primary" data-charge="'+item.id+'">Cobrar cliente</button><button class="primary" data-pay="'+item.id+'">Marcar como pago</button><details class="billing-more"><summary aria-label="Mais ações">•••</summary><button data-notice="'+item.id+'">'+(item.aviso_visivel?'Ocultar aviso do Walter':'Exibir aviso para Walter')+'</button></details>')+'</td></tr>';
     }).join('');
-    root.innerHTML = '<div class="billing-page"><div class="billing-head"><div><div class="ops-kicker">PRYNTIX • LICENCIAMENTO</div><h1>Assinatura</h1><p>Controle simples da implantação e das mensalidades da plataforma.</p></div><div class="billing-head-actions"><button class="ops-btn secondary" id="btnConfigPix">Configurar PIX</button><button class="ops-btn" id="btnNovaCobranca">+ Nova cobrança</button></div></div><div class="billing-summary"><article><span>Mensalidade</span><strong>R$ 300,00</strong></article><article><span>Próximo vencimento</span><strong>'+(proxima?Utils.fmtDate(proxima.vencimento):'Tudo em dia')+'</strong></article><article><span>Pagamentos registrados</span><strong>'+pagos+' de '+this.dados.length+'</strong></article></div><section class="billing-card"><div class="billing-card-title">Histórico de cobranças</div><div class="billing-table-wrap"><table class="billing-table"><thead><tr><th>Referência</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="billing-empty">Nenhuma cobrança cadastrada.</td></tr>')+'</tbody></table></div></section></div>' + this.modalHTML();
+    const accessRows = this.usuariosCliente.map(user => {
+      const active = user.access_status === 'active';
+      const name = user.name || user.email?.split('@')[0] || 'Usuário';
+      return '<div class="billing-access-row"><div><strong>'+Utils.escapeHTML(name)+'</strong><span>'+Utils.escapeHTML(user.email || '')+'</span></div><span class="billing-status '+(active?'paid':'overdue')+'">'+(active?'Acesso liberado':'Acesso bloqueado')+'</span><button type="button" class="billing-access-button '+(active?'danger':'release')+'" data-access-user="'+Utils.escapeHTML(user.id)+'" data-access-status="'+Utils.escapeHTML(user.access_status)+'">'+(active?'Bloquear acesso':'Liberar acesso')+'</button></div>';
+    }).join('');
+    const accessCard = '<section class="billing-access-card"><div><h2>Controle de acesso do cliente</h2><p>Use somente em caso de inadimplência. O bloqueio é reversível e não apaga nenhum dado.</p></div><div class="billing-access-list">'+(accessRows||'<span class="billing-access-empty">Nenhum usuário cliente cadastrado.</span>')+'</div></section>';
+    root.innerHTML = '<div class="billing-page"><div class="billing-head"><div><div class="ops-kicker">PRYNTIX • LICENCIAMENTO</div><h1>Assinatura</h1><p>Controle simples da implantação e das mensalidades da plataforma.</p></div><div class="billing-head-actions"><button class="ops-btn secondary" id="btnConfigPix">Configurar PIX</button><button class="ops-btn" id="btnNovaCobranca">+ Nova cobrança</button></div></div><div class="billing-summary"><article><span>Mensalidade</span><strong>R$ 300,00</strong></article><article><span>Próximo vencimento</span><strong>'+(proxima?Utils.fmtDate(proxima.vencimento):'Tudo em dia')+'</strong></article><article><span>Pagamentos registrados</span><strong>'+pagos+' de '+this.dados.length+'</strong></article></div>'+accessCard+'<section class="billing-card"><div class="billing-card-title">Histórico de cobranças</div><div class="billing-table-wrap"><table class="billing-table"><thead><tr><th>Referência</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th>Ações</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="billing-empty">Nenhuma cobrança cadastrada.</td></tr>')+'</tbody></table></div></section></div>' + this.modalHTML();
     root.querySelector('#btnNovaCobranca')?.addEventListener('click',()=>this.abrirNova());
     root.querySelector('#btnConfigPix')?.addEventListener('click',()=>this.abrirConfigPix());
     root.querySelectorAll('[data-charge]').forEach(b=>b.addEventListener('click',()=>this.abrirWhats(b.dataset.charge)));
     root.querySelectorAll('[data-pay]').forEach(b=>b.addEventListener('click',()=>this.marcarPago(b.dataset.pay)));
     root.querySelectorAll('[data-notice]').forEach(b=>b.addEventListener('click',()=>this.alternarAviso(b.dataset.notice)));
     root.querySelectorAll('[data-receipt]').forEach(b=>b.addEventListener('click',()=>this.gerarRecibo(b.dataset.receipt)));
+    root.querySelectorAll('[data-access-user]').forEach(b=>b.addEventListener('click',()=>this.alternarAcessoCliente(b.dataset.accessUser)));
     this.bindModal(root);
+  },
+
+  async alternarAcessoCliente(userId) {
+    const user = this.usuariosCliente.find(item => item.id === userId);
+    if (!user) return;
+    const bloquear = user.access_status === 'active';
+    const nome = user.name || user.email?.split('@')[0] || 'este usuário';
+    const pergunta = bloquear
+      ? 'Bloquear o acesso de '+nome+'? Ele não poderá entrar até que você libere novamente. Nenhum dado será apagado.'
+      : 'Liberar novamente o acesso de '+nome+'?';
+    if (!confirm(pergunta)) return;
+    try {
+      await this.callAdmin('set_access_status', { user_id: user.id, access_status: bloquear ? 'suspended' : 'active' });
+      user.access_status = bloquear ? 'suspended' : 'active';
+      this.render();
+      Utils.toast(bloquear ? 'Acesso bloqueado com segurança.' : 'Acesso liberado novamente.');
+    } catch (error) {
+      Utils.toast(Api.friendlyError(error, 'Não foi possível alterar o acesso.'), 'erro');
+    }
   },
 
   modalHTML() {

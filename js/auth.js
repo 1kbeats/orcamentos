@@ -29,6 +29,25 @@ const Auth = {
     }
   },
 
+  monitorarAcesso() {
+    if (CONFIG.role === 'owner' || this._accessMonitorStarted) return;
+    this._accessMonitorStarted = true;
+    const verificar = async () => {
+      try {
+        const membership = await this.buscarMembro(this.user?.id);
+        if (membership && membership.access_status !== 'active') {
+          CONFIG.clearSession();
+          sessionStorage.setItem('1kbeats_login_message', 'Acesso temporariamente indisponível. Entre em contato com o administrador responsável para verificar a liberação da plataforma.');
+          this.redirectToLogin();
+        }
+      } catch (_) {
+        // Falhas temporárias de conexão não devem encerrar uma sessão válida.
+      }
+    };
+    window.setInterval(verificar, 60000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) verificar(); });
+  },
+
   async renovarSessao(session) {
     if (!session?.refresh_token) return null;
     try {

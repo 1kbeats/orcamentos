@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!authenticated) return;
 
   document.body.classList.add('app-ready');
+  Auth.monitorarAcesso();
   Nav.bindEvents?.();
   Orcamentos.init();
   ListaOrcamentos.bindEvents();
